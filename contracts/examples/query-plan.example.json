@@ -1,0 +1,76 @@
+{
+  "$comment": "A2 query plan for 'top traffic sources'. Real trace from Phase 1. Validates against ../agents/a2-query-plan.schema.json.",
+
+  "schema_version": "0.1.0",
+
+  "propagated_a1_flags": {
+    "is_followup": false,
+    "out_of_scope": false,
+    "interpretation_request": false
+  },
+
+  "query_plans": [
+    {
+      "sub_question_id": "sq_1",
+      "queries": [
+        {
+          "query_id": "q_1_main",
+          "source": "ga4",
+          "purpose": "primary",
+          "metrics": {
+            "status": "ambiguous",
+            "user_term": "traffic",
+            "candidates": ["sessions", "activeUsers", "totalUsers", "screenPageViews"]
+          },
+          "dimensions": {
+            "status": "ambiguous",
+            "user_term": "sources",
+            "candidates": ["sessionSource", "sessionMedium", "sessionSourceMedium", "defaultChannelGroup"]
+          },
+          "filters": [],
+          "date_range": {
+            "status": "missing",
+            "candidates": ["last_28_days"]
+          },
+          "order_by": [],
+          "limit": null,
+          "grouping": "by_dimension",
+          "partial_period": true
+        }
+      ]
+    }
+  ],
+
+  "mapping_trace": [],
+
+  "ambiguity_report": {
+    "mapping_choices": [
+      {
+        "user_term": "traffic",
+        "type": "metric",
+        "candidates": [
+          { "value": "sessions",        "label": "Sessions" },
+          { "value": "activeUsers",     "label": "Active users" },
+          { "value": "totalUsers",      "label": "Total users" },
+          { "value": "screenPageViews", "label": "Pageviews" }
+        ]
+      },
+      {
+        "user_term": "sources",
+        "type": "dimension",
+        "candidates": [
+          { "value": "sessionSource",        "label": "Source" },
+          { "value": "sessionMedium",        "label": "Medium" },
+          { "value": "sessionSourceMedium",  "label": "Source / Medium" },
+          { "value": "defaultChannelGroup",  "label": "Channel Group" }
+        ]
+      }
+    ],
+    "range_choices": [],
+    "default_candidates": [
+      { "field": "date_range",    "candidates": ["last_28_days"] },
+      { "field": "ranking_limit", "candidates": [10, 5, 20] }
+    ],
+    "feasibility_failures": []
+  }
+}

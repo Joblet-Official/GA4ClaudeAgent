@@ -1,0 +1,190 @@
+{
+  "schema_version": "0.1.0",
+  "patterns": {
+    "ranking": {
+      "report_type": "ranking",
+      "blocks": [
+        {
+          "block_type": "kpi_strip",
+          "required": true,
+          "mandatory_annotations": [],
+          "purpose": "summary KPIs (totals, top-N share, sentinel share, shown count)"
+        },
+        {
+          "block_type": "ranked_table",
+          "required": true,
+          "mandatory_annotations": [
+            "shown_count",
+            "total_available",
+            "totals",
+            "sentinel_count",
+            "period_partial"
+          ],
+          "purpose": "detail table with bar-chart pairing"
+        }
+      ],
+      "events_of_interest_displays": [],
+      "other_rollup_policy": "if_a4_fetched_tail"
+    },
+    "trend": {
+      "report_type": "trend",
+      "blocks": [
+        {
+          "block_type": "kpi_card",
+          "required": true,
+          "mandatory_annotations": [],
+          "purpose": "headline KPI with sparkline + delta"
+        },
+        {
+          "block_type": "time_series",
+          "required": true,
+          "mandatory_annotations": [
+            "period_mean",
+            "period_min",
+            "period_max"
+          ],
+          "purpose": "daily line chart with min/max markers"
+        }
+      ],
+      "events_of_interest_displays": [],
+      "other_rollup_policy": "never"
+    },
+    "breakdown": {
+      "report_type": "breakdown",
+      "blocks": [
+        {
+          "block_type": "kpi_strip",
+          "required": true,
+          "mandatory_annotations": [],
+          "purpose": "total + share KPIs"
+        },
+        {
+          "block_type": "breakdown",
+          "required": true,
+          "mandatory_annotations": [
+            "shown_count",
+            "total_available"
+          ],
+          "purpose": "dimension breakdown with optional Other rollup"
+        }
+      ],
+      "events_of_interest_displays": [],
+      "other_rollup_policy": "if_a4_fetched_tail"
+    },
+    "comparison": {
+      "report_type": "comparison",
+      "blocks": [
+        {
+          "block_type": "comparison_pair",
+          "required": true,
+          "mandatory_annotations": [],
+          "purpose": "operand A vs operand B with delta"
+        },
+        {
+          "block_type": "ranked_table",
+          "required": false,
+          "mandatory_annotations": [
+            "shown_count",
+            "total_available"
+          ],
+          "purpose": "supporting per-slice detail"
+        }
+      ],
+      "events_of_interest_displays": [],
+      "other_rollup_policy": "never"
+    },
+    "funnel": {
+      "report_type": "funnel",
+      "blocks": [
+        {
+          "block_type": "funnel",
+          "required": true,
+          "mandatory_annotations": [
+            "overall_conversion",
+            "biggest_drop_step"
+          ],
+          "purpose": "funnel diagram with step rates"
+        },
+        {
+          "block_type": "kpi_strip",
+          "required": false,
+          "mandatory_annotations": [],
+          "purpose": "step rate KPIs as a supporting strip"
+        }
+      ],
+      "events_of_interest_displays": [
+        {
+          "block_type": "ranked_table",
+          "event_name": "view_search_results",
+          "when": "investigation_branch == 'path_exploration'"
+        }
+      ],
+      "other_rollup_policy": "never"
+    },
+    "snapshot": {
+      "report_type": "snapshot",
+      "blocks": [
+        {
+          "block_type": "kpi_strip",
+          "required": true,
+          "mandatory_annotations": [],
+          "purpose": "snapshot KPIs"
+        }
+      ],
+      "events_of_interest_displays": [],
+      "other_rollup_policy": "never"
+    },
+    "geo_distribution": {
+      "report_type": "geo_distribution",
+      "blocks": [
+        {
+          "block_type": "geo_distribution",
+          "required": true,
+          "mandatory_annotations": [
+            "shown_countries",
+            "total_countries"
+          ],
+          "purpose": "country-level distribution"
+        }
+      ],
+      "events_of_interest_displays": [],
+      "other_rollup_policy": "if_a4_fetched_tail"
+    }
+  },
+  "description_templates": {
+    "kpi_strip": "{kpi_count} summary figures: {kpi_summary}.{delta_clause}",
+    "kpi_card": "{label} is {value}.{delta_clause}",
+    "ranked_table": "Top {shown_count} of {total_available} {dimension} by {metric}; {top_label} leads with {top_value} ({top_share}).{delta_clause}",
+    "time_series": "{metric} across {point_count} {granularity}; period mean {period_mean}, ranging {period_min} to {period_max}.{delta_clause}",
+    "comparison_pair": "{left_label} {left_value} versus {right_label} {right_value}.{delta_clause}",
+    "breakdown": "{metric} by {dimension} across {shown_count} of {total_available} groups; {top_label} accounts for {top_share}.{delta_clause}",
+    "pivot_table": "{metric} by {row_dimension} and {col_dimension}; grand total {grand_total}.{delta_clause}",
+    "funnel": "{step_count}-step funnel; overall conversion {overall_conversion}, with the largest step-to-step drop at {biggest_drop_step}.{delta_clause}",
+    "geo_distribution": "{metric} across {shown_countries} of {total_countries} countries; {top_label} leads with {top_value}.{delta_clause}"
+  },
+  "delta_clauses": {
+    "higher": " {metric} is {delta_abs} higher than {vs_period} ({delta_pct}).",
+    "lower": " {metric} is {delta_abs} lower than {vs_period} ({delta_pct}).",
+    "unchanged": " {metric} is unchanged from {vs_period}."
+  },
+  "narrative_stages": [
+    { "id": "overview",    "label": "Overview",    "order": 1, "intro": "This section sets the baseline figures for the period before the detail is grouped by funnel stage.", "handoff": "Next, the report groups the detail by how traffic was acquired." },
+    { "id": "acquisition", "label": "Acquisition", "order": 2, "intro": "This section groups the acquisition-side views: which channels and sources the traffic came from.", "handoff": "Next, the report turns to engagement quality on the pages traffic landed on." },
+    { "id": "quality",     "label": "Quality",     "order": 3, "intro": "This section groups engagement-quality views: how engaged the sessions were, by landing page and device.", "handoff": "Next, the report turns to on-site behavior and the steps users took." },
+    { "id": "behavior",    "label": "Behavior",    "order": 4, "intro": "This section groups behavior views: the ordered funnel and the events on the pages in the journey.", "handoff": "Next, the report covers the outcome events at the end of the funnel." },
+    { "id": "outcomes",    "label": "Outcomes",    "order": 5, "intro": "This section groups the outcome views: the apply and conversion events at the end of the funnel.", "handoff": "This is the final stage of the funnel narrative; no further grouping follows." }
+  ],
+  "narrative_stage_map": [
+    { "stage_kind": ["temporal_daily", "temporal_weekly", "time_series"], "stage": "overview" },
+    { "stage_kind": "funnel", "stage": "behavior" },
+    { "event": ["view_search_results", "scroll", "page_view", "first_visit", "session_start"], "stage": "behavior" },
+    { "event": ["job_apply", "purchase", "generate_lead", "sign_up", "conversion"], "stage": "outcomes" },
+    { "metric": ["conversions", "totalRevenue", "purchaseRevenue", "eventCount", "eventValue", "ecommercePurchases"], "stage": "outcomes" },
+    { "metric": ["engagementRate", "engagedSessions", "userEngagementDuration", "averageSessionDuration", "bounceRate", "screenPageViewsPerSession"], "stage": "quality" },
+    { "dimension": ["landingPage", "landingPagePlusQueryString", "pagePath", "pageTitle"], "stage": "acquisition" },
+    { "dimension": ["sessionDefaultChannelGroup", "sessionSource", "sessionMedium", "sessionSourceMedium", "sessionCampaignName", "firstUserDefaultChannelGroup", "firstUserSource", "firstUserMedium"], "stage": "acquisition" },
+    { "dimension": ["deviceCategory", "country", "city", "browser", "operatingSystem"], "stage": "acquisition" },
+    { "stage_kind": ["kpi_strip", "kpi_card", "comparison_pair"], "stage": "overview" }
+  ],
+  "narrative_default_stage": "overview"
+}

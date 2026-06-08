@@ -1,0 +1,108 @@
+{
+  "$comment": "Viz registry instance — block_type → component map + colour-purpose policy. Mirrors what Phase 1 traces actually rendered. Validates against ../registries/viz-registry.schema.json.",
+
+  "schema_version": "0.1.0",
+
+  "block_to_component": {
+
+    "kpi_strip":       { "primary_component": "kpi_strip" },
+    "kpi_card":        { "primary_component": "kpi_card" },
+
+    "ranked_table": {
+      "primary_component": "bar_chart_table_pair",
+      "alternate_components": ["diverging_bar"],
+      "always_pair_table_with_chart": true
+    },
+
+    "time_series": {
+      "primary_component": "line_chart",
+      "always_pair_table_with_chart": true
+    },
+
+    "comparison_pair": {
+      "primary_component": "grouped_bar_chart",
+      "always_pair_table_with_chart": true
+    },
+
+    "breakdown": {
+      "primary_component": "donut_table_pair",
+      "alternate_components": ["bar_chart_table_pair"],
+      "always_pair_table_with_chart": true
+    },
+
+    "pivot_table": {
+      "primary_component": "heatmap",
+      "always_pair_table_with_chart": true
+    },
+
+    "funnel": {
+      "primary_component": "funnel_diagram",
+      "always_pair_table_with_chart": false
+    },
+
+    "geo_distribution": {
+      "primary_component": "choropleth",
+      "alternate_components": ["bar_chart_table_pair"],
+      "always_pair_table_with_chart": true
+    }
+  },
+
+  "colour_policy": {
+    "identity_palette": [
+      "#2E5C8A",
+      "#1f3f63",
+      "#94a3b8",
+      "#6b7280",
+      "#1f2937",
+      "#3730a3"
+    ],
+    "colour_purposes": {
+      "sentinel":         "#94a3b8",
+      "partial_period":   "#fff3e0",
+      "z_score_encoding": "monochrome_intensity_blue",
+      "default_text":     "#1f2937",
+      "muted_text":       "#6b7280"
+    },
+    "forbidden_uses": [
+      "red_green_evaluative_gradient",
+      "good_bad_indicator",
+      "performance_traffic_light",
+      "interpretive_highlight_box"
+    ]
+  },
+
+  "layouts": {
+    "ranking": {
+      "sections_order": ["title", "context_chips", "disclosure_chips", "kpi_strip", "main_blocks", "quality_notes", "footer_meta"],
+      "supports_step_narration": false
+    },
+    "trend": {
+      "sections_order": ["title", "context_chips", "disclosure_chips", "kpi_strip", "main_blocks", "quality_notes", "footer_meta"],
+      "supports_step_narration": false
+    },
+    "snapshot": {
+      "sections_order": ["title", "context_chips", "disclosure_chips", "kpi_strip", "quality_notes", "footer_meta"],
+      "supports_step_narration": false
+    },
+    "breakdown": {
+      "sections_order": ["title", "context_chips", "disclosure_chips", "kpi_strip", "main_blocks", "quality_notes", "footer_meta"],
+      "supports_step_narration": false
+    },
+    "comparison": {
+      "sections_order": ["title", "context_chips", "disclosure_chips", "kpi_strip", "main_blocks", "quality_notes", "footer_meta"],
+      "supports_step_narration": false
+    },
+    "funnel": {
+      "sections_order": ["title", "context_chips", "disclosure_chips", "main_blocks", "quality_notes", "footer_meta"],
+      "supports_step_narration": false
+    },
+    "geo_distribution": {
+      "sections_order": ["title", "context_chips", "disclosure_chips", "kpi_strip", "main_blocks", "quality_notes", "footer_meta"],
+      "supports_step_narration": false
+    },
+    "composite": {
+      "sections_order": ["title", "context_chips", "disclosure_chips", "kpi_strip", "main_blocks", "secondary_blocks", "quality_notes", "footer_meta"],
+      "supports_step_narration": true
+    }
+  }
+}

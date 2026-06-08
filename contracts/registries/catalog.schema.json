@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/registries/catalog.schema.json",
+  "title": "Catalog — GA4/GSC field definitions with annotated term definitions",
+  "description": "Per-source catalog of valid metrics, dimensions, filter operators, compatibility rules, and aliases. Crucially, every field carries a short_definition that A3 uses as clarification hint text (Phase-1 finding: A3 hint text must come from the catalog, not from the model paraphrasing GA4 semantics).",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": ["schema_version", "sources"],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "schema_version": { "const": "0.1.0" },
+
+    "sources": {
+      "type": "object",
+      "description": "Map of source identifier (ga4, gsc) to its CatalogSource.",
+      "propertyNames": { "$ref": "../_shared.schema.json#/$defs/Source" },
+      "additionalProperties": { "$ref": "#/$defs/CatalogSource" }
+    }
+  },
+
+  "$defs": {
+
+    "CatalogSource": {
+      "type": "object",
+      "required": ["source", "metrics", "dimensions"],
+      "additionalProperties": false,
+      "properties": {
+        "source":         { "$ref": "../_shared.schema.json#/$defs/Source" },
+        "property_scope": { "type": "string", "description": "Optional. When set, this catalog applies only to the named property/site." },
+        "metrics":            { "type": "array", "items": { "$ref": "#/$defs/FieldDef" } },
+        "dimensions":         { "type": "array", "items": { "$ref": "#/$defs/FieldDef" } },
+        "filter_operators":   { "type": "array", "items": { "$ref": "#/$defs/FilterOperator" } },
+        "compatibility_rules":{ "type": "array", "items": { "$ref": "#/$defs/CompatibilityRule" } },
+        "term_aliases":       { "type": "array", "items": { "$ref": "#/$defs/TermAlias" } }
+      }
+    },
+
+    "FieldDef": {
+      "type": "object",
+      "required": ["name", "kind", "display_name", "short_definition"],
+      "additionalProperties": false,
+      "properties": {
+        "name":             { "type": "string", "description": "Catalog field name, e.g. 'engagementRate'. Case-sensitive; matches the source's API." },
+        "kind":             { "type": "string", "enum": ["metric", "dimension"] },
+        "data_type":        { "type": "string", "enum": ["string", "integer", "float", "percent", "currency", "duration_seconds", "date", "boolean"] },
+        "display_name":     { "type": "string", "description": "Human-readable label. Used by A6 for column headers, axis labels, chip text." },
+        "short_definition": { "type": "string", "maxLength": 240, "description": "One-line factual definition. THIS IS WHAT A3 USES AS CLARIFICATION HINT TEXT. Must be factual; no editorial." },
+        "long_definition":  { "type": "string", "description": "Optional fuller explanation. For documentation; not surfaced to user automatically." },
+        "examples":         { "type": "array", "items": {}, "description": "Optional sample values illustrating typical content." },
+        "user_term_aliases":{
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Lowercased phrases users might type that should map to this field WHEN unambiguous. If multiple fields share an alias, the mapping is ambiguous and lands in A2's mapping_choices."
+        },
+        "gotchas":          {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Factual behavioural notes (e.g. 'totalUsers is scoped to the date range, despite the name')."
+        },
+        "rate_handling": {
+          "type": "string",
+          "enum": ["sum_to_period", "weighted_average", "ratio_of_sums", "not_aggregatable"],
+          "description": "How A5 must aggregate this field to a period. 'ratio_of_sums' is the rule for rates like engagementRate; A5 needs the underlying counts."
+        },
+        "rate_components":  {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "When rate_handling='ratio_of_sums', the underlying metric names needed (e.g. engagementRate.rate_components = ['engagedSessions','sessions'])."
+        },
+        "components": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 2,
+          "description": "For composite metrics (rates, ratios, averages): the metric IDs that compose it. Used by A2's L2 RCA playbook stage 2 (decompose_components). Absent or empty ⇒ metric is primitive and stage 2 is skipped."
+        }
+      }
+    },
+
+    "FilterOperator": {
+      "type": "object",
+      "required": ["name", "valid_for_kinds"],
+      "additionalProperties": false,
+      "properties": {
+        "name":             { "type": "string", "enum": ["eq", "ne", "contains", "starts_with", "ends_with", "in", "not_in", "gt", "gte", "lt", "lte", "regex"] },
+        "valid_for_kinds":  { "type": "array", "items": { "type": "string", "enum": ["metric", "dimension"] } },
+        "expression_format":{ "type": "string", "description": "Template for rendering the operator, e.g. \"{field} == {value}\"." }
+      }
+    },
+
+    "CompatibilityRule": {
+      "type": "object",
+      "required": ["when", "outcome"],
+      "additionalProperties": false,
+      "properties": {
+        "when":    { "type": "object", "description": "Condition expressed as { metric: X, dimension: Y } or { metrics: [...], dimensions: [...] }." },
+        "outcome": { "type": "string", "enum": ["incompatible", "warn", "compatible_with_caveat"] },
+        "reason":  { "type": "string" }
+      }
+    },
+
+    "TermAlias": {
+      "type": "object",
+      "required": ["user_term", "maps_to", "deterministic"],
+      "additionalProperties": false,
+      "description": "User-facing term → catalog field name. When deterministic=true, A2 maps directly (no mapping_choice emitted). When false, the alias is one of several candidates A2 surfaces.",
+      "properties": {
+        "user_term":     { "type": "string", "description": "Lowercased user phrase." },
+        "maps_to":       { "type": "string", "description": "Catalog field name. Must exist in metrics or dimensions." },
+        "deterministic": { "type": "boolean" },
+        "context":       { "type": "string", "description": "Optional context where this alias applies, e.g. 'when followed by per/by'." }
+      }
+    }
+  }
+}

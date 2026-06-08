@@ -1,0 +1,348 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/_shared.schema.json",
+  "title": "Shared types and enums",
+  "description": "Types referenced by multiple agent schemas. Centralised so the vocabulary stays consistent.",
+  "x-schema-version": "0.1.0",
+
+  "$defs": {
+
+    "ReportType": {
+      "type": "string",
+      "description": "The analytical shape of a request. A1 assigns; downstream agents use this to pick block patterns and components.",
+      "enum": [
+        "snapshot",
+        "trend",
+        "comparison",
+        "breakdown",
+        "ranking",
+        "funnel",
+        "geo_distribution",
+        "composite",
+        "unknown"
+      ]
+    },
+
+    "AnalysisLevel": {
+      "type": "string",
+      "enum": ["L1", "L2", "L3", "L4", "L5"],
+      "description": "Five-level complexity spectrum A1 classifies every question on. L1 = single fact (one metric, one window). L2 = ranking or period-over-period comparison. L3 = multi-surface descriptive ('how is X doing') — parallel basket across surfaces. L4 = single-metric diagnostic ('why did X change') — triggers A2's universal RCA playbook expansion. L5 = compound, open-ended, un-mapped, or single-event multi-pillar. No level implies the system will interpret causes; the level only changes the data-collection depth/shape at A2. Cross-field rule: L1-L3 imply interpretation_request=false; L4-L5 imply interpretation_request=true."
+    },
+
+    "AmbiguityFlag": {
+      "type": "string",
+      "description": "Closed enum of ambiguities A1 can flag. Extending requires schema version bump.",
+      "enum": [
+        "time_scope_missing",
+        "time_scope_conflict",
+        "time_scope_partial",
+        "metric_resolution_needed",
+        "dimension_resolution_needed",
+        "channel_mapping_needed",
+        "geo_resolution_needed",
+        "comparison_period_implicit",
+        "comparison_operands_unclear",
+        "ranking_limit_missing",
+        "ranking_direction_unclear",
+        "followup_unresolvable_without_prior_context",
+        "unparseable",
+        "followup_repeat_only"
+      ]
+    },
+
+    "Source": {
+      "type": "string",
+      "description": "Data source identifier. Tools registered per deployment.",
+      "enum": ["ga4", "gsc"]
+    },
+
+    "SentinelKind": {
+      "type": "string",
+      "description": "Classification of GA4/GSC sentinel values so A6 can render them distinctly.",
+      "enum": ["no_referrer", "missing", "bucketed_other", "anonymized", "internal"]
+    },
+
+    "Status": {
+      "type": "string",
+      "description": "Execution status used by A4 and downstream.",
+      "enum": ["ok", "partial", "failed"]
+    },
+
+    "FailureKind": {
+      "type": "string",
+      "description": "Classification of A4 failures. Drives retry vs surface decisions in the orchestrator.",
+      "enum": [
+        "validation_failure",
+        "permission_denied",
+        "not_found",
+        "invalid_field",
+        "rate_limited",
+        "quota_exceeded",
+        "transient_error",
+        "auth_failure"
+      ]
+    },
+
+    "SubQuestionId": {
+      "type": "string",
+      "description": "Stable identifier for a sub-question across the pipeline. Pattern: sq_N where N is a positive integer.",
+      "pattern": "^sq_[0-9]+$"
+    },
+
+    "QueryId": {
+      "type": "string",
+      "description": "Stable identifier for a single query within a sub-question. Pattern: q_<sub>_<n> or descriptive (e.g. 'current', 'comparison_baseline').",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+
+    "BlockId": {
+      "type": "string",
+      "description": "Stable identifier for a data block produced by A5.",
+      "pattern": "^sq_[0-9]+_b_[0-9]+$"
+    },
+
+    "DateString": {
+      "type": "string",
+      "description": "ISO date YYYY-MM-DD. Used for absolute date_range values.",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+
+    "RelativeDateRange": {
+      "type": "string",
+      "description": "Named relative date range. Resolved to absolute dates by A4 at execution time.",
+      "enum": [
+        "today",
+        "yesterday",
+        "last_7_days",
+        "last_28_days",
+        "last_30_days",
+        "last_90_days",
+        "this_week",
+        "last_week",
+        "this_month",
+        "last_month",
+        "this_quarter",
+        "last_quarter",
+        "this_year",
+        "last_year",
+        "prior_period_matched_length"
+      ]
+    },
+
+    "DateRange": {
+      "type": "object",
+      "description": "Date range. After A3 resolution, status must be 'resolved'.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["status", "type", "value"],
+          "properties": {
+            "status": { "const": "resolved" },
+            "type":   { "const": "relative" },
+            "value":  { "$ref": "#/$defs/RelativeDateRange" }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["status", "type", "start", "end"],
+          "properties": {
+            "status": { "const": "resolved" },
+            "type":   { "const": "absolute" },
+            "start":  { "$ref": "#/$defs/DateString" },
+            "end":    { "$ref": "#/$defs/DateString" }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["status"],
+          "properties": {
+            "status":     { "const": "missing" },
+            "candidates": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/RelativeDateRange" },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["status", "user_term", "candidates"],
+          "properties": {
+            "status":    { "const": "ambiguous" },
+            "user_term": { "type": "string" },
+            "candidates": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/RelativeDateRange" },
+              "minItems": 2
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+
+    "MappingChoice": {
+      "type": "object",
+      "description": "A user-named term that has multiple catalog candidates. A2 emits; A3 resolves (clarification or default).",
+      "required": ["user_term", "type", "candidates"],
+      "properties": {
+        "user_term":  { "type": "string", "description": "The term as the user wrote it." },
+        "type":       { "type": "string", "enum": ["metric", "dimension", "filter"] },
+        "candidates": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["value"],
+            "properties": {
+              "value":      { "type": "string", "description": "Catalog field name." },
+              "label":      { "type": "string", "description": "Human-readable label." },
+              "expression": { "type": "string", "description": "For filter mappings, the filter expression form." }
+            },
+            "additionalProperties": false
+          }
+        },
+        "preferred":  { "type": "string", "description": "Optional hint at the most likely choice. A3 must not auto-apply this; the registry decides." }
+      },
+      "additionalProperties": false
+    },
+
+    "DefaultCandidate": {
+      "type": "object",
+      "description": "A field A1 flagged as missing that A3 may fill from the defaults registry.",
+      "required": ["field", "candidates"],
+      "properties": {
+        "field":      { "type": "string", "description": "The schema-level field name (e.g. 'date_range', 'ranking_limit', 'comparison_period')." },
+        "candidates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "number" },
+              {
+                "type": "object",
+                "properties": {
+                  "value":       {},
+                  "label":       { "type": "string" },
+                  "description": { "type": "string" }
+                },
+                "required": ["value"],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "registry_recommended": { "description": "If the defaults registry has a recommended default for this field, surface it here. A3 still gates application." }
+      },
+      "additionalProperties": false
+    },
+
+    "FeasibilityFailure": {
+      "type": "object",
+      "description": "A2 emits when a sub-question cannot be expressed in the available catalog. A3 routes to NEEDS_CLARIFICATION.",
+      "required": ["sub_question_id", "reason"],
+      "properties": {
+        "sub_question_id": { "$ref": "#/$defs/SubQuestionId" },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "insufficient_intent",
+            "metric_not_in_catalog",
+            "dimension_not_in_catalog",
+            "incompatible_metric_dimension_combo",
+            "filter_value_not_resolvable",
+            "no_direct_concept",
+            "followup_unresolvable_without_prior_context"
+          ]
+        },
+        "detail":       { "type": "string", "description": "Free-text factual detail." },
+        "missing_term": { "type": "string" },
+        "proxy_candidates": {
+          "type": "array",
+          "description": "When reason='no_direct_concept', list of proxy investigations the user can choose (per bot-likely trace).",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "Disclosure": {
+      "type": "string",
+      "description": "Factual user-facing note. Renderable in A6 verbatim. NEVER interpretive or causal."
+    },
+
+    "AppliedDefault": {
+      "type": "object",
+      "description": "Record of a default A3 applied automatically.",
+      "required": ["field", "chosen", "source"],
+      "properties": {
+        "field":     { "type": "string" },
+        "chosen":    { "description": "The value chosen." },
+        "source":    { "type": "string", "enum": ["registry", "sticky_carryover"] },
+        "rationale": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "CarriedForward": {
+      "type": "object",
+      "description": "A resolution from a prior turn carried into this one. Always surfaces as a disclosure.",
+      "required": ["field", "chosen", "source"],
+      "properties": {
+        "field":   { "type": "string" },
+        "chosen":  {},
+        "source":  {
+          "type": "string",
+          "enum": [
+            "user_clarification_prior_turn",
+            "resolved_metric_match",
+            "resolved_dimension_match"
+          ],
+          "description": "Sticky-carryover key. resolved_metric_match means the prior turn resolved the same catalog metric (not necessarily the same user_term — see Phase-1 finding on 'engagement' vs 'engagement rate')."
+        },
+        "rationale": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "ScopeCues": {
+      "type": "object",
+      "description": "Explicit entities the user named in their question. Preserved as-written, not normalised.",
+      "properties": {
+        "metric_term":     { "type": ["string", "null"] },
+        "dimension_term":  { "type": ["string", "null"] },
+        "time":            { "type": ["string", "null"], "description": "As written by the user, e.g. 'last week', 'in April', null if unsaid." },
+        "geography":       { "type": ["string", "null"] },
+        "channel_filter":  { "type": ["string", "null"] },
+        "rank_direction":  { "type": ["string", "null"], "enum": ["top", "bottom", null] },
+        "direction":       { "type": ["string", "null"], "description": "User-named direction word for trend/change (e.g. 'dropping', 'rising'). Null if unsaid." },
+        "device":          { "type": ["string", "null"] },
+        "page":            { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+
+    "ComparisonIntent": {
+      "type": ["object", "null"],
+      "description": "Captured when the user asked for a comparison. Null when no comparison was named.",
+      "required": ["kind", "operands"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["period_over_period", "geo_vs_geo", "source_vs_source", "channel_vs_channel", "device_vs_device", "page_vs_page", "custom"]
+        },
+        "operands": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    }
+
+  }
+}

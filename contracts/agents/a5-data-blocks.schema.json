@@ -1,0 +1,505 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/agents/a5-data-blocks.schema.json",
+  "title": "A5 — Data blocks + quality notes",
+  "description": "Output of Agent 5 (Data Handling). Per-sub-question structured data blocks plus neutral data-quality notes. Block_type defines DATA SHAPE; A6 picks the VISUAL component. A5 may compute aggregations, deltas, derived metrics, shares — never interpretation, never recommendations.",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": [
+    "schema_version",
+    "blocks_by_sub_question",
+    "data_quality_notes",
+    "passthrough_pipeline"
+  ],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "schema_version": { "const": "0.1.0" },
+
+    "blocks_by_sub_question": {
+      "type": "object",
+      "propertyNames": { "$ref": "../_shared.schema.json#/$defs/SubQuestionId" },
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "items": { "$ref": "#/$defs/Block" }
+      }
+    },
+
+    "data_quality_notes": {
+      "type": "array",
+      "description": "Neutral factual notes A5 adds. Never interpretive. May reference: partial periods, sentinel counts, derivation exclusions, missing-date counts, top-N coverage.",
+      "items": { "type": "string" }
+    },
+
+    "passthrough_pipeline": { "$ref": "#/$defs/A5PipelinePassthrough" }
+
+  },
+
+  "$defs": {
+
+    "Block": {
+      "description": "Discriminated union by block_type. Approved-annotations list per block_type lives in registries/block-pattern.schema.json (Chunk 3).",
+      "oneOf": [
+        { "$ref": "#/$defs/KpiStripBlock" },
+        { "$ref": "#/$defs/KpiCardBlock" },
+        { "$ref": "#/$defs/RankedTableBlock" },
+        { "$ref": "#/$defs/TimeSeriesBlock" },
+        { "$ref": "#/$defs/ComparisonPairBlock" },
+        { "$ref": "#/$defs/BreakdownBlock" },
+        { "$ref": "#/$defs/PivotTableBlock" },
+        { "$ref": "#/$defs/FunnelBlock" },
+        { "$ref": "#/$defs/GeoDistributionBlock" }
+      ]
+    },
+
+    "BlockDescription": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Required neutral, descriptive restatement of the block's data (one to three sentences). Restates figures A5 already computed — NEVER causal, evaluative, judgemental, or recommending. Produced deterministically by the A5 describe layer (packages/agents/src/a5.describe.ts) by filling the block-pattern registry's description_templates from description_facts. Must not contain words attributing cause or passing judgement."
+    },
+
+    "BlockDescriptionFacts": {
+      "type": "object",
+      "description": "Optional structured facts the describe layer interpolates into the registry template (e.g. headline label, top item, totals, shown/available counts, delta direction + magnitude). Every numeric fact MUST equal a value already present in the block; the description only restates them, it never introduces new numbers.",
+      "additionalProperties": true
+    },
+
+    "NarrativeStage": {
+      "type": "string",
+      "enum": ["overview", "acquisition", "quality", "behavior", "outcomes"],
+      "description": "Funnel-narrative grouping this block belongs to. A6 groups blocks by this field (in registry order) into overview -> acquisition -> quality -> behavior -> outcomes, replacing the playbook's 'Stage N / Step X of N' order. Stamped by A5's assignNarrativeStage() from the block-pattern registry's narrative_stage_map (first-match-wins over metric/dimension/stage_kind/event; falls back to narrative_default_stage). Descriptive grouping only — never a causal ordering."
+    },
+
+    "BlockBase": {
+      "type": "object",
+      "required": ["block_id", "block_type", "title_seed", "description", "narrative_stage"],
+      "properties": {
+        "block_id":   { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+        "block_type": { "type": "string" },
+        "title_seed": {
+          "type": "string",
+          "description": "Factual title fragment A6 uses (with optional template wrapping). Example: 'Top 10 sources by total users'."
+        },
+        "description":       { "$ref": "#/$defs/BlockDescription" },
+        "description_facts": { "$ref": "#/$defs/BlockDescriptionFacts" },
+        "narrative_stage":   { "$ref": "#/$defs/NarrativeStage" }
+      }
+    },
+
+    "Kpi": {
+      "type": "object",
+      "required": ["label", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "label":      { "type": "string", "description": "Factual label, templated from A5 annotations. No editorial." },
+        "value":      { "description": "Number, string, or null (for missing)." },
+        "format":     { "type": "string", "enum": ["number", "percent", "duration_seconds", "currency", "raw"] },
+        "annotation": { "type": "string", "description": "Optional factual subtitle (e.g. '(direct) + (not set)')." },
+        "is_partial": { "type": "boolean" },
+        "spark_data": {
+          "type": "array",
+          "description": "Optional small time series for KPI sparkline. Each item: { date, value, is_partial? }.",
+          "items": { "$ref": "#/$defs/SparkPoint" }
+        },
+        "delta": {
+          "type": "object",
+          "description": "Optional period-over-period delta.",
+          "additionalProperties": false,
+          "properties": {
+            "absolute":     { "type": "number" },
+            "percent":      { "type": "number" },
+            "vs_period":    { "type": "string", "description": "e.g. 'prior 28 days', 'last month'" }
+          }
+        }
+      }
+    },
+
+    "SparkPoint": {
+      "type": "object",
+      "required": ["x", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "x":          { "type": "string", "description": "Typically date in YYYY-MM-DD; can be week label, etc." },
+        "value":      { "type": ["number", "null"] },
+        "is_partial": { "type": "boolean" },
+        "z_score":    { "type": ["number", "null"], "description": "Optional — magnitude-of-deviation for visual encoding only. A6 may shade by absolute value. Direction-neutral." }
+      }
+    },
+
+    "KpiStripBlock": {
+      "allOf": [
+        { "$ref": "#/$defs/BlockBase" },
+        {
+          "type": "object",
+          "required": ["block_type", "kpis"],
+          "additionalProperties": false,
+          "properties": {
+            "block_id":   { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "block_type": { "const": "kpi_strip" },
+            "title_seed": { "type": "string" },
+            "description":       { "$ref": "#/$defs/BlockDescription" },
+            "description_facts": { "$ref": "#/$defs/BlockDescriptionFacts" },
+            "narrative_stage":   { "$ref": "#/$defs/NarrativeStage" },
+            "kpis": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/$defs/Kpi" }
+            }
+          }
+        }
+      ]
+    },
+
+    "KpiCardBlock": {
+      "allOf": [
+        { "$ref": "#/$defs/BlockBase" },
+        {
+          "type": "object",
+          "required": ["block_type", "kpi"],
+          "additionalProperties": false,
+          "properties": {
+            "block_id":   { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "block_type": { "const": "kpi_card" },
+            "title_seed": { "type": "string" },
+            "description":       { "$ref": "#/$defs/BlockDescription" },
+            "description_facts": { "$ref": "#/$defs/BlockDescriptionFacts" },
+            "narrative_stage":   { "$ref": "#/$defs/NarrativeStage" },
+            "kpi":        { "$ref": "#/$defs/Kpi" }
+          }
+        }
+      ]
+    },
+
+    "RankedTableRow": {
+      "type": "object",
+      "required": ["rank"],
+      "description": "Free-form row; dimension and metric fields appear as keys matching the block's dimension_fields/metric_fields plus optional derived fields (share, etc.).",
+      "properties": {
+        "rank":          { "type": "integer", "minimum": 1 },
+        "share_of_shown":{ "type": "number", "minimum": 0, "maximum": 1 },
+        "is_sentinel":   { "type": "boolean" },
+        "sentinel_kind": { "$ref": "../_shared.schema.json#/$defs/SentinelKind" },
+        "is_partial":    { "type": "boolean" },
+        "z_score":       { "type": ["number", "null"] }
+      },
+      "additionalProperties": true
+    },
+
+    "RankedTableBlock": {
+      "allOf": [
+        { "$ref": "#/$defs/BlockBase" },
+        {
+          "type": "object",
+          "required": ["block_type", "dimension_fields", "metric_fields", "rows", "annotations"],
+          "additionalProperties": false,
+          "properties": {
+            "block_id":         { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "block_type":       { "const": "ranked_table" },
+            "title_seed":       { "type": "string" },
+            "description":       { "$ref": "#/$defs/BlockDescription" },
+            "description_facts": { "$ref": "#/$defs/BlockDescriptionFacts" },
+            "narrative_stage":   { "$ref": "#/$defs/NarrativeStage" },
+            "dimension_fields": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+            "metric_fields":    { "type": "array", "minItems": 1, "items": { "type": "string" } },
+            "rows":             { "type": "array", "items": { "$ref": "#/$defs/RankedTableRow" } },
+            "annotations":      { "$ref": "#/$defs/RankedTableAnnotations" }
+          }
+        }
+      ]
+    },
+
+    "RankedTableAnnotations": {
+      "type": "object",
+      "description": "Closed annotation set for ranked_table blocks (Phase-1 finding: only registry-approved annotations allowed per block_type).",
+      "additionalProperties": false,
+      "properties": {
+        "shown_count":        { "type": "integer", "minimum": 0 },
+        "total_available":    { "type": "integer", "minimum": 0 },
+        "totals":             { "type": "object", "additionalProperties": { "type": "number" } },
+        "top_n_share":        { "type": "object", "description": "Map like { 'top_3_share_of_shown': 0.85 }", "additionalProperties": { "type": "number" } },
+        "sentinel_count":     { "type": "integer", "minimum": 0 },
+        "sentinels_in_set":   { "type": "array", "items": { "type": "string" } },
+        "period_partial":     { "type": "boolean" },
+        "other_rollup": {
+          "type": ["object", "null"],
+          "description": "Aggregate of tail rows beyond shown_count. Null when A4 didn't fetch the tail.",
+          "additionalProperties": false,
+          "properties": {
+            "label":         { "type": "string" },
+            "tail_count":    { "type": "integer", "minimum": 0 },
+            "tail_metrics":  { "type": "object", "additionalProperties": { "type": "number" } },
+            "is_fabricated": { "type": "boolean", "description": "Must be false. A5 NEVER fabricates 'Other' rows it didn't get from A4." }
+          }
+        }
+      }
+    },
+
+    "TimeSeriesBlock": {
+      "allOf": [
+        { "$ref": "#/$defs/BlockBase" },
+        {
+          "type": "object",
+          "required": ["block_type", "date_field", "metric_fields", "points", "annotations"],
+          "additionalProperties": false,
+          "properties": {
+            "block_id":      { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "block_type":    { "const": "time_series" },
+            "title_seed":    { "type": "string" },
+            "description":       { "$ref": "#/$defs/BlockDescription" },
+            "description_facts": { "$ref": "#/$defs/BlockDescriptionFacts" },
+            "narrative_stage":   { "$ref": "#/$defs/NarrativeStage" },
+            "date_field":    { "type": "string" },
+            "metric_fields": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+            "points": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["date"],
+                "additionalProperties": true,
+                "properties": {
+                  "date":         { "$ref": "../_shared.schema.json#/$defs/DateString" },
+                  "is_partial":   { "type": "boolean" },
+                  "is_gap_fill":  { "type": "boolean", "description": "True if A5 filled a missing date with value=null." },
+                  "z_score":      { "type": ["number", "null"] }
+                }
+              }
+            },
+            "annotations":   { "$ref": "#/$defs/TimeSeriesAnnotations" }
+          }
+        }
+      ]
+    },
+
+    "TimeSeriesAnnotations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "period_mean":              { "type": "number" },
+        "period_min":               { "type": "object", "properties": { "date": {"type": "string"}, "value": {"type": "number"} }, "additionalProperties": false },
+        "period_max":               { "type": "object", "properties": { "date": {"type": "string"}, "value": {"type": "number"} }, "additionalProperties": false },
+        "partial_days_excluded":    { "type": "array", "items": { "$ref": "../_shared.schema.json#/$defs/DateString" } },
+        "missing_dates_count":      { "type": "integer" },
+        "smoothing_window":         { "type": ["integer", "null"], "description": "Set only if intent requested smoothing (e.g. user asked for moving average)." }
+      }
+    },
+
+    "ComparisonPairBlock": {
+      "allOf": [
+        { "$ref": "#/$defs/BlockBase" },
+        {
+          "type": "object",
+          "required": ["block_type", "left", "right", "delta"],
+          "additionalProperties": false,
+          "properties": {
+            "block_id":   { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "block_type": { "const": "comparison_pair" },
+            "title_seed": { "type": "string" },
+            "description":       { "$ref": "#/$defs/BlockDescription" },
+            "description_facts": { "$ref": "#/$defs/BlockDescriptionFacts" },
+            "narrative_stage":   { "$ref": "#/$defs/NarrativeStage" },
+            "left":       { "$ref": "#/$defs/ComparisonOperand" },
+            "right":      { "$ref": "#/$defs/ComparisonOperand" },
+            "delta": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "absolute":  { "type": "number" },
+                "percent":   { "type": "number" },
+                "percentage_points": { "type": "number" }
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    "ComparisonOperand": {
+      "type": "object",
+      "required": ["label", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "label":      { "type": "string" },
+        "value":      { "type": "number" },
+        "annotation": { "type": "string" },
+        "is_partial": { "type": "boolean" }
+      }
+    },
+
+    "BreakdownBlock": {
+      "allOf": [
+        { "$ref": "#/$defs/BlockBase" },
+        {
+          "type": "object",
+          "required": ["block_type", "dimension_field", "metric_field", "rows", "annotations"],
+          "additionalProperties": false,
+          "properties": {
+            "block_id":        { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "block_type":      { "const": "breakdown" },
+            "title_seed":      { "type": "string" },
+            "description":       { "$ref": "#/$defs/BlockDescription" },
+            "description_facts": { "$ref": "#/$defs/BlockDescriptionFacts" },
+            "narrative_stage":   { "$ref": "#/$defs/NarrativeStage" },
+            "dimension_field": { "type": "string" },
+            "metric_field":    { "type": "string" },
+            "rows": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "share":         { "type": "number" },
+                  "is_sentinel":   { "type": "boolean" },
+                  "sentinel_kind": { "$ref": "../_shared.schema.json#/$defs/SentinelKind" }
+                }
+              }
+            },
+            "annotations": { "$ref": "#/$defs/RankedTableAnnotations" }
+          }
+        }
+      ]
+    },
+
+    "PivotTableBlock": {
+      "allOf": [
+        { "$ref": "#/$defs/BlockBase" },
+        {
+          "type": "object",
+          "required": ["block_type", "row_dimension", "col_dimension", "metric_field", "cells"],
+          "additionalProperties": false,
+          "properties": {
+            "block_id":      { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "block_type":    { "const": "pivot_table" },
+            "title_seed":    { "type": "string" },
+            "description":       { "$ref": "#/$defs/BlockDescription" },
+            "description_facts": { "$ref": "#/$defs/BlockDescriptionFacts" },
+            "narrative_stage":   { "$ref": "#/$defs/NarrativeStage" },
+            "row_dimension": { "type": "string" },
+            "col_dimension": { "type": "string" },
+            "metric_field":  { "type": "string" },
+            "row_labels":    { "type": "array", "items": { "type": "string" } },
+            "col_labels":    { "type": "array", "items": { "type": "string" } },
+            "cells": {
+              "type": "array",
+              "description": "Row-major: cells[r][c] = numeric value or null.",
+              "items": {
+                "type": "array",
+                "items": { "type": ["number", "null"] }
+              }
+            },
+            "annotations": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "row_totals":    { "type": "array", "items": { "type": "number" } },
+                "col_totals":    { "type": "array", "items": { "type": "number" } },
+                "grand_total":   { "type": "number" },
+                "partial_cells": { "type": "array", "items": { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 } }
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    "FunnelBlock": {
+      "allOf": [
+        { "$ref": "#/$defs/BlockBase" },
+        {
+          "type": "object",
+          "required": ["block_type", "steps"],
+          "additionalProperties": false,
+          "properties": {
+            "block_id":   { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "block_type": { "const": "funnel" },
+            "title_seed": { "type": "string" },
+            "description":       { "$ref": "#/$defs/BlockDescription" },
+            "description_facts": { "$ref": "#/$defs/BlockDescriptionFacts" },
+            "narrative_stage":   { "$ref": "#/$defs/NarrativeStage" },
+            "domain_profile_ref": { "type": "string", "description": "Reference to the domain profile that defined this funnel (e.g. 'job_board')." },
+            "steps": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "object",
+                "required": ["label", "count"],
+                "additionalProperties": false,
+                "properties": {
+                  "label":             { "type": "string" },
+                  "event_name":        { "type": "string", "description": "Underlying GA4 event(s); may be a |-joined list for merged variants." },
+                  "count":             { "type": "number" },
+                  "step_rate_from_prev": { "type": "number", "description": "Conversion rate from the previous step. Null on the first step." }
+                }
+              }
+            },
+            "annotations": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "overall_conversion": { "type": "number" },
+                "biggest_drop_step":  { "type": "string", "description": "Label of the step with the largest step-rate drop. Factual ranking, not causal." }
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    "GeoDistributionBlock": {
+      "allOf": [
+        { "$ref": "#/$defs/BlockBase" },
+        {
+          "type": "object",
+          "required": ["block_type", "country_field", "metric_field", "rows"],
+          "additionalProperties": false,
+          "properties": {
+            "block_id":      { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "block_type":    { "const": "geo_distribution" },
+            "title_seed":    { "type": "string" },
+            "description":       { "$ref": "#/$defs/BlockDescription" },
+            "description_facts": { "$ref": "#/$defs/BlockDescriptionFacts" },
+            "narrative_stage":   { "$ref": "#/$defs/NarrativeStage" },
+            "country_field": { "type": "string" },
+            "metric_field":  { "type": "string" },
+            "rows": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "share":         { "type": "number" },
+                  "is_sentinel":   { "type": "boolean" }
+                }
+              }
+            },
+            "annotations": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "shown_countries":    { "type": "integer" },
+                "total_countries":    { "type": "integer" },
+                "sentinel_count":     { "type": "integer" }
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    "A5PipelinePassthrough": {
+      "type": "object",
+      "required": ["intent", "applied_defaults", "carried_forward", "a3_disclosures", "a4_warnings"],
+      "additionalProperties": false,
+      "properties": {
+        "intent":            { "type": "object" },
+        "applied_defaults":  { "type": "array", "items": { "$ref": "../_shared.schema.json#/$defs/AppliedDefault" } },
+        "carried_forward":   { "type": "array", "items": { "$ref": "../_shared.schema.json#/$defs/CarriedForward" } },
+        "a3_disclosures":    { "type": "array", "items": { "$ref": "../_shared.schema.json#/$defs/Disclosure" } },
+        "a4_warnings":       { "type": "array", "items": { "type": "string" } }
+      }
+    }
+
+  }
+}

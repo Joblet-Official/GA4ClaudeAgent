@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/agents/a1-intent.schema.json",
+  "title": "A1 — Intent record",
+  "description": "Output of Agent 1 (Intent Interpretation). Structured restatement of the user's question, plus an enumeration of what was left unsaid. A1 never resolves ambiguity; it only flags it.",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": [
+    "schema_version",
+    "report_type",
+    "analysis_level",
+    "business_objective",
+    "sub_questions",
+    "comparison_intent",
+    "ambiguity_flags",
+    "is_followup",
+    "followup_delta",
+    "out_of_scope",
+    "interpretation_request"
+  ],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "schema_version": {
+      "const": "0.1.0",
+      "description": "Schema version this record conforms to."
+    },
+
+    "report_type": {
+      "$ref": "../_shared.schema.json#/$defs/ReportType",
+      "description": "The analytical shape of the request. Drives block patterns downstream."
+    },
+
+    "analysis_level": {
+      "$ref": "../_shared.schema.json#/$defs/AnalysisLevel",
+      "description": "Classification of the question's analysis depth on the L1-L5 spectrum (see AnalysisLevel in _shared.schema.json). L4 is the single-metric diagnostic level that triggers A2's universal RCA playbook expansion. Cross-field invariant: L1-L3 iff interpretation_request=false; L4-L5 iff interpretation_request=true."
+    },
+
+    "business_objective": {
+      "type": "string",
+      "maxLength": 120,
+      "description": "Short factual restatement of WHAT the user wants to learn from the data. NOT strategic advice. Example: 'monitor channel performance', 'identify top acquisition sources', 'localize traffic decline by dimension'."
+    },
+
+    "sub_questions": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One or more atomic sub-questions. A single-part question yields a list of one. A2 plans one query plan per sub-question.",
+      "items": {
+        "type": "object",
+        "required": ["id", "verbatim", "report_type", "scope_cues"],
+        "additionalProperties": false,
+        "properties": {
+          "id":           { "$ref": "../_shared.schema.json#/$defs/SubQuestionId" },
+          "verbatim":     {
+            "type": "string",
+            "description": "The sub-question as A1 isolated it from the user's input. Preserves user's original phrasing for that part."
+          },
+          "report_type":  { "$ref": "../_shared.schema.json#/$defs/ReportType" },
+          "scope_cues":   { "$ref": "../_shared.schema.json#/$defs/ScopeCues" }
+        }
+      }
+    },
+
+    "comparison_intent": { "$ref": "../_shared.schema.json#/$defs/ComparisonIntent" },
+
+    "ambiguity_flags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "../_shared.schema.json#/$defs/AmbiguityFlag" },
+      "description": "Closed enum of ambiguities. A1 lists what was unsaid/conflicted; A3 decides what to default vs ask."
+    },
+
+    "is_followup": {
+      "type": "boolean",
+      "description": "True if this turn references the prior turn. A1 detects from pronouns, elided subjects, explicit refs. A1 does NOT silently merge prior intent."
+    },
+
+    "followup_delta": {
+      "type": ["string", "null"],
+      "description": "When is_followup=true, a short description of WHAT changed relative to prior intent (e.g. 'swap region US→India', 'change granularity to daily'). Null when is_followup=false.",
+      "maxLength": 200
+    },
+
+    "out_of_scope": {
+      "type": "boolean",
+      "description": "True if the question is not an analytics question, or asks for advice/recommendation/diagnosis. A3 handles response."
+    },
+
+    "interpretation_request": {
+      "type": "boolean",
+      "description": "True if the user asked 'why', 'should', or otherwise for causal/strategic interpretation. A1 still extracts the underlying descriptive sub-question; A3 attaches disclosure; A2 may plan a staged investigation."
+    }
+
+  },
+
+  "examples": [
+    {
+      "schema_version": "0.1.0",
+      "report_type": "ranking",
+      "analysis_level": "L1",
+      "business_objective": "identify top acquisition sources",
+      "sub_questions": [
+        {
+          "id": "sq_1",
+          "verbatim": "top traffic sources",
+          "report_type": "ranking",
+          "scope_cues": {
+            "metric_term": "traffic",
+            "dimension_term": "sources",
+            "rank_direction": "top",
+            "time": null,
+            "geography": null,
+            "channel_filter": null
+          }
+        }
+      ],
+      "comparison_intent": null,
+      "ambiguity_flags": [
+        "time_scope_missing",
+        "metric_resolution_needed",
+        "dimension_resolution_needed",
+        "ranking_limit_missing"
+      ],
+      "is_followup": false,
+      "followup_delta": null,
+      "out_of_scope": false,
+      "interpretation_request": false
+    }
+  ]
+}

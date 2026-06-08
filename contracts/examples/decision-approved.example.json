@@ -1,0 +1,38 @@
+{
+  "$comment": "A3 decision = APPROVED. Hypothetical example: user asked 'show me sessions yesterday by source' — every field is unambiguously catalog-resolvable, time is concrete, no defaults needed. Validates against ../agents/a3-decision.schema.json.",
+
+  "schema_version": "0.1.0",
+  "decision": "APPROVED",
+
+  "query_plan": {
+    "sub_question_id": "sq_1",
+    "queries": [
+      {
+        "query_id": "q_1_main",
+        "source": "ga4",
+        "purpose": "primary",
+        "metrics": {
+          "status": "resolved",
+          "items": [{ "name": "sessions" }]
+        },
+        "dimensions": {
+          "status": "resolved",
+          "items": [{ "name": "sessionSource" }]
+        },
+        "filters": [],
+        "date_range": {
+          "status": "resolved",
+          "type": "relative",
+          "value": "yesterday"
+        },
+        "order_by": [{ "field": "sessions", "direction": "desc" }],
+        "limit": 50,
+        "grouping": "by_dimension",
+        "partial_period": false
+      }
+    ]
+  },
+
+  "carried_forward": [],
+  "disclosures": []
+}

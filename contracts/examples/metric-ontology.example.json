@@ -1,0 +1,221 @@
+{
+  "$comment": "Metric ontology with two layers: (1) the original engagementRate investigation_branches (Phase-1 finding-driven); (2) the L2 RCA addendum's universal_l2_playbook + per-metric rca_playbook entries for the 10 well-known metrics in Appendix B. Validates against ../registries/metric-ontology.schema.json.",
+
+  "schema_version": "0.1.0",
+
+  "universal_l2_playbook": {
+    "version": "1.0.0",
+    "stages": [
+      { "id": "confirm_headline",           "kind": "confirm_headline",        "execute": "always" },
+      { "id": "decompose_components",       "kind": "decompose_components",    "execute": "always" },
+      { "id": "temporal_weekly",            "kind": "temporal_weekly",         "execute": "always" },
+      { "id": "temporal_daily",             "kind": "temporal_daily",          "execute": "always" },
+      { "id": "breakdown_channel",          "kind": "dimensional_breakdown",   "execute": "always", "dimension": "sessionDefaultChannelGroup", "surface": "traffic_acquisition" },
+      { "id": "breakdown_landing_page",     "kind": "dimensional_breakdown",   "execute": "always", "dimension": "landingPagePlusQueryString", "surface": "pages",               "cap": 20 },
+      { "id": "breakdown_device",           "kind": "dimensional_breakdown",   "execute": "always", "dimension": "deviceCategory",              "surface": "tech" },
+      { "id": "breakdown_country",          "kind": "dimensional_breakdown",   "execute": "always", "dimension": "country",                     "surface": "demographics" },
+      { "id": "breakdown_event",            "kind": "dimensional_breakdown",   "execute": "always", "dimension": "eventName",                   "surface": "events",              "cap": 20 },
+      { "id": "structural_diff_all",        "kind": "structural_diff_derived", "execute": "always" },
+      { "id": "path_exploration",           "kind": "path_exploration",        "execute": "conditional", "execute_if": "top_n_dim_diff(\"landingPage\", n=20) >= 5",                 "sample_strategy": "landing_pages_in_structural_diff", "cap": 10 },
+      { "id": "cohort_drilldown",           "kind": "cohort_drilldown",        "execute": "conditional", "execute_if": "any_dimension_concentration_change(any_dim) > 0.15",        "cap": 3 }
+    ]
+  },
+
+  "metrics": {
+
+    "engagementRate": {
+      "metric": "engagementRate",
+      "decomposition_kind": "ratio",
+      "formula": "engagedSessions / sessions",
+
+      "components": ["engagedSessions", "sessions"],
+
+      "affected_by": {
+        "engagedSessions": ["events_fired", "landingPage", "pageTitle", "deviceCategory"],
+        "sessions":        ["sessionDefaultChannelGroup", "deviceCategory", "newVsReturning", "country"]
+      },
+
+      "investigation_branches": [
+        {
+          "branch_id": "confirm_and_decompose",
+          "trigger": "always",
+          "queries": [
+            { "template_id": "pop_totals", "source": "ga4",
+              "metrics": ["engagedSessions", "sessions"], "dimensions": [], "date_window": "both" }
+          ],
+          "rationale_template": "engagementRate = engagedSessions / sessions. Split numerator and denominator to localise where the change concentrates."
+        },
+        {
+          "branch_id": "temporal_localisation",
+          "trigger": "always",
+          "queries": [
+            { "template_id": "daily_series", "source": "ga4",
+              "metrics": ["engagedSessions", "sessions"], "dimensions": ["date"], "date_window": "both" }
+          ],
+          "rationale_template": "Period averages hide step-changes. Weekly aggregation surfaces step boundaries."
+        },
+        {
+          "branch_id": "sessions_component_channel",
+          "trigger": "always",
+          "queries": [
+            { "template_id": "channel_breakdown", "source": "ga4",
+              "metrics": ["engagedSessions", "sessions"], "dimensions": ["sessionDefaultChannelGroup"], "date_window": "both", "limit": 15 }
+          ],
+          "rationale_template": "sessions ← traffic_sources. Per-channel rate + volume change."
+        },
+        {
+          "branch_id": "engaged_component_landing_page",
+          "trigger": "always",
+          "queries": [
+            { "template_id": "lp_breakdown", "source": "ga4",
+              "metrics": ["engagedSessions", "sessions"], "dimensions": ["landingPage"], "date_window": "both", "limit": 20 }
+          ],
+          "rationale_template": "engagedSessions ← landing_page_quality. Per-page rate + structural diff."
+        },
+        {
+          "branch_id": "engaged_component_page_title_diff",
+          "trigger": "always",
+          "queries": [
+            { "template_id": "page_title_diff", "source": "ga4",
+              "metrics": ["screenPageViews"], "dimensions": ["pageTitle"], "date_window": "both", "limit": 20 }
+          ],
+          "rationale_template": "Page renames produce title-level appearance/disappearance even when URLs persist."
+        },
+        {
+          "branch_id": "engaged_component_event_diff",
+          "trigger": "always",
+          "queries": [
+            { "template_id": "event_breakdown", "source": "ga4",
+              "metrics": ["eventCount"], "dimensions": ["eventName"], "date_window": "both", "limit": 30 }
+          ],
+          "rationale_template": "engagedSessions ← events_fired. Event rename/add/remove shifts the engaged flag."
+        },
+        {
+          "branch_id": "custom_funnel",
+          "trigger": "always",
+          "queries": [
+            { "template_id": "funnel_events_from_domain_profile", "source": "ga4",
+              "metrics": ["eventCount"], "dimensions": ["eventName"], "date_window": "both" }
+          ],
+          "rationale_template": "Domain profile defines the canonical conversion funnel for this property."
+        },
+        {
+          "branch_id": "path_exploration",
+          "trigger": "conditional",
+          "condition": "funnel_step_rate_drop(\"view_search_results\") > 0.5 AND top_n_dim_diff(\"landingPage\", n=20) >= 5",
+          "queries": [
+            { "template_id": "landing_page_event_mix", "source": "ga4",
+              "metrics": ["eventCount"], "dimensions": ["landingPage", "eventName"], "date_window": "both", "limit": 2500 }
+          ],
+          "rationale_template": "Search-results step collapsed AND new landing pages appeared → check whether new pages emit the same downstream events as the old."
+        }
+      ],
+
+      "path_exploration_strategy": {
+        "trigger_when": "funnel_step_rate_drop(target_event) > 0.5 AND top_n_dim_diff(\"landingPage\", n=20) >= 5",
+        "sample_strategy": [
+          "landing_pages_where_event_fired_in_baseline",
+          "landing_pages_in_structural_diff"
+        ],
+        "target_event_for_event_count": "view_search_results"
+      },
+
+      "rca_playbook": {
+        "inherits": "universal_l2",
+        "adds": {
+          "stages": [
+            { "id": "funnel_search_to_apply",       "kind": "funnel_run",                        "execute": "always",      "funnel_id": "search_to_apply" },
+            { "id": "funnel_step_breakdown",        "kind": "funnel_step_dimensional_breakdown", "execute": "conditional", "execute_if": "funnel_step_rate_drop(\"view_search_results\") > 0.3" },
+            { "id": "path_exploration_with_event",  "kind": "path_exploration",                  "execute": "conditional", "execute_if": "top_n_dim_diff(\"landingPage\", n=20) >= 5", "sample_strategy": "landing_pages_where_event_fired_in_baseline", "target_event": "view_search_results", "cap": 10 }
+          ]
+        },
+        "overrides": {
+          "decompose_components": { "components": ["engagedSessions", "sessions"] },
+          "path_exploration":     { "replace": true }
+        }
+      }
+    },
+
+    "sessions": {
+      "metric": "sessions",
+      "decomposition_kind": "atomic",
+      "rca_playbook": { "inherits": "universal_l2" }
+    },
+
+    "totalUsers": {
+      "metric": "totalUsers",
+      "decomposition_kind": "atomic",
+      "rca_playbook": { "inherits": "universal_l2" }
+    },
+
+    "activeUsers": {
+      "metric": "activeUsers",
+      "decomposition_kind": "atomic",
+      "rca_playbook": { "inherits": "universal_l2" }
+    },
+
+    "newUsers": {
+      "metric": "newUsers",
+      "decomposition_kind": "atomic",
+      "rca_playbook": { "inherits": "universal_l2" }
+    },
+
+    "bounceRate": {
+      "metric": "bounceRate",
+      "decomposition_kind": "ratio",
+      "formula": "bounces / sessions",
+      "components": ["bounces", "sessions"],
+      "rca_playbook": {
+        "inherits": "universal_l2",
+        "overrides": {
+          "decompose_components": { "components": ["bounces", "sessions"] }
+        }
+      }
+    },
+
+    "averageSessionDuration": {
+      "metric": "averageSessionDuration",
+      "decomposition_kind": "average",
+      "formula": "userEngagementDuration / sessions",
+      "components": ["userEngagementDuration", "sessions"],
+      "rca_playbook": {
+        "inherits": "universal_l2",
+        "overrides": {
+          "decompose_components": { "components": ["userEngagementDuration", "sessions"] }
+        }
+      }
+    },
+
+    "screenPageViewsPerSession": {
+      "metric": "screenPageViewsPerSession",
+      "decomposition_kind": "average",
+      "formula": "screenPageViews / sessions",
+      "components": ["screenPageViews", "sessions"],
+      "rca_playbook": {
+        "inherits": "universal_l2",
+        "overrides": {
+          "decompose_components": { "components": ["screenPageViews", "sessions"] }
+        }
+      }
+    },
+
+    "conversions": {
+      "metric": "conversions",
+      "decomposition_kind": "atomic",
+      "rca_playbook": {
+        "inherits": "universal_l2",
+        "adds": {
+          "stages": [
+            { "id": "conversion_funnel_run", "kind": "funnel_run", "execute": "conditional", "execute_if": "row_count_for_query(\"conversion_funnel_def\") > 0", "funnel_id": "conversion_funnel" }
+          ]
+        }
+      }
+    },
+
+    "userEngagementDuration": {
+      "metric": "userEngagementDuration",
+      "decomposition_kind": "atomic",
+      "rca_playbook": { "inherits": "universal_l2" }
+    }
+  }
+}

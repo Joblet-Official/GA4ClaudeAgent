@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/registries/domain-profile.schema.json",
+  "title": "Domain profile — per-property business-domain configuration",
+  "description": "Per-property profile that tells A2 what kind of site this is and which events matter. Drives custom funnel construction at runtime (a job_board has session_start → page_view → view_search_results → job_apply; an ecommerce has session_start → view_item → add_to_cart → purchase). Without a profile, A2 falls back to source-default funnels.",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": ["schema_version", "profiles"],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "schema_version": { "const": "0.1.0" },
+
+    "profiles": {
+      "type": "object",
+      "description": "Map of property identifier (e.g. GA4 property id 'properties/516147906') to its profile.",
+      "additionalProperties": { "$ref": "#/$defs/DomainProfile" }
+    }
+  },
+
+  "$defs": {
+
+    "DomainProfile": {
+      "type": "object",
+      "required": ["property_id", "domain_type"],
+      "additionalProperties": false,
+      "properties": {
+
+        "property_id": {
+          "type": "string",
+          "description": "Source-qualified property id, e.g. 'ga4:516147906' or 'gsc:sc-domain:joblet.ai'."
+        },
+
+        "domain_type": {
+          "type": "string",
+          "enum": ["job_board", "ecommerce", "saas", "media_blog", "marketplace", "lead_gen", "education", "other"],
+          "description": "Coarse classification driving funnel template selection and event-name heuristics."
+        },
+
+        "display_name": { "type": "string" },
+
+        "key_engagement_events": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Events whose presence on a session counts as 'engaged' in this domain's interpretation. For job_board: ['view_search_results','page_view','scroll']. Used by A5 for sanity checks and by A6 for funnel construction."
+        },
+
+        "key_conversion_events": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Events that represent the property's primary conversion. For joblet.ai: ['job_apply','job_apply_','job_apply_unknown']. Multiple entries handle rename variants — A2/A5 sum them as a merged total."
+        },
+
+        "funnel_template": {
+          "type": "array",
+          "description": "Ordered list of funnel steps. Each step references events by name or by tag.",
+          "items": { "$ref": "#/$defs/FunnelStep" }
+        },
+
+        "page_classification": {
+          "type": "object",
+          "description": "Optional. URL-pattern rules that classify pages into roles (e.g. '/jobs/* = job_detail', '/jobs/*/form = apply_form').",
+          "additionalProperties": false,
+          "properties": {
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["pattern", "role"],
+                "additionalProperties": false,
+                "properties": {
+                  "pattern": { "type": "string" },
+                  "role":    { "type": "string" },
+                  "match":   { "type": "string", "enum": ["glob", "regex", "starts_with", "equals"] }
+                }
+              }
+            }
+          }
+        },
+
+        "notes": { "type": "string", "description": "Free-form factual notes." }
+      }
+    },
+
+    "FunnelStep": {
+      "type": "object",
+      "required": ["label", "event_match"],
+      "additionalProperties": false,
+      "properties": {
+        "label":       { "type": "string", "description": "Human-readable step label, e.g. 'Search-results views'." },
+        "event_match": {
+          "oneOf": [
+            { "type": "string", "description": "Single event name." },
+            {
+              "type": "object",
+              "required": ["any_of"],
+              "additionalProperties": false,
+              "properties": {
+                "any_of": { "type": "array", "items": { "type": "string" }, "description": "Multiple event names treated as the same step (e.g. apply variants)." }
+              }
+            }
+          ]
+        },
+        "page_filter": { "type": "string", "description": "Optional pagePath filter to refine which firings count (e.g. for 'view job detail' = page_view filtered to /jobs/*)." }
+      }
+    }
+  }
+}

@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/orchestration/state-machine.schema.json",
+  "title": "Orchestrator state machine — formal FSM schema",
+  "description": "Validates finite-state-machine specifications. The orchestrator's actual FSM lives in state-machine.example.json. Implementations conform to whatever this schema accepts.",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": ["schema_version", "states", "initial_state", "terminal_states", "transitions"],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "schema_version": { "const": "0.1.0" },
+
+    "states": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/State" }
+    },
+
+    "initial_state": {
+      "type": "string",
+      "description": "Must match one of states[].name."
+    },
+
+    "terminal_states": {
+      "type": "array",
+      "description": "States from which no further transitions occur. Must each match a states[].name.",
+      "items": { "type": "string" }
+    },
+
+    "transitions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/Transition" }
+    },
+
+    "session_storage": { "$ref": "#/$defs/SessionStorageSpec" },
+
+    "retry_policy": { "$ref": "#/$defs/RetryPolicySpec" }
+  },
+
+  "$defs": {
+
+    "State": {
+      "type": "object",
+      "required": ["name", "kind", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "description": "Uppercase identifier, e.g. 'IDLE', 'A1_RUNNING', 'HALTED_FOR_USER'."
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["initial", "running", "halted", "terminal_success", "terminal_failure"]
+        },
+        "description": { "type": "string" },
+        "agent_active": {
+          "type": ["string", "null"],
+          "enum": ["A1", "A2", "A3", "A4", "A5", "A6", null],
+          "description": "Which agent (if any) is invoked while in this state."
+        },
+        "user_visible": {
+          "type": "boolean",
+          "description": "True only for HALTED_FOR_USER and terminal states the user observes."
+        }
+      }
+    },
+
+    "Transition": {
+      "type": "object",
+      "required": ["from", "to", "trigger"],
+      "additionalProperties": false,
+      "properties": {
+        "from":   { "type": "string", "description": "Source state name. Must match a states[].name." },
+        "to":     { "type": "string", "description": "Destination state name. Must match a states[].name." },
+        "trigger": {
+          "type": "string",
+          "description": "Event that causes the transition. Examples: 'user_input_received', 'a1_emitted_intent', 'a3_decision_NEEDS_CLARIFICATION', 'a4_stage_completed', 'unrecoverable_error'."
+        },
+        "guard": {
+          "type": ["string", "null"],
+          "description": "Optional condition predicate evaluated against accumulated state. Must reference orchestrator-known fields (e.g. 'a2_plan.stages is defined', 'a3_decision == APPROVED')."
+        },
+        "action": {
+          "type": "string",
+          "description": "Deterministic action taken on transition. Examples: 'validate_a1_record', 'persist_to_session_storage', 'invoke_a4_with(plan)', 'return_clarification_to_frontend'."
+        },
+        "on_failure": {
+          "type": ["string", "null"],
+          "description": "Alternate destination if the action fails. Typically references a retry state or FAILED."
+        }
+      }
+    },
+
+    "SessionStorageSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "per_turn_fields": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Required field names persisted per turn."
+        },
+        "per_session_fields": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "halt_ttl_hours":         { "type": "integer", "minimum": 1 },
+        "completed_retention_days": { "type": "integer", "minimum": 1 }
+      }
+    },
+
+    "RetryPolicySpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["agent", "failure_class", "action", "max_attempts"],
+            "additionalProperties": false,
+            "properties": {
+              "agent":         { "type": "string", "enum": ["A1", "A2", "A3", "A4", "A5", "A6"] },
+              "failure_class": {
+                "type": "string",
+                "enum": [
+                  "schema_validation_failure",
+                  "llm_api_5xx",
+                  "llm_api_timeout",
+                  "llm_api_429",
+                  "llm_api_4xx",
+                  "ga4_5xx",
+                  "ga4_429",
+                  "ga4_403_404_400",
+                  "ga4_401",
+                  "catalog_read_error",
+                  "computation_overflow",
+                  "io_write_failure"
+                ]
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "retry_with_prompt_nudge",
+                  "exponential_backoff",
+                  "honor_retry_after",
+                  "no_retry_surface",
+                  "no_retry_escalate"
+                ]
+              },
+              "max_attempts": { "type": "integer", "minimum": 0 },
+              "backoff_seconds": {
+                "type": "array",
+                "items": { "type": "number" },
+                "description": "Backoff sequence for exponential_backoff actions."
+              }
+            }
+          }
+        },
+        "per_turn_llm_budget_seconds": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/registries/block-pattern.schema.json",
+  "title": "Block-pattern registry — report_type → block patterns + per-block approved annotations",
+  "description": "A5 consults this to decide which block types to emit per report_type, and which annotations are approved for each block_type. Per Phase-1 finding: A5 may render only approved annotations; the schema enforces this via the per-block annotation contracts already declared in a5-data-blocks.schema.json. This registry adds the report-type → blocks mapping and per-block 'events_of_interest_displays' rule (resolves view_search_results-0 finding).",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": ["schema_version", "patterns", "description_templates", "delta_clauses", "narrative_stages", "narrative_stage_map", "narrative_default_stage"],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "schema_version": { "const": "0.1.0" },
+
+    "patterns": {
+      "type": "object",
+      "description": "Map of report_type to its block pattern.",
+      "propertyNames": { "$ref": "../_shared.schema.json#/$defs/ReportType" },
+      "additionalProperties": { "$ref": "#/$defs/BlockPattern" }
+    },
+
+    "description_templates": {
+      "type": "object",
+      "description": "Neutral, descriptive sentence templates keyed by block_type. The A5 describe layer fills {placeholders} from a block's description_facts to produce block.description. Templates restate figures only — they MUST NOT contain causal, evaluative, judgemental, or recommending language. Use the literal token {delta_clause} where an optional period-over-period clause (from delta_clauses) should be spliced in.",
+      "propertyNames": {
+        "enum": ["kpi_strip", "kpi_card", "ranked_table", "time_series", "comparison_pair", "breakdown", "pivot_table", "funnel", "geo_distribution"]
+      },
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+
+    "delta_clauses": {
+      "type": "object",
+      "description": "Neutral comparative clauses spliced into a template's {delta_clause} slot when a block carries a period-over-period delta. Keyed by factual direction. Magnitude and direction only ('higher than', 'lower than', 'unchanged from') — never evaluative ('improved'/'worsened') or causal.",
+      "propertyNames": { "enum": ["higher", "lower", "unchanged"] },
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+
+    "narrative_stages": {
+      "type": "array",
+      "description": "Ordered funnel-narrative stages A6 groups blocks into. Render order = this array order (also encoded by `order`). Each stage carries a templated intro caption and a handoff caption to the next stage. Intro/handoff are method-framing only — descriptive, never causal links between stages.",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/NarrativeStageDef" }
+    },
+
+    "narrative_stage_map": {
+      "type": "array",
+      "description": "First-match-wins rules mapping a block to a narrative_stage. Each rule matches over the block's metric / dimension / stage_kind / event signals; a key set to \"*\" (or omitted) is a wildcard. The first rule whose every specified key matches wins; if none match, narrative_default_stage applies.",
+      "items": { "$ref": "#/$defs/NarrativeStageRule" }
+    },
+
+    "narrative_default_stage": {
+      "$ref": "#/$defs/NarrativeStageId",
+      "description": "Fallback stage when no narrative_stage_map rule matches a block."
+    }
+  },
+
+  "$defs": {
+
+    "BlockPattern": {
+      "type": "object",
+      "required": ["report_type", "blocks"],
+      "additionalProperties": false,
+      "properties": {
+        "report_type": { "$ref": "../_shared.schema.json#/$defs/ReportType" },
+
+        "blocks": {
+          "type": "array",
+          "description": "Ordered blocks A5 emits for this report_type, in render order.",
+          "items": { "$ref": "#/$defs/BlockSpec" }
+        },
+
+        "events_of_interest_displays": {
+          "type": "array",
+          "description": "Resolves view_search_results-0 finding. For blocks that render per-page/per-group event mixes, the listed events MUST always have their actual count surfaced (not collapsed to in-top-K badges). Each entry: { block_type, event_name, when }.",
+          "items": {
+            "type": "object",
+            "required": ["block_type", "event_name"],
+            "additionalProperties": false,
+            "properties": {
+              "block_type":  { "type": "string" },
+              "event_name":  { "type": "string", "description": "Event whose count must be displayed for every group, even if outside top-K." },
+              "when":        { "type": "string", "description": "Optional condition: e.g. 'always', or a trigger expression." }
+            }
+          }
+        },
+
+        "other_rollup_policy": {
+          "type": "string",
+          "enum": ["never", "if_a4_fetched_tail", "always_fetch_tail_for_rollup"],
+          "description": "Per Phase-1 finding: 'Other' row policy. 'never' = omit; 'if_a4_fetched_tail' = render only if A4 returned tail; 'always_fetch_tail_for_rollup' = A2 must plan an extra query for the tail aggregate."
+        }
+      }
+    },
+
+    "BlockSpec": {
+      "type": "object",
+      "required": ["block_type"],
+      "additionalProperties": false,
+      "properties": {
+        "block_type": {
+          "type": "string",
+          "enum": ["kpi_strip", "kpi_card", "ranked_table", "time_series", "comparison_pair", "breakdown", "pivot_table", "funnel", "geo_distribution"]
+        },
+        "required": { "type": "boolean", "description": "When true, A5 must emit this block (empty if data is empty). When false, emit only if the data supports it." },
+        "mandatory_annotations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Annotation keys A5 MUST populate for this block within this report_type. Keys must be in the per-block-type approved-annotations set declared in a5-data-blocks.schema.json."
+        },
+        "purpose":   { "type": "string", "description": "Free-form factual label for this block's role in the report. Example: 'summary KPIs', 'detail table'." }
+      }
+    },
+
+    "NarrativeStageId": {
+      "type": "string",
+      "enum": ["overview", "acquisition", "quality", "behavior", "outcomes"]
+    },
+
+    "NarrativeStageDef": {
+      "type": "object",
+      "required": ["id", "label", "order", "intro", "handoff"],
+      "additionalProperties": false,
+      "properties": {
+        "id":      { "$ref": "#/$defs/NarrativeStageId" },
+        "label":   { "type": "string", "minLength": 1, "description": "Stage header A6 renders." },
+        "order":   { "type": "integer", "minimum": 1, "description": "Render order within the funnel narrative." },
+        "intro":   { "type": "string", "minLength": 1, "description": "Templated intro caption for the stage. Method-framing, descriptive — never causal." },
+        "handoff": { "type": "string", "minLength": 1, "description": "Bridging caption to the next stage. Method-framing only; never a causal link between stages." }
+      }
+    },
+
+    "NarrativeMatchValue": {
+      "description": "A match criterion: a single signal string, a non-empty list of acceptable signal strings, or \"*\" wildcard (matches anything).",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      ]
+    },
+
+    "NarrativeStageRule": {
+      "type": "object",
+      "required": ["stage"],
+      "additionalProperties": false,
+      "description": "First-match-wins rule. Any of metric/dimension/stage_kind/event may be omitted or \"*\" (wildcard). A rule matches a block when every specified (non-wildcard) key matches one of the block's corresponding signals.",
+      "properties": {
+        "metric":     { "$ref": "#/$defs/NarrativeMatchValue" },
+        "dimension":  { "$ref": "#/$defs/NarrativeMatchValue" },
+        "stage_kind": { "$ref": "#/$defs/NarrativeMatchValue" },
+        "event":      { "$ref": "#/$defs/NarrativeMatchValue" },
+        "stage":      { "$ref": "#/$defs/NarrativeStageId" }
+      }
+    }
+  }
+}

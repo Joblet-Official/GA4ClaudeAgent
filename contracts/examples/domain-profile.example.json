@@ -1,0 +1,50 @@
+{
+  "$comment": "Domain profile for joblet.ai. Drives custom funnel construction in A2's investigation planning. Validates against ../registries/domain-profile.schema.json.",
+
+  "schema_version": "0.1.0",
+
+  "profiles": {
+    "ga4:516147906": {
+      "property_id": "ga4:516147906",
+      "domain_type": "job_board",
+      "display_name": "joblet.ai",
+
+      "key_engagement_events": ["view_search_results", "page_view", "scroll", "user_engagement"],
+
+      "key_conversion_events": ["job_apply", "job_apply_", "job_apply_unknown"],
+
+      "funnel_template": [
+        {
+          "label": "Sessions (session_start)",
+          "event_match": "session_start"
+        },
+        {
+          "label": "Pageviews",
+          "event_match": "page_view"
+        },
+        {
+          "label": "Search-results views",
+          "event_match": "view_search_results"
+        },
+        {
+          "label": "Apply events (all variants)",
+          "event_match": {
+            "any_of": ["job_apply", "job_apply_", "job_apply_unknown"]
+          }
+        }
+      ],
+
+      "page_classification": {
+        "rules": [
+          { "pattern": "/jobs/*/form",   "role": "apply_form",      "match": "glob" },
+          { "pattern": "/jobs/kb-*",     "role": "campaign_landing","match": "glob" },
+          { "pattern": "/jobs/*",        "role": "job_detail",      "match": "glob" },
+          { "pattern": "/blog/*",        "role": "blog_post",       "match": "glob" },
+          { "pattern": "/",              "role": "homepage",        "match": "equals" }
+        ]
+      },
+
+      "notes": "Apply events have rename variants visible in the data (job_apply, job_apply_, job_apply_unknown); A5/A6 must merge these when computing conversion totals."
+    }
+  }
+}

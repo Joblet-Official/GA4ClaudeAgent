@@ -1,0 +1,120 @@
+{
+  "$comment": "A6 viz spec corresponding to the rendered top_traffic_sources_2026-05-22.html. Validates against ../agents/a6-viz-spec.schema.json.",
+
+  "schema_version": "0.1.0",
+
+  "report_title": "Top traffic sources",
+  "subtitle": "joblet.ai · Last 28 days, ending 2026-05-22",
+
+  "context_chips": [
+    { "key": "Source",     "text": "GA4 (property 516147906)",   "kind": "context" },
+    { "key": "Timezone",   "text": "Asia/Calcutta",              "kind": "context" },
+    { "key": "Pulled in",  "text": "1.4 s",                      "kind": "context" },
+    { "key": "Rows",       "text": "10 of 81 matching",          "kind": "context" },
+    { "key": "Freshness",  "text": "Today (2026-05-22) is partial", "kind": "partial" }
+  ],
+
+  "disclosure_chips": [
+    { "key": "Default",     "text": "Last 28 days",  "kind": "default" },
+    { "key": "Default",     "text": "Top 10",        "kind": "default" },
+    { "key": "User picked", "text": "totalUsers",    "kind": "user_picked" },
+    { "key": "User picked", "text": "sessionSource", "kind": "user_picked" }
+  ],
+
+  "sections": [
+    {
+      "section_id": "sq_1_summary",
+      "section_title": "Overview",
+      "narrative_stage": "overview",
+      "narrative_intro": "This section sets the baseline: the summary figures for the period, before the report groups the detail by funnel stage.",
+      "narrative_handoff": "Having set the totals, the report next groups the sources by how traffic was acquired.",
+      "components": [
+        {
+          "component": "kpi_strip",
+          "block_ref": "sq_1_b_1",
+          "narrative_stage": "overview",
+          "kpis": [
+            { "label": "Total users (top 10)",  "value_display": "9,298",  "sub_display": "aggregated over the period" },
+            { "label": "Top 3 share of top 10", "value_display": "84.9%",  "sub_display": "(direct) + hirefeed.co.in + google" },
+            { "label": "Sentinel share",        "value_display": "39.7%",  "sub_display": "(direct) and (not set)" },
+            { "label": "Sources not shown",     "value_display": "71",     "sub_display": "tail of 81 total matching" }
+          ]
+        }
+      ]
+    },
+    {
+      "section_id": "sq_1_main",
+      "section_title": "Acquisition",
+      "narrative_stage": "acquisition",
+      "narrative_intro": "This section groups the acquisition-side detail: which sources brought the traffic, ranked by total users.",
+      "components": [
+        {
+          "component": "bar_chart_table_pair",
+          "block_ref": "sq_1_b_2",
+          "narrative_stage": "acquisition",
+          "caption": "Top 10 of 81 sources by total users; (direct) leads with 3,470 users (37.3% of shown), followed by hirefeed.co.in with 3,041. Two of the 10 rows are GA4 sentinel values.",
+          "chart": {
+            "orientation": "horizontal",
+            "max_value": 3470,
+            "bars": [
+              { "label": "(direct)",              "value": 3470, "value_display": "3,470", "is_sentinel": true,  "sentinel_label": "no referrer", "is_partial": true },
+              { "label": "hirefeed.co.in",        "value": 3041, "value_display": "3,041", "is_partial": true },
+              { "label": "google",                "value": 1387, "value_display": "1,387", "is_partial": true },
+              { "label": "linkedin.com",          "value": 659,  "value_display": "659",   "is_partial": true },
+              { "label": "reddit",                "value": 285,  "value_display": "285",   "is_partial": true },
+              { "label": "(not set)",             "value": 218,  "value_display": "218",   "is_sentinel": true,  "sentinel_label": "missing",     "is_partial": true },
+              { "label": "lnkd.in",               "value": 71,   "value_display": "71",    "is_partial": true },
+              { "label": "houston.craigslist.org","value": 61,   "value_display": "61",    "is_partial": true },
+              { "label": "tiktok.com",            "value": 54,   "value_display": "54",    "is_partial": true },
+              { "label": "atlanta.craigslist.org","value": 52,   "value_display": "52",    "is_partial": true }
+            ],
+            "visual_encoding": {
+              "sentinel_style": "italic_muted",
+              "partial_period_style": "diagonal_stripe",
+              "z_score_encoding": "none",
+              "identity_palette": ["#2E5C8A"]
+            }
+          },
+          "table": {
+            "columns": [
+              { "key": "rank",          "label": "#",            "align": "right" },
+              { "key": "sessionSource", "label": "Source",       "align": "left"  },
+              { "key": "totalUsers",    "label": "Total users",  "align": "right" },
+              { "key": "share",         "label": "Share",        "align": "right" }
+            ],
+            "rows": [
+              { "rank": 1,  "sessionSource": "(direct)",               "totalUsers": "3,470", "share": "37.3%", "is_sentinel": true },
+              { "rank": 2,  "sessionSource": "hirefeed.co.in",         "totalUsers": "3,041", "share": "32.7%" },
+              { "rank": 3,  "sessionSource": "google",                 "totalUsers": "1,387", "share": "14.9%" },
+              { "rank": 4,  "sessionSource": "linkedin.com",           "totalUsers": "659",   "share": "7.1%" },
+              { "rank": 5,  "sessionSource": "reddit",                 "totalUsers": "285",   "share": "3.1%" },
+              { "rank": 6,  "sessionSource": "(not set)",              "totalUsers": "218",   "share": "2.3%", "is_sentinel": true },
+              { "rank": 7,  "sessionSource": "lnkd.in",                "totalUsers": "71",    "share": "0.8%" },
+              { "rank": 8,  "sessionSource": "houston.craigslist.org", "totalUsers": "61",    "share": "0.7%" },
+              { "rank": 9,  "sessionSource": "tiktok.com",             "totalUsers": "54",    "share": "0.6%" },
+              { "rank": 10, "sessionSource": "atlanta.craigslist.org", "totalUsers": "52",    "share": "0.6%" },
+              { "rank": "—","sessionSource": "+71 others (not in dataset)", "totalUsers": "—", "share": "—", "is_others_row": true }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+
+  "quality_notes": [
+    "Today (2026-05-22) is in progress; values include partial data.",
+    "Top 10 of 81 sources shown; the remaining 71 are not in the dataset.",
+    "2 of 10 rows are GA4 sentinel values ((direct), (not set)); together they account for 39.7% of shown users.",
+    "Block is an aggregate over the period; no per-day breakdown was requested or returned."
+  ],
+
+  "footer_meta": {
+    "source": "GA4 property 516147906",
+    "pulled_at": "2026-05-22T14:03:22Z",
+    "latency_ms": 1417,
+    "sampling": "none",
+    "thresholding": "none"
+  },
+
+  "html_path": "E:/Documents/joveo/agent6_output/top_traffic_sources_2026-05-22.html"
+}

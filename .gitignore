@@ -1,0 +1,52 @@
+# ---------------------------------------------------------------------------
+# Root .gitignore for the GA4 Visualization Platform
+# Defense-in-depth: each sub-package also has its own .gitignore.
+# ---------------------------------------------------------------------------
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# Secrets - NEVER commit
+.env
+.env.local
+.env.*.local
+*service-account*.json
+*credentials*.json
+*.pem
+*.key
+
+# Build output
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Python
+__pycache__/
+*.pyc
+
+# Scratch / temp
+.tmp/
+.tmp_*/
+tmp_*.json
+tmp_ga4_q1.json
+_ga4_q1.json
+
+# Generated outputs - keep this repo source-only
+# (HTML reports, smoke/demo outputs, generated .docx)
+reports/
+*.docx
+
+# Vercel
+.vercel
+
+# OS / editors / logs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

@@ -1,0 +1,69 @@
+{
+  "$comment": "A4 data record for 'top traffic sources' trace from Phase 1. Real GA4 response normalised to canonical row form. Validates against ../agents/a4-data-record.schema.json.",
+
+  "schema_version": "0.1.0",
+  "status": "ok",
+
+  "rows_by_sub_question": {
+    "sq_1": [
+      { "dimensions": { "sessionSource": "(direct)" },              "metrics": { "totalUsers": 3470 } },
+      { "dimensions": { "sessionSource": "hirefeed.co.in" },        "metrics": { "totalUsers": 3041 } },
+      { "dimensions": { "sessionSource": "google" },                "metrics": { "totalUsers": 1387 } },
+      { "dimensions": { "sessionSource": "linkedin.com" },          "metrics": { "totalUsers": 659  } },
+      { "dimensions": { "sessionSource": "reddit" },                "metrics": { "totalUsers": 285  } },
+      { "dimensions": { "sessionSource": "(not set)" },             "metrics": { "totalUsers": 218  } },
+      { "dimensions": { "sessionSource": "lnkd.in" },               "metrics": { "totalUsers": 71   } },
+      { "dimensions": { "sessionSource": "houston.craigslist.org" },"metrics": { "totalUsers": 61   } },
+      { "dimensions": { "sessionSource": "tiktok.com" },            "metrics": { "totalUsers": 54   } },
+      { "dimensions": { "sessionSource": "atlanta.craigslist.org" },"metrics": { "totalUsers": 52   } }
+    ]
+  },
+
+  "execution_metadata": {
+    "queries_executed": 1,
+    "execution_strategy": "single",
+    "total_latency_ms": 1417,
+    "per_query": [
+      {
+        "sub_question_id": "sq_1",
+        "query_id": "q_1_main",
+        "source": "ga4",
+        "latency_ms": 1417,
+        "row_count": 10,
+        "total_rows_available": 81,
+        "sampling":     { "is_sampled": false, "rate": 1.0 },
+        "thresholding": { "applied": false, "hidden_rows": 0 },
+        "truncated": true,
+        "truncated_by": "user_requested_limit",
+        "data_freshness": { "latest_data_date": "2026-05-22", "is_partial": true },
+        "time_zone": "Asia/Calcutta",
+        "retries_attempted": 0
+      }
+    ]
+  },
+
+  "warnings": [
+    "Showing top 10 of 81 sources matching the query.",
+    "Data for 2026-05-22 is partial (today is in progress)."
+  ],
+
+  "failures": [],
+
+  "passthrough_pipeline": {
+    "intent": {
+      "$comment": "Verbatim A1 intent record. Embedded so A5 can read report_type without re-loading from session state."
+    },
+    "applied_defaults": [
+      { "field": "date_range",    "chosen": "last_28_days", "source": "registry", "rationale": "no time scope specified" },
+      { "field": "ranking_limit", "chosen": 10,             "source": "registry", "rationale": "no limit specified" }
+    ],
+    "carried_forward": [
+      { "field": "traffic_metric",    "chosen": "totalUsers",    "source": "user_clarification_prior_turn" },
+      { "field": "sources_dimension", "chosen": "sessionSource", "source": "user_clarification_prior_turn" }
+    ],
+    "a3_disclosures": [
+      "Showing last 28 days (no time range specified).",
+      "Top 10 sources (no limit specified)."
+    ]
+  }
+}

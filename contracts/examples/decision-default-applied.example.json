@@ -1,0 +1,55 @@
+{
+  "$comment": "A3 decision = DEFAULT_APPLIED. Real trace from Phase 1: user asked 'what is the engagement rate'. Only time scope was missing; registry defaulted to last_28_days. Engagement rate term mapped deterministically (1-to-1 catalog match) so no clarification needed. Validates against ../agents/a3-decision.schema.json.",
+
+  "schema_version": "0.1.0",
+  "decision": "DEFAULT_APPLIED",
+
+  "query_plan": {
+    "sub_question_id": "sq_1",
+    "queries": [
+      {
+        "query_id": "q_1_main",
+        "source": "ga4",
+        "purpose": "primary",
+        "metrics": {
+          "status": "resolved",
+          "items": [
+            { "name": "engagementRate" },
+            { "name": "engagedSessions", "purpose": "derivation_input" },
+            { "name": "sessions",        "purpose": "derivation_input" }
+          ]
+        },
+        "dimensions": {
+          "status": "resolved",
+          "items": [{ "name": "date" }]
+        },
+        "filters": [],
+        "date_range": {
+          "status": "resolved",
+          "type": "relative",
+          "value": "last_28_days"
+        },
+        "order_by": [],
+        "limit": null,
+        "grouping": "by_date",
+        "partial_period": true
+      }
+    ]
+  },
+
+  "applied_defaults": [
+    {
+      "field": "date_range",
+      "chosen": "last_28_days",
+      "source": "registry",
+      "rationale": "no time scope specified; GA4 28-day window is conventional for rate metrics"
+    }
+  ],
+
+  "carried_forward": [],
+
+  "disclosures": [
+    "Showing last 28 days (no time range specified).",
+    "Period rate computed as sum(engagedSessions) / sum(sessions) over complete days only — today (partial) excluded from the rate."
+  ]
+}

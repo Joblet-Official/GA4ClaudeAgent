@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/pipeline/trigger-expressions.schema.json",
+  "title": "Trigger-expression DSL — operator catalog and grammar reference",
+  "description": "Specifies the small expression language A2 uses to declare conditional-stage gates and A4 uses to evaluate them. This schema validates the OPERATOR CATALOG (the set of legal operators); the expression STRINGS themselves are parsed by the orchestrator at runtime. The DSL is deliberately tiny: arithmetic comparisons against typed accessor functions over prior-stage results. No side effects, no I/O, no LLM in the loop.",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": ["schema_version", "operators", "boolean_combinators", "grammar"],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "schema_version": { "const": "0.1.0" },
+
+    "operators": {
+      "type": "array",
+      "description": "Closed catalog of accessor functions. Each takes typed arguments and returns a typed value the comparison operators below can act on.",
+      "items": { "$ref": "#/$defs/OperatorDef" }
+    },
+
+    "comparison_operators": {
+      "type": "array",
+      "default": [">", ">=", "<", "<=", "==", "!="],
+      "items": { "type": "string", "enum": [">", ">=", "<", "<=", "==", "!="] }
+    },
+
+    "boolean_combinators": {
+      "type": "array",
+      "default": ["AND", "OR", "NOT"],
+      "items": { "type": "string", "enum": ["AND", "OR", "NOT"] }
+    },
+
+    "grammar": {
+      "type": "object",
+      "required": ["bnf"],
+      "additionalProperties": false,
+      "properties": {
+        "bnf": {
+          "type": "string",
+          "description": "BNF-ish grammar reference."
+        }
+      }
+    }
+
+  },
+
+  "$defs": {
+
+    "OperatorDef": {
+      "type": "object",
+      "required": ["name", "arity", "arguments", "returns", "semantics"],
+      "additionalProperties": false,
+      "properties": {
+
+        "name": {
+          "type": "string",
+          "enum": [
+            "funnel_step_rate",
+            "funnel_step_rate_drop",
+            "top_n_dim_diff",
+            "component_change_pct",
+            "metric_period_change_pct",
+            "metric_period_change_pp",
+            "z_score_max_abs",
+            "row_count_for_query",
+            "any_landing_page_share_above",
+            "any_dimension_concentration_change"
+          ]
+        },
+
+        "arity": { "type": "integer", "minimum": 0, "maximum": 4 },
+
+        "arguments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string", "enum": ["string", "integer", "float", "event_name", "metric_name", "dimension_name"] },
+              "description": { "type": "string" }
+            }
+          }
+        },
+
+        "returns": {
+          "type": "string",
+          "enum": ["integer", "float", "percent", "boolean"]
+        },
+
+        "semantics": {
+          "type": "string",
+          "description": "Plain-English evaluation rule. Example for funnel_step_rate_drop: 'Returns the fractional drop in funnel step rate for event X between baseline and current period; e.g. baseline 30%, current 3% returns 0.9.'"
+        },
+
+        "evaluates_against": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["stage1_results", "all_prior_stages", "current_stage", "constants_only"] },
+          "description": "Which prior data the operator consumes. Determines stage ordering constraints."
+        },
+
+        "examples": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Sample expression fragments using this operator."
+        }
+      }
+    }
+  }
+}

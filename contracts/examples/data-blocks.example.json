@@ -1,0 +1,98 @@
+{
+  "$comment": "A5 data blocks for 'top traffic sources'. Two blocks per the ranking-report block pattern: kpi_strip + ranked_table. Real Phase 1 trace. Validates against ../agents/a5-data-blocks.schema.json.",
+
+  "schema_version": "0.1.0",
+
+  "blocks_by_sub_question": {
+    "sq_1": [
+      {
+        "block_id": "sq_1_b_1",
+        "block_type": "kpi_strip",
+        "narrative_stage": "overview",
+        "title_seed": "Summary",
+        "description": "Four summary figures for the top 10 traffic sources over the period: 9,298 total users, an 84.9% top-3 share of the shown sources, a 39.7% sentinel share, and 71 sources not shown.",
+        "description_facts": {
+          "kpi_count": 4,
+          "total_users": 9298,
+          "top_3_share": "84.9%",
+          "sentinel_share": "39.7%",
+          "sources_not_shown": 71
+        },
+        "kpis": [
+          { "label": "Total users (top 10)",     "value": 9298,  "format": "number" },
+          { "label": "Top 3 share of top 10",    "value": 0.849, "format": "percent", "annotation": "(direct) + hirefeed.co.in + google" },
+          { "label": "Sentinel share",           "value": 0.397, "format": "percent", "annotation": "(direct) + (not set)" },
+          { "label": "Sources not shown",        "value": 71,    "format": "number",  "annotation": "tail of 81 total matching" }
+        ]
+      },
+      {
+        "block_id": "sq_1_b_2",
+        "block_type": "ranked_table",
+        "narrative_stage": "acquisition",
+        "title_seed": "Top 10 sources by total users",
+        "description": "Top 10 of 81 sources by total users; (direct) leads with 3,470 users (37.3% of shown), followed by hirefeed.co.in with 3,041. Two of the 10 rows are GA4 sentinel values.",
+        "description_facts": {
+          "shown_count": 10,
+          "total_available": 81,
+          "dimension": "sources",
+          "metric": "total users",
+          "top_label": "(direct)",
+          "top_value": "3,470",
+          "top_share": "37.3% of shown",
+          "sentinel_count": 2
+        },
+        "dimension_fields": ["sessionSource"],
+        "metric_fields":    ["totalUsers"],
+        "rows": [
+          { "rank": 1,  "sessionSource": "(direct)",              "totalUsers": 3470, "share_of_shown": 0.373, "is_sentinel": true,  "sentinel_kind": "no_referrer" },
+          { "rank": 2,  "sessionSource": "hirefeed.co.in",        "totalUsers": 3041, "share_of_shown": 0.327, "is_sentinel": false },
+          { "rank": 3,  "sessionSource": "google",                "totalUsers": 1387, "share_of_shown": 0.149, "is_sentinel": false },
+          { "rank": 4,  "sessionSource": "linkedin.com",          "totalUsers": 659,  "share_of_shown": 0.071, "is_sentinel": false },
+          { "rank": 5,  "sessionSource": "reddit",                "totalUsers": 285,  "share_of_shown": 0.031, "is_sentinel": false },
+          { "rank": 6,  "sessionSource": "(not set)",             "totalUsers": 218,  "share_of_shown": 0.023, "is_sentinel": true,  "sentinel_kind": "missing" },
+          { "rank": 7,  "sessionSource": "lnkd.in",               "totalUsers": 71,   "share_of_shown": 0.008, "is_sentinel": false },
+          { "rank": 8,  "sessionSource": "houston.craigslist.org","totalUsers": 61,   "share_of_shown": 0.007, "is_sentinel": false },
+          { "rank": 9,  "sessionSource": "tiktok.com",            "totalUsers": 54,   "share_of_shown": 0.006, "is_sentinel": false },
+          { "rank": 10, "sessionSource": "atlanta.craigslist.org","totalUsers": 52,   "share_of_shown": 0.006, "is_sentinel": false }
+        ],
+        "annotations": {
+          "shown_count":      10,
+          "total_available":  81,
+          "totals":           { "totalUsers": 9298 },
+          "top_n_share":      { "top_3_share_of_shown": 0.849, "top_1_share_of_shown": 0.373 },
+          "sentinel_count":   2,
+          "sentinels_in_set": ["(direct)", "(not set)"],
+          "period_partial":   true,
+          "other_rollup":     null
+        }
+      }
+    ]
+  },
+
+  "data_quality_notes": [
+    "Today (2026-05-22) is in progress; values include partial data.",
+    "Top 10 of 81 sources shown; the remaining 71 are not in the dataset.",
+    "2 of 10 rows are GA4 sentinel values ((direct), (not set)); together they account for 39.7% of shown users.",
+    "Block is an aggregate over the period; no per-day breakdown was requested or returned."
+  ],
+
+  "passthrough_pipeline": {
+    "intent": { "$comment": "Verbatim A1 intent record." },
+    "applied_defaults": [
+      { "field": "date_range",    "chosen": "last_28_days", "source": "registry" },
+      { "field": "ranking_limit", "chosen": 10,             "source": "registry" }
+    ],
+    "carried_forward": [
+      { "field": "traffic_metric",    "chosen": "totalUsers",    "source": "user_clarification_prior_turn" },
+      { "field": "sources_dimension", "chosen": "sessionSource", "source": "user_clarification_prior_turn" }
+    ],
+    "a3_disclosures": [
+      "Showing last 28 days (no time range specified).",
+      "Top 10 sources (no limit specified)."
+    ],
+    "a4_warnings": [
+      "Showing top 10 of 81 sources matching the query.",
+      "Data for 2026-05-22 is partial (today is in progress)."
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "@gvp/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./schemas/*": "./schemas/*"
+  },
+  "files": ["dist", "schemas"],
+  "scripts": {
+    "build": "tsc",
+    "codegen": "tsx scripts/codegen.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "ajv": "^8.16.0",
+    "ajv-formats": "^3.0.1"
+  },
+  "devDependencies": {
+    "json-schema-to-typescript": "^15.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0",
+    "@types/node": "^20.12.0"
+  }
+}

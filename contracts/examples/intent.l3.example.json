@@ -1,0 +1,39 @@
+{
+  "$comment": "A1 intent record for the user question: 'How is our organic traffic doing?' (Q21 from the training corpus). L3 (multi-surface descriptive) example — A2 expands a parallel basket of queries across surfaces, filtered to the organic slice. 'organic' is a channel cue (resolved to sessionDefaultChannelGroup='Organic Search' by A3); the time anchor is missing, so time_scope_missing is flagged and A3 must halt (never auto-default). analysis_level=L3 ⇔ interpretation_request=false. Validates against ../agents/a1-intent.schema.json.",
+
+  "schema_version": "0.1.0",
+  "report_type": "composite",
+  "analysis_level": "L3",
+  "business_objective": "assess organic traffic across surfaces",
+
+  "sub_questions": [
+    {
+      "id": "sq_1",
+      "verbatim": "How is our organic traffic doing?",
+      "report_type": "composite",
+      "scope_cues": {
+        "metric_term": "traffic",
+        "dimension_term": null,
+        "time": null,
+        "geography": null,
+        "channel_filter": "organic",
+        "rank_direction": null,
+        "direction": null,
+        "device": null,
+        "page": null
+      }
+    }
+  ],
+
+  "comparison_intent": null,
+
+  "ambiguity_flags": [
+    "time_scope_missing",
+    "comparison_period_implicit"
+  ],
+
+  "is_followup": false,
+  "followup_delta": null,
+  "out_of_scope": false,
+  "interpretation_request": false
+}

@@ -1,0 +1,255 @@
+{
+  "schema_version": "0.1.0",
+  "tools": [
+    {
+      "tool_id": "ga4_data_api",
+      "name": "Google Analytics Data API client",
+      "kind": "data_api",
+      "side_effect": "read_only",
+      "requires_credential": true,
+      "credential_scope": "https://www.googleapis.com/auth/analytics.readonly",
+      "typical_usage": "A4 invokes runReport / batchRunReports against properties/516147906.",
+      "constraints": {
+        "max_rows_per_query": 100000,
+        "max_concurrent_queries_per_turn": 5,
+        "max_total_queries_per_turn": 50,
+        "read_only_enforced": true,
+        "rate_limit_handling": "honor_retry_after_header",
+        "credentials_source": "service_account_json"
+      }
+    },
+    {
+      "tool_id": "catalog_reader",
+      "name": "Catalog registry reader",
+      "kind": "registry_read",
+      "side_effect": "read_only",
+      "requires_credential": false,
+      "typical_usage": "A2 reads catalog entries to map user terms to catalog fields and to retrieve short_definition for A3 hint text.",
+      "constraints": {
+        "cache_in_memory": true,
+        "refresh_on": "deployment"
+      }
+    },
+    {
+      "tool_id": "defaults_registry_reader",
+      "name": "Defaults registry reader",
+      "kind": "registry_read",
+      "side_effect": "read_only",
+      "requires_credential": false,
+      "typical_usage": "A3 consults per-field defaultable + default_value policies.",
+      "constraints": {
+        "cache_in_memory": true,
+        "refresh_on": "deployment"
+      }
+    },
+    {
+      "tool_id": "metric_ontology_reader",
+      "name": "Metric ontology reader",
+      "kind": "registry_read",
+      "side_effect": "read_only",
+      "requires_credential": false,
+      "typical_usage": "A2 consults ontology entries when interpretation_request=true to plan staged investigations.",
+      "constraints": {
+        "cache_in_memory": true,
+        "refresh_on": "deployment"
+      }
+    },
+    {
+      "tool_id": "domain_profile_reader",
+      "name": "Domain profile reader",
+      "kind": "registry_read",
+      "side_effect": "read_only",
+      "requires_credential": false,
+      "typical_usage": "A2 consults per-property profile to construct custom funnel templates.",
+      "constraints": {
+        "cache_in_memory": true,
+        "refresh_on": "deployment"
+      }
+    },
+    {
+      "tool_id": "block_pattern_registry_reader",
+      "name": "Block-pattern registry reader",
+      "kind": "registry_read",
+      "side_effect": "read_only",
+      "requires_credential": false,
+      "typical_usage": "A5 looks up report_type \u2192 default block_types and approved annotations.",
+      "constraints": {
+        "cache_in_memory": true,
+        "refresh_on": "deployment"
+      }
+    },
+    {
+      "tool_id": "viz_registry_reader",
+      "name": "Viz registry reader",
+      "kind": "registry_read",
+      "side_effect": "read_only",
+      "requires_credential": false,
+      "typical_usage": "A6 maps block_type \u2192 component, reads colour policy, picks layout per report_type.",
+      "constraints": {
+        "cache_in_memory": true,
+        "refresh_on": "deployment"
+      }
+    },
+    {
+      "tool_id": "html_file_writer",
+      "name": "HTML file writer (constrained path)",
+      "kind": "file_write",
+      "side_effect": "write",
+      "requires_credential": false,
+      "typical_usage": "A6 writes the rendered viz spec to an HTML file under reports/.",
+      "constraints": {
+        "write_path_pattern": "reports/**/*.html",
+        "max_file_size_mb": 10,
+        "format_allowed": [
+          "text/html"
+        ],
+        "path_traversal_rejected": true,
+        "overwrite_policy": "allowed_for_timestamped_paths"
+      }
+    },
+    {
+      "tool_id": "clarification_emitter",
+      "name": "User clarification emitter",
+      "kind": "user_surface",
+      "side_effect": "write",
+      "requires_credential": false,
+      "typical_usage": "A3 emits a NEEDS_CLARIFICATION decision; orchestrator returns the clarification structure to the frontend.",
+      "constraints": {
+        "rate_limit_per_turn": 1,
+        "payload_must_match": "agents/a3-decision.schema.json#/$defs/Clarification",
+        "hint_text_must_come_from": "catalog.short_definition"
+      }
+    }
+  ],
+  "agent_permissions": {
+    "A1": {
+      "may_use": [],
+      "may_not_use": [
+        "ga4_data_api",
+        "catalog_reader",
+        "defaults_registry_reader",
+        "metric_ontology_reader",
+        "domain_profile_reader",
+        "block_pattern_registry_reader",
+        "viz_registry_reader",
+        "html_file_writer",
+        "clarification_emitter"
+      ],
+      "can_contact_user": false,
+      "can_generate_user_facing_text": "no",
+      "rationale": "A1 is a pure language\u2192structure transform. It reads the user's text and emits an intent record. No catalog, no data, no user contact, no file writes. If A1 could read the catalog it would normalise user terms, defeating A2's ambiguity-flagging."
+    },
+    "A2": {
+      "may_use": [
+        "catalog_reader",
+        "metric_ontology_reader",
+        "domain_profile_reader"
+      ],
+      "may_not_use": [
+        "ga4_data_api",
+        "defaults_registry_reader",
+        "block_pattern_registry_reader",
+        "viz_registry_reader",
+        "html_file_writer",
+        "clarification_emitter"
+      ],
+      "can_contact_user": false,
+      "can_generate_user_facing_text": "no",
+      "rationale": "A2 grounds intent in catalog and plans queries. For interpretation_request=true intents it also consults the metric ontology and domain profile to plan staged investigations. A2 never queries live data (Rule 1) and never decides defaults (A3's job)."
+    },
+    "A3": {
+      "may_use": [
+        "defaults_registry_reader",
+        "clarification_emitter"
+      ],
+      "may_not_use": [
+        "ga4_data_api",
+        "catalog_reader",
+        "metric_ontology_reader",
+        "domain_profile_reader",
+        "block_pattern_registry_reader",
+        "viz_registry_reader",
+        "html_file_writer"
+      ],
+      "can_contact_user": true,
+      "can_generate_user_facing_text": "only_via_catalog_hints",
+      "rationale": "A3 is the gatekeeper and the only user-facing agent. It reads the defaults registry to decide APPROVED vs DEFAULT_APPLIED vs NEEDS_CLARIFICATION, and emits clarification with hint text sourced from catalog.short_definition (NOT generated freely)."
+    },
+    "A4": {
+      "may_use": [
+        "ga4_data_api"
+      ],
+      "may_not_use": [
+        "catalog_reader",
+        "defaults_registry_reader",
+        "metric_ontology_reader",
+        "domain_profile_reader",
+        "block_pattern_registry_reader",
+        "viz_registry_reader",
+        "html_file_writer",
+        "clarification_emitter"
+      ],
+      "can_contact_user": false,
+      "can_generate_user_facing_text": "no",
+      "rationale": "First and only agent with data access (Rule 1 boundary). Receives a resolved plan; executes via the GA4 client; surfaces failures as structured records, never user-facing text.",
+      "per_tool_constraints": {
+        "ga4_data_api": {
+          "max_concurrent_queries_per_turn": 5,
+          "max_total_queries_per_turn": 50
+        }
+      }
+    },
+    "A5": {
+      "may_use": [
+        "block_pattern_registry_reader"
+      ],
+      "may_not_use": [
+        "ga4_data_api",
+        "catalog_reader",
+        "defaults_registry_reader",
+        "metric_ontology_reader",
+        "domain_profile_reader",
+        "viz_registry_reader",
+        "html_file_writer",
+        "clarification_emitter"
+      ],
+      "can_contact_user": false,
+      "can_generate_user_facing_text": "no",
+      "rationale": "A5 transforms raw rows into structured blocks per the block-pattern registry. Receives all upstream metadata via passthrough_pipeline; no re-querying, no re-reading other registries (would risk inconsistency with upstream resolution)."
+    },
+    "A6": {
+      "may_use": [
+        "viz_registry_reader",
+        "html_file_writer"
+      ],
+      "may_not_use": [
+        "ga4_data_api",
+        "catalog_reader",
+        "defaults_registry_reader",
+        "metric_ontology_reader",
+        "domain_profile_reader",
+        "block_pattern_registry_reader",
+        "clarification_emitter"
+      ],
+      "can_contact_user": false,
+      "can_generate_user_facing_text": "only_via_templates",
+      "rationale": "A6 paints what A5 emits using the viz registry to pick components and colour policy. Writes HTML to a constrained path. Generates user-facing text only via templates filled with A5 annotations.",
+      "per_tool_constraints": {
+        "html_file_writer": {
+          "write_path_pattern": "reports/**/*.html"
+        }
+      }
+    }
+  },
+  "invariants": {
+    "agents_permitted_data_apis": [
+      "A4"
+    ],
+    "agents_permitted_user_surface": [
+      "A3"
+    ],
+    "agents_permitted_file_write": [
+      "A6"
+    ]
+  }
+}

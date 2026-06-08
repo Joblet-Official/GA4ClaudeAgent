@@ -1,0 +1,38 @@
+{
+  "$comment": "A1 intent record for the user question: 'why did the engagement rate drop in April 2026'. L4 (single-metric diagnostic) example — triggers A2's universal RCA playbook expansion. Note: 'in April' is named but the baseline period is implicit, so comparison_period_implicit is flagged. analysis_level=L4 ⇔ interpretation_request=true (cross-field invariant enforced by verify.py Check 5). Validates against ../agents/a1-intent.schema.json.",
+
+  "schema_version": "0.1.0",
+  "report_type": "trend",
+  "analysis_level": "L4",
+  "business_objective": "localize engagement rate decline in April",
+
+  "sub_questions": [
+    {
+      "id": "sq_1",
+      "verbatim": "why did the engagement rate drop in April 2026",
+      "report_type": "trend",
+      "scope_cues": {
+        "metric_term": "engagement rate",
+        "dimension_term": null,
+        "time": "in April 2026",
+        "geography": null,
+        "channel_filter": null,
+        "rank_direction": null,
+        "direction": "dropped",
+        "device": null,
+        "page": null
+      }
+    }
+  ],
+
+  "comparison_intent": null,
+
+  "ambiguity_flags": [
+    "comparison_period_implicit"
+  ],
+
+  "is_followup": false,
+  "followup_delta": null,
+  "out_of_scope": false,
+  "interpretation_request": true
+}

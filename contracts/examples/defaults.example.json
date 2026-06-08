@@ -1,0 +1,61 @@
+{
+  "$comment": "Defaults registry instance — the exact defaults applied in Phase 1 traces. Validates against ../registries/defaults.schema.json.",
+
+  "schema_version": "0.1.0",
+
+  "fields": {
+
+    "date_range": {
+      "defaultable": true,
+      "default_value": "last_28_days",
+      "candidates": ["last_28_days", "last_7_days", "last_30_days"],
+      "disclosure_template": "Showing last 28 days (no time range specified)."
+    },
+
+    "ranking_limit": {
+      "defaultable": true,
+      "default_value": 10,
+      "candidates": [10, 5, 20],
+      "disclosure_template": "Top {chosen} (no limit specified).",
+      "applies_to_report_types": ["ranking"]
+    },
+
+    "comparison_period": {
+      "defaultable": true,
+      "default_value": "prior_period_matched_length",
+      "candidates": ["prior_period_matched_length", "last_month", "last_quarter"],
+      "disclosure_template": "Comparing against {chosen} as baseline.",
+      "depends_on": { "current_period_choice": true }
+    },
+
+    "geography_scope": {
+      "defaultable": true,
+      "default_value": "all_regions",
+      "disclosure_template": "Showing all regions (no geography specified)."
+    },
+
+    "traffic_metric": {
+      "defaultable": false,
+      "candidates": ["sessions", "activeUsers", "totalUsers", "screenPageViews"],
+      "no_default_reason": "The ranking can change materially depending on which traffic metric is picked. Sessions, users, and pageviews measure different things.",
+      "registry_recommended": true
+    },
+
+    "sources_dimension": {
+      "defaultable": false,
+      "candidates": ["sessionSource", "sessionMedium", "sessionSourceMedium", "sessionDefaultChannelGroup"],
+      "no_default_reason": "Source breakdown vs channel-group breakdown produces fundamentally different views of acquisition.",
+      "registry_recommended": false
+    },
+
+    "organic_scope": {
+      "defaultable": false,
+      "candidates": [
+        { "value": "sessionMedium == 'organic'",                       "label": "Organic search only" },
+        { "value": "sessionDefaultChannelGroup == 'Organic Search'",   "label": "Organic Search channel group" },
+        { "value": "sessionDefaultChannelGroup starts_with 'Organic'", "label": "All Organic channels (Search + Social + Video + Shopping)" }
+      ],
+      "no_default_reason": "Organic-search vs all-organic-channels are materially different scopes."
+    }
+  }
+}

@@ -1,0 +1,211 @@
+{
+  "schema_version": "0.1.0",
+  "operators": [
+    {
+      "name": "funnel_step_rate",
+      "arity": 2,
+      "arguments": [
+        {
+          "name": "event_name",
+          "type": "event_name",
+          "description": "Funnel step event whose conversion rate is queried."
+        },
+        {
+          "name": "period",
+          "type": "string",
+          "description": "'current' or 'baseline'."
+        }
+      ],
+      "returns": "percent",
+      "semantics": "Returns the conversion rate FROM the funnel step preceding event_name TO event_name itself, in the named period.",
+      "evaluates_against": [
+        "stage1_results",
+        "all_prior_stages"
+      ],
+      "examples": [
+        "funnel_step_rate(\"view_search_results\", \"baseline\")",
+        "funnel_step_rate(\"job_apply\", \"current\")"
+      ]
+    },
+    {
+      "name": "funnel_step_rate_drop",
+      "arity": 1,
+      "arguments": [
+        {
+          "name": "event_name",
+          "type": "event_name",
+          "description": "The funnel step whose drop between baseline and current is measured."
+        }
+      ],
+      "returns": "float",
+      "semantics": "Returns (baseline_rate - current_rate) / baseline_rate. Range [-inf, 1]. 0.9 = step rate fell 90%. Negative = step rate grew.",
+      "evaluates_against": [
+        "all_prior_stages"
+      ],
+      "examples": [
+        "funnel_step_rate_drop(\"view_search_results\") > 0.5"
+      ]
+    },
+    {
+      "name": "top_n_dim_diff",
+      "arity": 2,
+      "arguments": [
+        {
+          "name": "dimension_name",
+          "type": "dimension_name"
+        },
+        {
+          "name": "n",
+          "type": "integer",
+          "description": "Top-N to compare across both periods."
+        }
+      ],
+      "returns": "integer",
+      "semantics": "Returns the number of dimension values that appear in the current-period top-N but NOT in the baseline-period top-N (symmetric size of the appeared+disappeared sets, divided by 2). A measure of composition turnover.",
+      "evaluates_against": [
+        "all_prior_stages"
+      ],
+      "examples": [
+        "top_n_dim_diff(\"landingPage\", n=20) >= 5"
+      ]
+    },
+    {
+      "name": "component_change_pct",
+      "arity": 1,
+      "arguments": [
+        {
+          "name": "component_metric",
+          "type": "metric_name",
+          "description": "Underlying component of the metric being investigated."
+        }
+      ],
+      "returns": "percent",
+      "semantics": "Returns (current_sum - baseline_sum) / baseline_sum for the named metric. Negative = component fell.",
+      "evaluates_against": [
+        "all_prior_stages"
+      ],
+      "examples": [
+        "component_change_pct(\"engagedSessions\")"
+      ]
+    },
+    {
+      "name": "metric_period_change_pct",
+      "arity": 1,
+      "arguments": [
+        {
+          "name": "metric_name",
+          "type": "metric_name"
+        }
+      ],
+      "returns": "percent",
+      "semantics": "Generic period-over-period percent change of any metric.",
+      "evaluates_against": [
+        "all_prior_stages"
+      ],
+      "examples": [
+        "metric_period_change_pct(\"sessions\") < -0.10"
+      ]
+    },
+    {
+      "name": "metric_period_change_pp",
+      "arity": 1,
+      "arguments": [
+        {
+          "name": "metric_name",
+          "type": "metric_name"
+        }
+      ],
+      "returns": "float",
+      "semantics": "Period-over-period change in percentage points (for rate metrics). Example: 0.715 → 0.600 returns -0.115 (i.e. -11.5 pp).",
+      "evaluates_against": [
+        "all_prior_stages"
+      ],
+      "examples": [
+        "metric_period_change_pp(\"engagementRate\") < -0.05"
+      ]
+    },
+    {
+      "name": "z_score_max_abs",
+      "arity": 1,
+      "arguments": [
+        {
+          "name": "series_name",
+          "type": "string",
+          "description": "Identifier of a prior-stage time series (e.g. 'daily_engagement_rate')."
+        }
+      ],
+      "returns": "float",
+      "semantics": "Maximum absolute z-score across the named series, computed against the series's trailing mean and standard deviation.",
+      "evaluates_against": [
+        "all_prior_stages"
+      ]
+    },
+    {
+      "name": "row_count_for_query",
+      "arity": 1,
+      "arguments": [
+        {
+          "name": "query_id",
+          "type": "string"
+        }
+      ],
+      "returns": "integer",
+      "semantics": "Number of rows returned by the named prior-stage query.",
+      "evaluates_against": [
+        "all_prior_stages"
+      ]
+    },
+    {
+      "name": "any_landing_page_share_above",
+      "arity": 1,
+      "arguments": [
+        {
+          "name": "threshold",
+          "type": "float",
+          "description": "Share threshold between 0 and 1."
+        }
+      ],
+      "returns": "boolean",
+      "semantics": "True if any landing page in the current-period top set holds at least `threshold` share of sessions.",
+      "evaluates_against": [
+        "all_prior_stages"
+      ]
+    },
+    {
+      "name": "any_dimension_concentration_change",
+      "arity": 1,
+      "arguments": [
+        {
+          "name": "dim",
+          "type": "dimension_name",
+          "description": "Dimension name, or the literal special token 'any_dim' to check the max concentration change across all standard playbook breakdown dimensions (channel, landingPage, device, country, eventName)."
+        }
+      ],
+      "returns": "float",
+      "semantics": "Returns the maximum absolute change in any single cohort's share-of-whole between baseline and current periods, expressed as a fraction (e.g. 0.18 = 18 percentage points). When dim='any_dim', the orchestrator scans every breakdown dimension produced by the universal L2 playbook and returns the maximum. Used by the universal cohort_drilldown stage trigger.",
+      "evaluates_against": [
+        "all_prior_stages"
+      ],
+      "examples": [
+        "any_dimension_concentration_change(any_dim) > 0.15",
+        "any_dimension_concentration_change(\"sessionDefaultChannelGroup\") > 0.10"
+      ]
+    }
+  ],
+  "comparison_operators": [
+    ">",
+    ">=",
+    "<",
+    "<=",
+    "==",
+    "!="
+  ],
+  "boolean_combinators": [
+    "AND",
+    "OR",
+    "NOT"
+  ],
+  "grammar": {
+    "bnf": "Expression := BooleanTerm (Combinator BooleanTerm)*\nBooleanTerm := Comparison | \"NOT\" Comparison | \"(\" Expression \")\"\nComparison := Operator(...) ComparisonOp Literal\nOperator := identifier — must be in operators[].name\nComparisonOp := \">\" | \">=\" | \"<\" | \"<=\" | \"==\" | \"!=\"\nCombinator := \"AND\" | \"OR\"\nLiteral := integer | float | percent | string"
+  }
+}

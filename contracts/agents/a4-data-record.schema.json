@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/agents/a4-data-record.schema.json",
+  "title": "A4 — Normalised data record",
+  "description": "Output of Agent 4 (Data Access). Canonical row-shaped data per sub-question, plus rich execution metadata (sampling, thresholding, truncation, freshness, retries) and a typed failure surface. For staged investigation plans, also records which stages executed vs were skipped and why.",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": [
+    "schema_version",
+    "status",
+    "rows_by_sub_question",
+    "execution_metadata",
+    "warnings",
+    "failures",
+    "passthrough_pipeline"
+  ],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "schema_version": { "const": "0.1.0" },
+
+    "status": { "$ref": "../_shared.schema.json#/$defs/Status" },
+
+    "rows_by_sub_question": {
+      "type": "object",
+      "description": "Canonical rows keyed by sub_question_id. Empty array means the query returned 0 rows (not a failure).",
+      "propertyNames": { "$ref": "../_shared.schema.json#/$defs/SubQuestionId" },
+      "additionalProperties": {
+        "type": "array",
+        "items": { "$ref": "#/$defs/CanonicalRow" }
+      }
+    },
+
+    "execution_metadata": { "$ref": "#/$defs/ExecutionMetadata" },
+
+    "warnings": {
+      "type": "array",
+      "description": "Factual non-blocking notes (sampling, truncation, partial period, etc.). Never interpretive.",
+      "items": { "type": "string" }
+    },
+
+    "failures": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Failure" }
+    },
+
+    "passthrough_pipeline": { "$ref": "#/$defs/A4PipelinePassthrough" }
+
+  },
+
+  "$defs": {
+
+    "CanonicalRow": {
+      "type": "object",
+      "required": ["dimensions", "metrics"],
+      "additionalProperties": false,
+      "description": "Source-agnostic row shape. GA4's dimensionValues/metricValues arrays and GSC's keys/clicks/impressions all collapse to this.",
+      "properties": {
+        "dimensions": {
+          "type": "object",
+          "description": "Map of dimension field name → string value (preserves source's native representation, e.g. GA4 dates as 'YYYYMMDD').",
+          "additionalProperties": { "type": "string" }
+        },
+        "metrics": {
+          "type": "object",
+          "description": "Map of metric field name → numeric value. A4 casts source strings to numbers; values that cannot be cast are surfaced via unknown_fields_dropped, not silently coerced.",
+          "additionalProperties": { "type": "number" }
+        }
+      }
+    },
+
+    "ExecutionMetadata": {
+      "type": "object",
+      "required": ["queries_executed", "total_latency_ms", "per_query"],
+      "additionalProperties": false,
+      "properties": {
+        "queries_executed": { "type": "integer", "minimum": 0 },
+        "execution_strategy": {
+          "type": "string",
+          "enum": ["single", "parallel", "sequential", "split_by_date", "split_by_dimension", "paginated"],
+          "description": "A4's reasoning output — the strategy it chose, surfaced for telemetry and debugging."
+        },
+        "total_latency_ms": { "type": "integer", "minimum": 0 },
+        "per_query": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/PerQueryMetadata" }
+        },
+        "stages_executed": {
+          "type": "array",
+          "description": "Present only when A2 emitted a staged plan. Records which stages ran, which were skipped, and why.",
+          "items": { "$ref": "#/$defs/StageExecutionRecord" }
+        }
+      }
+    },
+
+    "PerQueryMetadata": {
+      "type": "object",
+      "required": ["sub_question_id", "query_id", "source", "latency_ms", "row_count"],
+      "additionalProperties": false,
+      "properties": {
+        "sub_question_id": { "$ref": "../_shared.schema.json#/$defs/SubQuestionId" },
+        "query_id":        { "$ref": "../_shared.schema.json#/$defs/QueryId" },
+        "source":          { "$ref": "../_shared.schema.json#/$defs/Source" },
+        "latency_ms":      { "type": "integer", "minimum": 0 },
+        "row_count":       { "type": "integer", "minimum": 0 },
+
+        "total_rows_available": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "When the source reports total matching rows (e.g. GA4 response.row_count), capture here so A6 can render 'top 10 of 81'. Phase-1 spec finding."
+        },
+
+        "sampling": {
+          "type": "object",
+          "required": ["is_sampled", "rate"],
+          "additionalProperties": false,
+          "properties": {
+            "is_sampled": { "type": "boolean" },
+            "rate":       { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+
+        "thresholding": {
+          "type": "object",
+          "required": ["applied"],
+          "additionalProperties": false,
+          "properties": {
+            "applied":     { "type": "boolean" },
+            "hidden_rows": { "type": "integer", "minimum": 0 }
+          }
+        },
+
+        "truncated": { "type": "boolean" },
+
+        "truncated_by": {
+          "type": "string",
+          "enum": ["user_requested_limit", "ceiling_hit", "none"],
+          "description": "Phase-1 finding: distinguishes 'user asked for 10' (not really truncation) from 'A4 row ceiling hit' (real truncation)."
+        },
+
+        "data_freshness": {
+          "type": "object",
+          "required": ["latest_data_date", "is_partial"],
+          "additionalProperties": false,
+          "properties": {
+            "latest_data_date": { "$ref": "../_shared.schema.json#/$defs/DateString" },
+            "is_partial":       { "type": "boolean" }
+          }
+        },
+
+        "time_zone": { "type": "string" },
+
+        "unknown_fields_dropped": {
+          "type": "array",
+          "description": "Fields the source returned that the plan did not request. Dropped from rows; logged here for transparency.",
+          "items": { "type": "string" }
+        },
+
+        "retries_attempted": { "type": "integer", "minimum": 0 }
+      }
+    },
+
+    "StageExecutionRecord": {
+      "type": "object",
+      "required": ["stage_id", "status"],
+      "additionalProperties": false,
+      "description": "Per-stage execution record for staged plans. Makes the conditional gates visible in telemetry.",
+      "properties": {
+        "stage_id":            { "type": "string" },
+        "status":              { "type": "string", "enum": ["executed", "skipped"] },
+        "execute_if":          { "type": "string", "description": "Trigger expression as written in A2's plan, before evaluation." },
+        "condition_evaluated": { "type": "string", "description": "Trigger expression with values substituted, e.g. 'search_step_rate_drop = 0.89 > 0.5'." },
+        "condition_result":    { "type": "boolean" },
+        "skip_reason":         { "type": "string", "description": "Required when status='skipped' and stage was conditional. E.g. 'condition not met'." }
+      }
+    },
+
+    "Failure": {
+      "type": "object",
+      "required": ["sub_question_id", "kind", "fatal"],
+      "additionalProperties": false,
+      "properties": {
+        "sub_question_id":   { "$ref": "../_shared.schema.json#/$defs/SubQuestionId" },
+        "query_id":          { "$ref": "../_shared.schema.json#/$defs/QueryId" },
+        "kind":              { "$ref": "../_shared.schema.json#/$defs/FailureKind" },
+        "detail":            { "type": "string" },
+        "retries_attempted": { "type": "integer", "minimum": 0 },
+        "fatal":             { "type": "boolean", "description": "True = permanent failure for this sub-question. False = transient that was eventually recovered." }
+      }
+    },
+
+    "A4PipelinePassthrough": {
+      "type": "object",
+      "required": ["intent", "applied_defaults", "carried_forward", "a3_disclosures"],
+      "additionalProperties": false,
+      "description": "Per Phase-1 finding: A4 carries A1's intent and A3's resolution metadata forward unchanged. A5 needs these for block-type selection and disclosure rendering.",
+      "properties": {
+        "intent": {
+          "type": "object",
+          "description": "Verbatim A1 intent record (for report_type, comparison_intent, business_objective)."
+        },
+        "applied_defaults": {
+          "type": "array",
+          "items": { "$ref": "../_shared.schema.json#/$defs/AppliedDefault" }
+        },
+        "carried_forward": {
+          "type": "array",
+          "items": { "$ref": "../_shared.schema.json#/$defs/CarriedForward" }
+        },
+        "a3_disclosures": {
+          "type": "array",
+          "items": { "$ref": "../_shared.schema.json#/$defs/Disclosure" }
+        }
+      }
+    }
+
+  }
+}

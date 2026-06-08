@@ -1,0 +1,605 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/agents/a6-viz-spec.schema.json",
+  "title": "A6 — Visualisation spec",
+  "description": "Output of Agent 6 (Visualisation). A render-ready specification for the frontend. Component choices are deterministic registry lookups; every label is templated; zero free-text generation. The viz_spec is a structured contract; an additional output (HTML file path) is optional and surfaces the rendered artifact when A6 wrote one to disk.",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": [
+    "schema_version",
+    "report_title",
+    "subtitle",
+    "context_chips",
+    "disclosure_chips",
+    "sections",
+    "quality_notes",
+    "footer_meta"
+  ],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "schema_version": { "const": "0.1.0" },
+
+    "report_title": {
+      "type": "string",
+      "description": "Templated, factual title. No editorial. Example: 'Top traffic sources', 'Engagement rate', 'Sessions by country — where the change sits'."
+    },
+
+    "subtitle": {
+      "type": "string",
+      "description": "Templated subtitle. Example: 'joblet.ai · Last 28 days (Apr 24 – May 22, 2026)'."
+    },
+
+    "context_chips": {
+      "type": "array",
+      "description": "Top-of-report chips: scope, period, source, freshness flags.",
+      "items": { "$ref": "#/$defs/Chip" }
+    },
+
+    "disclosure_chips": {
+      "type": "array",
+      "description": "Defaults applied + sticky-carried choices, rendered as chips so user can see what was assumed.",
+      "items": { "$ref": "#/$defs/Chip" }
+    },
+
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/Section" }
+    },
+
+    "quality_notes": {
+      "type": "array",
+      "description": "Carried from A5's data_quality_notes (may be augmented with A6 method notes).",
+      "items": { "type": "string" }
+    },
+
+    "footer_meta": { "$ref": "#/$defs/FooterMeta" },
+
+    "html_path": {
+      "type": "string",
+      "description": "Optional. When A6 wrote an HTML file to disk, its absolute path."
+    },
+
+    "passthrough_pipeline": {
+      "description": "Full upstream metadata trail, for telemetry/debug. Optional in the wire contract (frontend doesn't need it).",
+      "type": "object"
+    }
+
+  },
+
+  "$defs": {
+
+    "Chip": {
+      "type": "object",
+      "required": ["text", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "key":  { "type": "string", "description": "Small label preceding the value (e.g. 'Source')." },
+        "text": { "type": "string", "description": "Chip body. Templated, factual." },
+        "kind": {
+          "type": "string",
+          "enum": ["context", "default", "user_picked", "partial", "mapped", "computed"],
+          "description": "Drives chip styling. 'partial' uses peach (data-freshness flag). Editorial colours forbidden."
+        }
+      }
+    },
+
+    "Section": {
+      "type": "object",
+      "required": ["section_id", "section_title", "components"],
+      "additionalProperties": false,
+      "properties": {
+        "section_id":     { "type": "string" },
+        "section_title":  { "type": "string", "description": "Templated, factual." },
+        "step_rationale": { "type": "string", "description": "For staged investigations only. Factual, ontology-grounded reasoning rendered as the section's 'Why this step' logic box. Never causal." },
+        "narrative_stage":   { "$ref": "#/$defs/NarrativeStage", "description": "When A6 groups by funnel narrative, the stage this section renders. Section grouping identity." },
+        "narrative_intro":   { "type": "string", "description": "Templated intro caption for this narrative stage (method-framing, descriptive). Sourced from narrative_stages[].intro in the block-pattern registry." },
+        "narrative_handoff": { "type": "string", "description": "Bridging caption rendered after this section to the next narrative stage. Method-framing only — never a causal link between stages." },
+        "is_conditional": { "type": "boolean", "description": "True if this section corresponds to a conditional stage." },
+        "conditional_executed": { "type": "boolean", "description": "When is_conditional=true, whether the stage actually ran." },
+        "components":     {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/Component" }
+        },
+        "findings": {
+          "type": "array",
+          "description": "Section-level factual findings, lifted from A5 annotations or computed across the section's blocks.",
+          "items": { "type": "string" }
+        }
+      }
+    },
+
+    "Component": {
+      "description": "Discriminated union by component type. Component selection is a registry lookup keyed on the source block's block_type — A6 does NOT pick creatively.",
+      "oneOf": [
+        { "$ref": "#/$defs/KpiStripComponent" },
+        { "$ref": "#/$defs/KpiCardComponent" },
+        { "$ref": "#/$defs/BarChartTablePairComponent" },
+        { "$ref": "#/$defs/LineChartComponent" },
+        { "$ref": "#/$defs/GroupedBarChartComponent" },
+        { "$ref": "#/$defs/DonutTablePairComponent" },
+        { "$ref": "#/$defs/HeatmapComponent" },
+        { "$ref": "#/$defs/FunnelDiagramComponent" },
+        { "$ref": "#/$defs/ChoroplethComponent" },
+        { "$ref": "#/$defs/DivergingBarComponent" }
+      ]
+    },
+
+    "NarrativeStage": {
+      "type": "string",
+      "enum": ["overview", "acquisition", "quality", "behavior", "outcomes"],
+      "description": "Funnel-narrative grouping this component (block) belongs to, carried through from the source A5 block. A6 groups components by this field in registry order (overview -> acquisition -> quality -> behavior -> outcomes), rendering a stage header + templated intro caption per group and a handoff caption between groups, in place of the playbook's 'Stage N / Step X of N' per-block header. Descriptive grouping only."
+    },
+
+    "ComponentBase": {
+      "type": "object",
+      "required": ["component", "block_ref", "narrative_stage"],
+      "properties": {
+        "component": { "type": "string" },
+        "block_ref": {
+          "$ref": "../_shared.schema.json#/$defs/BlockId",
+          "description": "References the A5 block this component renders. Must exist in A5's blocks_by_sub_question."
+        },
+        "narrative_stage": { "$ref": "#/$defs/NarrativeStage" }
+      }
+    },
+
+    "Caption": {
+      "type": "string",
+      "description": "Optional neutral descriptive body text rendered directly under this component's heading. Set verbatim from the source A5 block.description (the block named by block_ref). Plain body text — never editorial, never status-coloured.",
+      "minLength": 1
+    },
+
+    "VisualEncoding": {
+      "type": "object",
+      "description": "Closed set of approved visual encodings. Editorial colour (red=bad/green=good) is forbidden everywhere.",
+      "additionalProperties": false,
+      "properties": {
+        "sentinel_style":          { "type": "string", "enum": ["italic_muted", "tagged"] },
+        "partial_period_style":    { "type": "string", "enum": ["diagonal_stripe", "dashed_segment", "open_marker", "peach_chip"] },
+        "z_score_encoding":        { "type": "string", "enum": ["monochrome_intensity", "none"], "description": "Direction-neutral. Darker = further from mean, NOT 'bad'." },
+        "identity_palette":        { "type": "array", "items": { "type": "string" }, "description": "Hex codes assigned by rank order. Consistent across charts in the same report." }
+      }
+    },
+
+    "KpiStripComponent": {
+      "allOf": [
+        { "$ref": "#/$defs/ComponentBase" },
+        {
+          "type": "object",
+          "required": ["component", "kpis"],
+          "additionalProperties": false,
+          "properties": {
+            "component": { "const": "kpi_strip" },
+            "block_ref": { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "caption":   { "$ref": "#/$defs/Caption" },
+            "narrative_stage": { "$ref": "#/$defs/NarrativeStage" },
+            "kpis": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["label", "value_display"],
+                "additionalProperties": false,
+                "properties": {
+                  "label":             { "type": "string" },
+                  "value_display":     { "type": "string", "description": "Pre-formatted string (e.g. '60.3%', '9,298', '5,278 of 11,151')." },
+                  "sub_display":       { "type": "string" },
+                  "sparkline":         { "$ref": "#/$defs/SparklineSpec" },
+                  "delta_display":     { "type": "string", "description": "Pre-formatted delta string. Sign is shown numerically, not colour-coded." },
+                  "is_partial":        { "type": "boolean" },
+                  "tone":              { "type": "string", "enum": ["default", "warn"], "description": "warn = peach left-border (used ONLY for partial/data-freshness flags). Not 'bad'." }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    "SparklineSpec": {
+      "type": "object",
+      "required": ["points"],
+      "additionalProperties": false,
+      "properties": {
+        "points": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["x", "value"],
+            "additionalProperties": false,
+            "properties": {
+              "x":           { "type": "string" },
+              "value":       { "type": ["number", "null"] },
+              "is_partial":  { "type": "boolean" }
+            }
+          }
+        },
+        "y_range":           { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+        "partial_segment_style": { "type": "string", "enum": ["dashed_peach", "none"] }
+      }
+    },
+
+    "KpiCardComponent": {
+      "allOf": [
+        { "$ref": "#/$defs/ComponentBase" },
+        {
+          "type": "object",
+          "required": ["component", "kpi"],
+          "additionalProperties": false,
+          "properties": {
+            "component": { "const": "kpi_card" },
+            "block_ref": { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "caption":   { "$ref": "#/$defs/Caption" },
+            "narrative_stage": { "$ref": "#/$defs/NarrativeStage" },
+            "kpi": {
+              "type": "object",
+              "required": ["label", "value_display"],
+              "additionalProperties": true
+            },
+            "hero":               { "type": "boolean", "description": "Render larger (primary card)." }
+          }
+        }
+      ]
+    },
+
+    "BarChartTablePairComponent": {
+      "allOf": [
+        { "$ref": "#/$defs/ComponentBase" },
+        {
+          "type": "object",
+          "required": ["component", "chart", "table"],
+          "additionalProperties": false,
+          "properties": {
+            "component": { "const": "bar_chart_table_pair" },
+            "block_ref": { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "caption":   { "$ref": "#/$defs/Caption" },
+            "narrative_stage": { "$ref": "#/$defs/NarrativeStage" },
+            "chart": {
+              "type": "object",
+              "required": ["bars", "max_value"],
+              "additionalProperties": false,
+              "properties": {
+                "orientation":   { "type": "string", "enum": ["horizontal", "vertical"] },
+                "max_value":     { "type": "number" },
+                "bars": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["label", "value"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "label":          { "type": "string" },
+                      "value":          { "type": "number" },
+                      "value_display":  { "type": "string" },
+                      "is_sentinel":    { "type": "boolean" },
+                      "sentinel_label": { "type": "string", "description": "Tag rendered next to label (e.g. 'no referrer')." },
+                      "is_partial":     { "type": "boolean" }
+                    }
+                  }
+                },
+                "visual_encoding": { "$ref": "#/$defs/VisualEncoding" }
+              }
+            },
+            "table": {
+              "type": "object",
+              "required": ["columns", "rows"],
+              "additionalProperties": false,
+              "properties": {
+                "columns": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["key", "label"],
+                    "properties": {
+                      "key":   { "type": "string" },
+                      "label": { "type": "string" },
+                      "align": { "type": "string", "enum": ["left", "right"] }
+                    }
+                  }
+                },
+                "rows": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "is_sentinel":     { "type": "boolean" },
+                      "is_others_row":   { "type": "boolean", "description": "True for the '+N others' rollup row. If A5's other_rollup was null, the values must be '—' (no fabrication)." },
+                      "is_partial":      { "type": "boolean" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    "LineChartComponent": {
+      "allOf": [
+        { "$ref": "#/$defs/ComponentBase" },
+        {
+          "type": "object",
+          "required": ["component", "chart"],
+          "additionalProperties": false,
+          "properties": {
+            "component": { "const": "line_chart" },
+            "block_ref": { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "caption":   { "$ref": "#/$defs/Caption" },
+            "narrative_stage": { "$ref": "#/$defs/NarrativeStage" },
+            "chart": {
+              "type": "object",
+              "required": ["points", "x_axis", "y_axis"],
+              "additionalProperties": false,
+              "properties": {
+                "x_axis": {
+                  "type": "object",
+                  "required": ["label"],
+                  "properties": {
+                    "label": { "type": "string" },
+                    "ticks": { "type": "array", "items": { "type": "string" } }
+                  }
+                },
+                "y_axis": {
+                  "type": "object",
+                  "required": ["label"],
+                  "properties": {
+                    "label":   { "type": "string" },
+                    "format":  { "type": "string", "enum": ["number", "percent", "duration_seconds"] },
+                    "min":     { "type": "number" },
+                    "max":     { "type": "number" }
+                  }
+                },
+                "points": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["x", "value"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "x":          { "type": "string" },
+                      "value":      { "type": ["number", "null"] },
+                      "is_partial": { "type": "boolean" },
+                      "is_extremum":{ "type": "string", "enum": ["min", "max"], "description": "When set, A6 renders a ring marker with factual label (e.g. 'low: 28.0%'). No editorial." }
+                    }
+                  }
+                },
+                "reference_lines": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["value", "label"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "value":  { "type": "number" },
+                      "label":  { "type": "string", "description": "e.g. '28-day mean 60.6%'" },
+                      "style":  { "type": "string", "enum": ["dashed_grey", "dashed_primary", "dashed_peach"] }
+                    }
+                  }
+                },
+                "partial_segment_style": { "type": "string", "enum": ["dashed_peach", "none"] },
+                "visual_encoding": { "$ref": "#/$defs/VisualEncoding" }
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    "GroupedBarChartComponent": {
+      "allOf": [
+        { "$ref": "#/$defs/ComponentBase" },
+        {
+          "type": "object",
+          "required": ["component", "groups"],
+          "additionalProperties": false,
+          "properties": {
+            "component": { "const": "grouped_bar_chart" },
+            "block_ref": { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "caption":   { "$ref": "#/$defs/Caption" },
+            "narrative_stage": { "$ref": "#/$defs/NarrativeStage" },
+            "groups": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["label", "bars"],
+                "additionalProperties": false,
+                "properties": {
+                  "label": { "type": "string" },
+                  "bars": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["series_label", "value", "value_display"],
+                      "properties": {
+                        "series_label": { "type": "string" },
+                        "value":        { "type": "number" },
+                        "value_display":{ "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    "DonutTablePairComponent": {
+      "allOf": [
+        { "$ref": "#/$defs/ComponentBase" },
+        {
+          "type": "object",
+          "required": ["component", "donut", "table"],
+          "additionalProperties": false,
+          "properties": {
+            "component": { "const": "donut_table_pair" },
+            "block_ref": { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "caption":   { "$ref": "#/$defs/Caption" },
+            "narrative_stage": { "$ref": "#/$defs/NarrativeStage" },
+            "donut": {
+              "type": "object",
+              "required": ["slices", "total"],
+              "properties": {
+                "slices": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["label", "value", "share"],
+                    "properties": {
+                      "label": { "type": "string" },
+                      "value": { "type": "number" },
+                      "share": { "type": "number", "minimum": 0, "maximum": 1 }
+                    }
+                  }
+                },
+                "total": { "type": "number" }
+              }
+            },
+            "table": { "type": "object" }
+          }
+        }
+      ]
+    },
+
+    "HeatmapComponent": {
+      "allOf": [
+        { "$ref": "#/$defs/ComponentBase" },
+        {
+          "type": "object",
+          "required": ["component", "matrix"],
+          "additionalProperties": false,
+          "properties": {
+            "component": { "const": "heatmap" },
+            "block_ref": { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "caption":   { "$ref": "#/$defs/Caption" },
+            "narrative_stage": { "$ref": "#/$defs/NarrativeStage" },
+            "matrix": {
+              "type": "object",
+              "required": ["row_labels", "col_labels", "cells"],
+              "additionalProperties": false,
+              "properties": {
+                "row_labels":         { "type": "array", "items": { "type": "string" } },
+                "col_labels":         { "type": "array", "items": { "type": "string" } },
+                "cells":              { "type": "array", "items": { "type": "array", "items": { "type": ["number", "null"] } } },
+                "shading":            { "type": "string", "enum": ["monochrome_intensity"], "description": "Editorial gradient (e.g. red→green) FORBIDDEN." },
+                "partial_cells":      { "type": "array", "items": { "type": "array", "items": { "type": "integer" } } }
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    "FunnelDiagramComponent": {
+      "allOf": [
+        { "$ref": "#/$defs/ComponentBase" },
+        {
+          "type": "object",
+          "required": ["component", "steps"],
+          "additionalProperties": false,
+          "properties": {
+            "component": { "const": "funnel_diagram" },
+            "block_ref": { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "caption":   { "$ref": "#/$defs/Caption" },
+            "narrative_stage": { "$ref": "#/$defs/NarrativeStage" },
+            "steps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["label", "count_display"],
+                "properties": {
+                  "label":              { "type": "string" },
+                  "count":              { "type": "number" },
+                  "count_display":      { "type": "string" },
+                  "step_rate_display":  { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    "ChoroplethComponent": {
+      "allOf": [
+        { "$ref": "#/$defs/ComponentBase" },
+        {
+          "type": "object",
+          "required": ["component", "countries"],
+          "additionalProperties": false,
+          "properties": {
+            "component": { "const": "choropleth" },
+            "block_ref": { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "caption":   { "$ref": "#/$defs/Caption" },
+            "narrative_stage": { "$ref": "#/$defs/NarrativeStage" },
+            "countries": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["country", "value"],
+                "properties": {
+                  "country":       { "type": "string" },
+                  "value":         { "type": "number" },
+                  "value_display": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    "DivergingBarComponent": {
+      "allOf": [
+        { "$ref": "#/$defs/ComponentBase" },
+        {
+          "type": "object",
+          "required": ["component", "items"],
+          "additionalProperties": false,
+          "properties": {
+            "component": { "const": "diverging_bar" },
+            "block_ref": { "$ref": "../_shared.schema.json#/$defs/BlockId" },
+            "caption":   { "$ref": "#/$defs/Caption" },
+            "narrative_stage": { "$ref": "#/$defs/NarrativeStage" },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["label", "delta"],
+                "additionalProperties": false,
+                "properties": {
+                  "label":         { "type": "string" },
+                  "delta":         { "type": "number" },
+                  "delta_display": { "type": "string" },
+                  "side_info":     { "type": "string", "description": "e.g. 'prior 3,338 / cur 2,496'" }
+                }
+              }
+            },
+            "zero_at_center": { "type": "boolean", "const": true }
+          }
+        }
+      ]
+    },
+
+    "FooterMeta": {
+      "type": "object",
+      "required": ["source", "pulled_at"],
+      "additionalProperties": false,
+      "properties": {
+        "source":     { "type": "string", "description": "e.g. 'GA4 property 516147906'" },
+        "pulled_at":  { "type": "string", "description": "ISO timestamp" },
+        "latency_ms": { "type": "integer" },
+        "sampling":   { "type": "string", "description": "'none' or 'rate X%'" },
+        "thresholding": { "type": "string" }
+      }
+    }
+
+  }
+}

@@ -1,0 +1,3624 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-20T12:41:28.507652+00:00",
+  "property_id": "516147906",
+  "source": {
+    "ga4_metadata_api": true,
+    "gtm_snapshot": "gtm_snapshot.latest.json"
+  },
+  "dimensions": [
+    {
+      "api_name": "achievementId",
+      "ui_name": "Achievement ID",
+      "category": "Other",
+      "description": "The achievement ID in a game for an event. Populated by the event parameter `achievement_id`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "adFormat",
+      "ui_name": "Ad format",
+      "category": "Publisher",
+      "description": "Describes the way ads looked and where they were located. Typical formats include `Interstitial`, `Banner`, `Rewarded`, and `Native advanced`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "adSourceName",
+      "ui_name": "Ad source",
+      "category": "Publisher",
+      "description": "The source network that served the ad. Typical sources include `AdMob Network`, `Liftoff`, `Facebook Audience Network`, and `Mediated house ads`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "adUnitName",
+      "ui_name": "Ad unit",
+      "category": "Publisher",
+      "description": "The name you chose to describe this Ad unit. Ad units are containers you place in your apps to show ads to users.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "appVersion",
+      "ui_name": "App version",
+      "category": "Platform / Device",
+      "description": "The app's versionName (Android) or short bundle version (iOS).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "audienceId",
+      "ui_name": "Audience ID",
+      "category": "User",
+      "description": "The numeric identifier of an Audience. Users are reported in the audiences to which they belonged during the report's date range. Current user behavior does not affect historical audience membership in reports.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "audienceName",
+      "ui_name": "Audience name",
+      "category": "User",
+      "description": "The given name of an Audience. Users are reported in the audiences to which they belonged during the report's date range. Current user behavior does not affect historical audience membership in reports.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "audienceResourceName",
+      "ui_name": "Audience resource name",
+      "category": "User",
+      "description": "The resource name of this audience. Resource names contain both collection & resource identifiers to uniquely identify a resource; to learn more, see [Resource names](//google.aip.dev/122).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "brandingInterest",
+      "ui_name": "Interests",
+      "category": "Demographics",
+      "description": "Interests demonstrated by users who are higher in the shopping funnel. Users can be counted in multiple interest categories. For example, `Shoppers`, `Lifestyles & Hobbies/Pet Lovers`, or `Travel/Travel Buffs/Beachbound Travelers`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "browser",
+      "ui_name": "Browser",
+      "category": "Platform / Device",
+      "description": "The browsers used to view your website.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "browserVersion",
+      "ui_name": "Browser version",
+      "category": "Platform / Device",
+      "description": "The version of the browser from which the user activity originated. For example, a version might appear as `146.0.7680.178`. To understand which browser this version belongs to, use this version alongside the Browser dimension.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "campaignId",
+      "ui_name": "Campaign ID",
+      "category": "Attribution",
+      "description": "The identifier of the marketing campaign. Present only for key events. Includes Google Ads Campaigns, Manual Campaigns, & other Campaigns.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "campaignName",
+      "ui_name": "Campaign",
+      "category": "Attribution",
+      "description": "The name of the marketing campaign. Present only for key events. Includes Google Ads Campaigns, Manual Campaigns, & other Campaigns.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "character",
+      "ui_name": "Character",
+      "category": "Other",
+      "description": "The player character in a game for an event. Populated by the event parameter `character`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "city",
+      "ui_name": "City",
+      "category": "Geography",
+      "description": "The city from which the user activity originated.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cityId",
+      "ui_name": "City ID",
+      "category": "Geography",
+      "description": "The geographic ID of the city from which the user activity originated, derived from their IP address.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360AccountId",
+      "ui_name": "CM360 account ID",
+      "category": "Attribution",
+      "description": "The CM360 Account ID that led to the key event. Identifies the CM360 Account.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360AccountName",
+      "ui_name": "CM360 account name",
+      "category": "Attribution",
+      "description": "The CM360 Account Name that led to the key event. A CM360 account consists of advertisers, sites, campaigns, and user profiles.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360AdvertiserId",
+      "ui_name": "CM360 advertiser ID",
+      "category": "Attribution",
+      "description": "The CM360 Advertiser ID that led to the key event. A CM360 Advertiser contains a group of campaigns, creative assets, and other settings.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360AdvertiserName",
+      "ui_name": "CM360 advertiser name",
+      "category": "Attribution",
+      "description": "The CM360 Advertiser Name that led to the key event. A CM360 Advertiser contains a group of campaigns, creative assets, and other settings.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360CampaignId",
+      "ui_name": "CM360 campaign ID",
+      "category": "Attribution",
+      "description": "The CM360 Campaign ID that led to the key event. A CM360 campaign can be configured to specify when your ads run, what landing pages are used, and other properties.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360CampaignName",
+      "ui_name": "CM360 campaign name",
+      "category": "Attribution",
+      "description": "The CM360 Campaign Name that led to the key event. A CM360 campaign can be configured to specify when your ads run, what landing pages are used, and other properties.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360CreativeFormat",
+      "ui_name": "CM360 creative format",
+      "category": "Attribution",
+      "description": "The CM360 Creative Format that led to the key event. CM360 creative formats are also referred to as creative types.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360CreativeId",
+      "ui_name": "CM360 creative ID",
+      "category": "Attribution",
+      "description": "The CM360 Creative ID that led to the key event. Identifies a CM360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360CreativeName",
+      "ui_name": "CM360 creative name",
+      "category": "Attribution",
+      "description": "The CM360 Creative Name that led to the key event. The name given to a CM360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360CreativeType",
+      "ui_name": "CM360 creative type",
+      "category": "Attribution",
+      "description": "The CM360 Creative Type that led to the key event. A category of CM360 creatives like 'Display' or 'Tracking'. To learn more, see [manage creatives](https://support.google.com/campaignmanager/answer/3068258)",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360CreativeTypeId",
+      "ui_name": "CM360 creative type ID",
+      "category": "Attribution",
+      "description": "The CM360 Creative Type ID that led to the key event. Identifies a CM360 creative type.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360CreativeVersion",
+      "ui_name": "CM360 creative version",
+      "category": "Attribution",
+      "description": "The CM360 Creative Version that led to the key event. The version number helps you keep track of multiple versions of your creative in your reports. If you upload a new asset to an existing creative, the version number is increased by one.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360Medium",
+      "ui_name": "CM360 medium",
+      "category": "Attribution",
+      "description": "The CM360 Medium that led to the key event. The CM360 medium is also referred to as the placement cost structure.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360PlacementCostStructure",
+      "ui_name": "CM360 placement cost structure",
+      "category": "Attribution",
+      "description": "The CM360 Placement Cost Structure that led to the key event. Placement cost structures regulate how media cost will be calculated. For example 'CPM'.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360PlacementId",
+      "ui_name": "CM360 placement ID",
+      "category": "Attribution",
+      "description": "The CM360 Placement ID that led to the key event. Identifies a CM360 placement. A placement is the part of a website where your ad appears.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360PlacementName",
+      "ui_name": "CM360 placement name",
+      "category": "Attribution",
+      "description": "The CM360 Placement Name that led to the key event. The given name for a CM360 placement. A placement is the part of a website where your ad appears.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360RenderingId",
+      "ui_name": "CM360 rendering ID",
+      "category": "Attribution",
+      "description": "The CM360 Rendering ID that led to the key event. Identifies a CM360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360SiteId",
+      "ui_name": "CM360 site ID",
+      "category": "Attribution",
+      "description": "The CM360 Site ID that led to the key event. Identifies a CM360 site.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360SiteName",
+      "ui_name": "CM360 site name",
+      "category": "Attribution",
+      "description": "The CM360 Site Name that led to the key event. The CM360 Site name from which the ad space was purchased.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360Source",
+      "ui_name": "CM360 source",
+      "category": "Attribution",
+      "description": "The CM360 Source that led to the key event. The CM360 source is also referred to as the site name.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cm360SourceMedium",
+      "ui_name": "CM360 source / medium",
+      "category": "Attribution",
+      "description": "The CM360 Source Medium that led to the key event. A combination of the source and medium.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cohort",
+      "ui_name": "Cohort",
+      "category": "Cohort",
+      "description": "The cohort's name in the request. A cohort is a set of users who started using your website or app in any consecutive group of days. If a cohort name is not specified in the request, cohorts are named by their zero based index such as cohort_0 and cohort_1.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cohortNthDay",
+      "ui_name": "Daily cohort",
+      "category": "Cohort",
+      "description": "Day offset relative to the firstSessionDate for the users in the cohort. For example, if a cohort is selected with the start and end date of 2020-03-01, then for the date 2020-03-02, cohortNthDay will be 0001.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cohortNthMonth",
+      "ui_name": "Monthly cohort",
+      "category": "Cohort",
+      "description": "Month offset relative to the firstSessionDate for the users in the cohort. Month boundaries align with calendar month boundaries. For example, if a cohort is selected with the start and end date in March 2020, then for any date in April 2020, cohortNthMonth will be 0001.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cohortNthWeek",
+      "ui_name": "Weekly cohort",
+      "category": "Cohort",
+      "description": "Week offset relative to the firstSessionDate for the users in the cohort. Weeks start on Sunday and end on Saturday. For example, if a cohort is selected with the start and end date in the range 2020-11-08 to 2020-11-14, then for the dates in the range 2020-11-15 to 2020-11-21, cohortNthWeek will be 0001.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "comparison",
+      "ui_name": "Comparison",
+      "category": "Other",
+      "description": "Comparisons enable you to evaluate subsets of your data side by side. For report requests, the comparisons column is automatically added to the response. For pivot report requests, the requested dimension must be used.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "contentGroup",
+      "ui_name": "Content group",
+      "category": "Page / Screen",
+      "description": "A category that applies to items of published content. Populated by the event parameter `content_group`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "contentId",
+      "ui_name": "Content ID",
+      "category": "Page / Screen",
+      "description": "The identifier of the selected content. Populated by the event parameter `content_id`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "contentType",
+      "ui_name": "Content type",
+      "category": "Page / Screen",
+      "description": "The category of the selected content. Populated by the event parameter `content_type`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "continent",
+      "ui_name": "Continent",
+      "category": "Geography",
+      "description": "The continent from which the user activity originated. For example, `Americas` or `Asia`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "continentId",
+      "ui_name": "Continent ID",
+      "category": "Geography",
+      "description": "The geographic ID of the continent from which the user activity originated, derived from their IP address.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "country",
+      "ui_name": "Country",
+      "category": "Geography",
+      "description": "The country from which the user activity originated.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "countryId",
+      "ui_name": "Country ID",
+      "category": "Geography",
+      "description": "The geographic ID of the country from which the user activity originated, derived from their IP address. Formatted according to ISO 3166-1 alpha-2 standard.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "currencyCode",
+      "ui_name": "Currency",
+      "category": "Ecommerce",
+      "description": "The local currency code (based on ISO 4217 standard) of the eCommerce event. For example, `USD` or `GBP`. Currency is specified in tagging by the `currency` parameter. Businesses that transact in more than one currency can specify a local currency code when sending eCommerce events to Analytics, and this dimension shows those currencies. To Learn more, See [Currency reference](https://support.google.com/analytics/answer/9796179).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "date",
+      "ui_name": "Date",
+      "category": "Time",
+      "description": "The date of the event, formatted as YYYYMMDD.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dateHour",
+      "ui_name": "Date + hour (YYYYMMDDHH)",
+      "category": "Time",
+      "description": "The combined values of date and hour formatted as YYYYMMDDHH.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dateHourMinute",
+      "ui_name": "Date hour and minute",
+      "category": "Time",
+      "description": "The combined values of date, hour, and minute formatted as YYYYMMDDHHMM.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "day",
+      "ui_name": "Day",
+      "category": "Time",
+      "description": "The day of the month, a two-digit number from 01 to 31.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dayOfWeek",
+      "ui_name": "Day of week",
+      "category": "Time",
+      "description": "The integer day of the week. It returns values in the range 0 to 6 with Sunday as the first day of the week.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dayOfWeekName",
+      "ui_name": "Day of week name",
+      "category": "Time",
+      "description": "The day of the week in English. This dimension has values such as Sunday or Monday.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "defaultChannelGroup",
+      "ui_name": "Default channel group",
+      "category": "Attribution",
+      "description": "The key event's default channel group is based primarily on source and medium. An enumeration which includes `Direct`, `Organic Search`, `Paid Social`, `Organic Social`, `Email`, `Affiliates`, `Referral`, `Paid Search`, `Video`, and `Display`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "deviceCategory",
+      "ui_name": "Device category",
+      "category": "Platform / Device",
+      "description": "The type of device: Desktop, Tablet, or Mobile.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "deviceModel",
+      "ui_name": "Device model",
+      "category": "Platform / Device",
+      "description": "The mobile device model (example: iPhone 10,6).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360AdvertiserId",
+      "ui_name": "DV360 advertiser ID",
+      "category": "Attribution",
+      "description": "The DV360 Advertiser ID that led to the key event. Identifies the DV360 advertiser.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360AdvertiserName",
+      "ui_name": "DV360 advertiser name",
+      "category": "Attribution",
+      "description": "The DV360 Advertiser Name that led to the key event. DV360 advertisers represent real-life businesses that run advertising campaigns.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360CampaignId",
+      "ui_name": "DV360 campaign ID",
+      "category": "Attribution",
+      "description": "The DV360 Campaign ID that led to the key event. Identifies the DV360 campaign.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360CampaignName",
+      "ui_name": "DV360 campaign name",
+      "category": "Attribution",
+      "description": "The DV360 Campaign Name that led to the key event. DV360 campaigns group together related insertion orders with a common business goal.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360CreativeFormat",
+      "ui_name": "DV360 creative format",
+      "category": "Attribution",
+      "description": "The DV360 Creative Format that led to the key event. Also referred to as the creative type. For example, expandable, video, or native.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360CreativeId",
+      "ui_name": "DV360 creative ID",
+      "category": "Attribution",
+      "description": "The DV360 Creative ID that led to the key event. Identifies the DV360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360CreativeName",
+      "ui_name": "DV360 creative name",
+      "category": "Attribution",
+      "description": "The DV360 Creative Name that led to the key event. The name given to a DV360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360ExchangeId",
+      "ui_name": "DV360 exchange ID",
+      "category": "Attribution",
+      "description": "The DV360 Exchange ID that led to the key event. Identifies the DV360 exchange.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360ExchangeName",
+      "ui_name": "DV360 exchange name",
+      "category": "Attribution",
+      "description": "The DV360 Exchange Name that led to the key event. The DV360 ad exchange involved in the ad click. To learn more, see [managing exchanges](https://support.google.com/displayvideo/answer/9230278).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360InsertionOrderId",
+      "ui_name": "DV360 insertion order ID",
+      "category": "Attribution",
+      "description": "The DV360 Insertion Order ID that led to the key event. Identifies the DV360 insertion order.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360InsertionOrderName",
+      "ui_name": "DV360 insertion order name",
+      "category": "Attribution",
+      "description": "The DV360 Insertion Order Name that led to the key event. A DV360 insertion order contains a set of line items that are related to the same advertising campaign.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360LineItemId",
+      "ui_name": "DV360 line item ID",
+      "category": "Attribution",
+      "description": "The DV360 Line Item ID that led to the key event. Identifies the DV360 line item.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360LineItemName",
+      "ui_name": "DV360 line item name",
+      "category": "Attribution",
+      "description": "The DV360 Line Item Name that led to the key event. A DV360 line item bids on impressions and serves creatives to inventory sources.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360Medium",
+      "ui_name": "DV360 medium",
+      "category": "Attribution",
+      "description": "The DV360 Medium that led to the key event. The billable outcome of the insertion order. For example, `cpm`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360PartnerId",
+      "ui_name": "DV360 partner ID",
+      "category": "Attribution",
+      "description": "The DV360 Partner ID that led to the key event. Identifies the DV360 partner.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360PartnerName",
+      "ui_name": "DV360 partner name",
+      "category": "Attribution",
+      "description": "The DV360 Partner Name that led to the key event. DV360 partners represent agencies, trading desks, or large individual advertisers.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360Source",
+      "ui_name": "DV360 source",
+      "category": "Attribution",
+      "description": "The DV360 Source that led to the key event. The DV360 site name where your ad was displayed.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dv360SourceMedium",
+      "ui_name": "DV360 source / medium",
+      "category": "Attribution",
+      "description": "The DV360 Source Medium that led to the key event. A combination of the source and medium.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "eventName",
+      "ui_name": "Event name",
+      "category": "Event",
+      "description": "The name of the event.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "fileExtension",
+      "ui_name": "File extension",
+      "category": "Other",
+      "description": "The extension of the downloaded file (for example, `pdf` or `txt`). Automatically populated if Enhanced Measurement is enabled. Populated by the event parameter `file_extension`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "fileName",
+      "ui_name": "File name",
+      "category": "Other",
+      "description": "The page path of the downloaded file (for example, `/menus/dinner-menu.pdf`). Automatically populated if Enhanced Measurement is enabled. Populated by the event parameter `file_name`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstSessionDate",
+      "ui_name": "First session date",
+      "category": "User Lifetime",
+      "description": "The date the user's first session occurred, formatted as YYYYMMDD.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCampaignId",
+      "ui_name": "First user campaign ID",
+      "category": "Traffic Source",
+      "description": "Identifier of the marketing campaign that first acquired the user. Includes Google Ads Campaigns, Manual Campaigns, & other Campaigns.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCampaignName",
+      "ui_name": "First user campaign",
+      "category": "Traffic Source",
+      "description": "Name of the marketing campaign that first acquired the user. Includes Google Ads Campaigns, Manual Campaigns, & other Campaigns.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360AccountId",
+      "ui_name": "First user CM360 account ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Account ID that originally acquired the user. Identifies the CM360 account.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360AccountName",
+      "ui_name": "First user CM360 account name",
+      "category": "Traffic Source",
+      "description": "The CM360 Account Name that originally acquired the user. A CM360 account consists of advertisers, sites, campaigns, and user profiles.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360AdvertiserId",
+      "ui_name": "First user CM360 advertiser ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Advertiser ID that originally acquired the user. Identifies the CM360 advertiser.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360AdvertiserName",
+      "ui_name": "First user CM360 advertiser name",
+      "category": "Traffic Source",
+      "description": "The CM360 Advertiser Name that originally acquired the user. A CM360 Advertiser contains a group of campaigns, creative assets, and other settings.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360CampaignId",
+      "ui_name": "First user CM360 campaign ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Campaign ID that originally acquired the user. Identifies the CM360 campaign.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360CampaignName",
+      "ui_name": "First user CM360 campaign name",
+      "category": "Traffic Source",
+      "description": "The CM360 Campaign Name that originally acquired the user. A CM360 campaign can be configured to specify when your ads run, what landing pages are used, and other properties.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360CreativeFormat",
+      "ui_name": "First user CM360 creative format",
+      "category": "Traffic Source",
+      "description": "The CM360 Creative Format that originally acquired the user. CM360 creative formats are also referred to as creative types.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360CreativeId",
+      "ui_name": "First user CM360 creative ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Creative ID that originally acquired the user. Identifies a CM360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360CreativeName",
+      "ui_name": "First user CM360 creative name",
+      "category": "Traffic Source",
+      "description": "The CM360 Creative Name that originally acquired the user. The name given to a CM360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360CreativeType",
+      "ui_name": "First user CM360 creative type",
+      "category": "Traffic Source",
+      "description": "The CM360 Creative Type that originally acquired the user. A category of CM360 creatives like 'Display' or 'Tracking'. To learn more, see [manage creatives](https://support.google.com/campaignmanager/answer/3068258)",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360CreativeTypeId",
+      "ui_name": "First user CM360 creative type ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Creative Type ID that originally acquired the user. Identifies a CM360 creative type.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360CreativeVersion",
+      "ui_name": "First user CM360 creative version",
+      "category": "Traffic Source",
+      "description": "The CM360 Creative Version that originally acquired the user. The version number helps you keep track of multiple versions of your creative in your reports. If you upload a new asset to an existing creative, the version number is increased by one.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360Medium",
+      "ui_name": "First user CM360 medium",
+      "category": "Traffic Source",
+      "description": "The CM360 Medium that originally acquired the user. The CM360 medium is also referred to as the placement cost structure.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360PlacementCostStructure",
+      "ui_name": "First user CM360 placement cost structure",
+      "category": "Traffic Source",
+      "description": "The CM360 Placement Cost Structure that originally acquired the user. Placement cost structures regulate how media cost will be calculated. For example 'CPM'.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360PlacementId",
+      "ui_name": "First user CM360 placement ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Placement ID that originally acquired the user. Identifies a CM360 placement. A placement is the part of a website where your ad appears.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360PlacementName",
+      "ui_name": "First user CM360 placement name",
+      "category": "Traffic Source",
+      "description": "The CM360 Placement Name that originally acquired the user. The given name for a CM360 placement. A placement is the part of a website where your ad appears.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360RenderingId",
+      "ui_name": "First user CM360 rendering ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Rendering ID that originally acquired the user. Identifies a CM360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360SiteId",
+      "ui_name": "First user CM360 site ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Site ID that originally acquired the user. Identifies a CM360 site.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360SiteName",
+      "ui_name": "First user CM360 site name",
+      "category": "Traffic Source",
+      "description": "The CM360 Site Name that originally acquired the user. The CM360 Site name from which the ad space was purchased.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360Source",
+      "ui_name": "First user CM360 source",
+      "category": "Traffic Source",
+      "description": "The CM360 Source that originally acquired the user. The CM360 source is also referred to as the site name.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserCm360SourceMedium",
+      "ui_name": "First user CM360 source / medium",
+      "category": "Traffic Source",
+      "description": "The CM360 Source Medium that originally acquired the user. A combination of the source and medium.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDefaultChannelGroup",
+      "ui_name": "First user default channel group",
+      "category": "Traffic Source",
+      "description": "The default channel group that first acquired the user. Default channel group is based primarily on source and medium. An enumeration which includes `Direct`, `Organic Search`, `Paid Social`, `Organic Social`, `Email`, `Affiliates`, `Referral`, `Paid Search`, `Video`, and `Display`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360AdvertiserId",
+      "ui_name": "First user DV360 advertiser ID",
+      "category": "Traffic Source",
+      "description": "The DV360 Advertiser ID that originally acquired the user. Identifies the DV360 advertiser.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360AdvertiserName",
+      "ui_name": "First user DV360 advertiser name",
+      "category": "Traffic Source",
+      "description": "The DV360 Advertiser Name that originally acquired the user. DV360 advertisers represent real-life businesses that run advertising campaigns.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360CampaignId",
+      "ui_name": "First user DV360 campaign ID",
+      "category": "Traffic Source",
+      "description": "The DV360 Campaign ID that originally acquired the user. Identifies the DV360 campaign.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360CampaignName",
+      "ui_name": "First user DV360 campaign name",
+      "category": "Traffic Source",
+      "description": "The DV360 Campaign Name that originally acquired the user. DV360 campaigns group together related insertion orders with a common business goal.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360CreativeFormat",
+      "ui_name": "First user DV360 creative format",
+      "category": "Traffic Source",
+      "description": "The DV360 Creative Format that originally acquired the user. Also referred to as the creative type. For example, expandable, video, or native.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360CreativeId",
+      "ui_name": "First user DV360 creative ID",
+      "category": "Traffic Source",
+      "description": "The DV360 Creative ID that originally acquired the user. Identifies the DV360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360CreativeName",
+      "ui_name": "First user DV360 creative name",
+      "category": "Traffic Source",
+      "description": "The DV360 Creative Name that originally acquired the user. The name given to a DV360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360ExchangeId",
+      "ui_name": "First user DV360 exchange ID",
+      "category": "Traffic Source",
+      "description": "The DV360 Exchange ID that originally acquired the user. Identifies the DV360 exchange.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360ExchangeName",
+      "ui_name": "First user DV360 exchange name",
+      "category": "Traffic Source",
+      "description": "The DV360 Exchange Name that originally acquired the user. The DV360 ad exchange involved in the ad click. To learn more, see [managing exchanges](https://support.google.com/displayvideo/answer/9230278).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360InsertionOrderId",
+      "ui_name": "First user DV360 insertion order ID",
+      "category": "Traffic Source",
+      "description": "The DV360 Insertion Order ID that originally acquired the user. Identifies the DV360 insertion order.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360InsertionOrderName",
+      "ui_name": "First user DV360 insertion order name",
+      "category": "Traffic Source",
+      "description": "The DV360 Insertion Order Name that originally acquired the user. A DV360 insertion order contains a set of line items that are related to the same advertising campaign.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360LineItemId",
+      "ui_name": "First user DV360 line item ID",
+      "category": "Traffic Source",
+      "description": "The DV360 Line Item ID that originally acquired the user. Identifies the DV360 line item.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360LineItemName",
+      "ui_name": "First user DV360 line item name",
+      "category": "Traffic Source",
+      "description": "The DV360 Line Item Name that originally acquired the user. A DV360 line item bids on impressions and serves creatives to inventory sources.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360Medium",
+      "ui_name": "First user DV360 medium",
+      "category": "Traffic Source",
+      "description": "The DV360 Medium that originally acquired the user. The billable outcome of the insertion order. For example, `cpm`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360PartnerId",
+      "ui_name": "First user DV360 partner ID",
+      "category": "Traffic Source",
+      "description": "The DV360 Partner ID that originally acquired the user. Identifies the DV360 partner.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360PartnerName",
+      "ui_name": "First user DV360 partner name",
+      "category": "Traffic Source",
+      "description": "The DV360 Partner Name that originally acquired the user. DV360 partners represent agencies, trading desks, or large individual advertisers.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360Source",
+      "ui_name": "First user DV360 source",
+      "category": "Traffic Source",
+      "description": "The DV360 Source that originally acquired the user. The DV360 site name where your ad was displayed.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserDv360SourceMedium",
+      "ui_name": "First user DV360 source / medium",
+      "category": "Traffic Source",
+      "description": "The DV360 Source Medium that originally acquired the user. A combination of the source and medium.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserGoogleAdsAccountName",
+      "ui_name": "First user Google Ads account name",
+      "category": "Traffic Source",
+      "description": "The Account name from Google Ads that first acquired the user.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserGoogleAdsAdGroupId",
+      "ui_name": "First user Google Ads ad group ID",
+      "category": "Traffic Source",
+      "description": "The Ad Group Id in Google Ads that first acquired the user.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserGoogleAdsAdGroupName",
+      "ui_name": "First user Google Ads ad group name",
+      "category": "Traffic Source",
+      "description": "The Ad Group Name in Google Ads that first acquired the user.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserGoogleAdsAdNetworkType",
+      "ui_name": "First user Google Ads ad network type",
+      "category": "Traffic Source",
+      "description": "The advertising network that first acquired the user. An enumeration which includes `Google search`, `Search partners`, `Google Display Network`, `Youtube Search`, `Youtube Videos`, `Cross-network`, `Social`, and `(universal campaign)`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserGoogleAdsCampaignId",
+      "ui_name": "First user Google Ads campaign ID",
+      "category": "Traffic Source",
+      "description": "Identifier of the Google Ads marketing campaign that first acquired the user.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserGoogleAdsCampaignName",
+      "ui_name": "First user Google Ads campaign",
+      "category": "Traffic Source",
+      "description": "Name of the Google Ads marketing campaign that first acquired the user.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserGoogleAdsCampaignType",
+      "ui_name": "First user Google Ads campaign type",
+      "category": "Traffic Source",
+      "description": "The campaign type of the Google Ads campaign that first acquired the user. Campaign types determine where customers see your ads and the settings and options available to you in Google Ads. Campaign type is an enumeration that includes: Search, Display, Shopping, Video, Demand Gen, App, Smart, Hotel, Local, and Performance Max. To learn more, see [Choose the right campaign type](https://support.google.com/google-ads/answer/2567043).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserGoogleAdsCreativeId",
+      "ui_name": "First user Google Ads creative ID",
+      "category": "Traffic Source",
+      "description": "The ID of the Google Ads creative that first acquired the user. Creative IDs identify individual ads.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserGoogleAdsCustomerId",
+      "ui_name": "First user Google Ads customer ID",
+      "category": "Traffic Source",
+      "description": "The Customer ID from Google Ads that first acquired the user. Customer IDs in Google Ads uniquely identify Google Ads accounts.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserGoogleAdsKeyword",
+      "ui_name": "First user Google Ads keyword text",
+      "category": "Traffic Source",
+      "description": "First user Google Ads keyword text | The matched keyword that first acquired the user. Keywords are words or phrases describing your product or service that you choose to get your ad in front of the right customers. To learn more about Keywords, see [Keywords: Definition](https://support.google.com/google-ads/answer/6323).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserGoogleAdsQuery",
+      "ui_name": "First user Google Ads query",
+      "category": "Traffic Source",
+      "description": "The search query that first acquired the user.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserManualAdContent",
+      "ui_name": "First user manual ad content",
+      "category": "Traffic Source",
+      "description": "The ad content that first acquired the user. Populated by the utm_content parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserManualCampaignId",
+      "ui_name": "First user manual campaign ID",
+      "category": "Traffic Source",
+      "description": "The manual Campaign ID that originally acquired the user. Identifies the manual campaign. Populated by `utm_id` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserManualCampaignName",
+      "ui_name": "First user manual campaign name",
+      "category": "Traffic Source",
+      "description": "The manual Campaign Name that originally acquired the user. The name of the manual campaign. Populated by `utm_campaign` URL parameter. To learn more, see [Collect campaign data with custom URLs](https://support.google.com/analytics/answer/10917952).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserManualCreativeFormat",
+      "ui_name": "First user manual creative format",
+      "category": "Traffic Source",
+      "description": "The manual Creative Format that originally acquired the user. Identifies the creative format used in the ad. Populated by `utm_creative_format` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserManualMarketingTactic",
+      "ui_name": "First user manual marketing tactic",
+      "category": "Traffic Source",
+      "description": "The manual Marketing Tactic that originally acquired the user. The targeting criteria applied to a campaign. For example, remarketing or prospecting. Populated by `utm_marketing_tactic` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserManualMedium",
+      "ui_name": "First user manual medium",
+      "category": "Traffic Source",
+      "description": "The manual Medium that originally acquired the user. The marketing medium used in the referral. For example, `cpc`. Populated by `utm_medium` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserManualSource",
+      "ui_name": "First user manual source",
+      "category": "Traffic Source",
+      "description": "The manual Source that originally acquired the user. The referrer. Populated by `utm_source` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserManualSourceMedium",
+      "ui_name": "First user manual source / medium",
+      "category": "Traffic Source",
+      "description": "The manual Source Medium that originally acquired the user. A combination of the source and medium.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserManualSourcePlatform",
+      "ui_name": "First user manual source platform",
+      "category": "Traffic Source",
+      "description": "The manual Source Platform that originally acquired the user. The platform responsible for directing traffic to a given Analytics property. Populated by `utm_source_platform` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserManualTerm",
+      "ui_name": "First user manual term",
+      "category": "Traffic Source",
+      "description": "The term that first acquired the user. Populated by the utm_term parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserMedium",
+      "ui_name": "First user medium",
+      "category": "Traffic Source",
+      "description": "The medium that first acquired the user to your website or app.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserPrimaryChannelGroup",
+      "ui_name": "First user primary channel group",
+      "category": "Traffic Source",
+      "description": "The primary channel group that originally acquired a user. Primary channel groups are the channel groups used in standard reports in Google Analytics and serve as an active record of your property's data in alignment with channel grouping over time. To learn more, see [Custom channel groups](https://support.google.com/analytics/answer/13051316).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360AdGroupId",
+      "ui_name": "First user SA360 ad group ID",
+      "category": "Traffic Source",
+      "description": "The SA360 Ad Group ID that originally acquired the user. Identifies the SA360 ad group.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360AdGroupName",
+      "ui_name": "First user SA360 ad group name",
+      "category": "Traffic Source",
+      "description": "The SA360 Ad Group Name that originally acquired the user. SA360 Ad groups contain ads and keywords that relate to each other.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360CampaignId",
+      "ui_name": "First user SA360 campaign ID",
+      "category": "Traffic Source",
+      "description": "The SA360 Campaign ID that originally acquired the user. Identifies the SA360 campaign.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360CampaignName",
+      "ui_name": "First user SA360 campaign",
+      "category": "Traffic Source",
+      "description": "The SA360 Campaign Name that originally acquired the user. A SA360 campaign lets you organize your ads and define a goal for your advertising.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360CreativeFormat",
+      "ui_name": "First user SA360 creative format",
+      "category": "Traffic Source",
+      "description": "The SA360 Creative Format that originally acquired the user. The creative format is the specific layout or design of the advertisement used in a campaign.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360EngineAccountId",
+      "ui_name": "First user SA360 engine account ID",
+      "category": "Traffic Source",
+      "description": "The SA360 Engine Account ID that originally acquired the user. Identifies the SA360 engine account.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360EngineAccountName",
+      "ui_name": "First user SA360 engine account name",
+      "category": "Traffic Source",
+      "description": "The SA360 Engine Account Name that originally acquired the user. A SA360 engine account contains campaigns, ad groups, and other items from an advertising account.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360EngineAccountType",
+      "ui_name": "First user SA360 engine account type",
+      "category": "Traffic Source",
+      "description": "The SA360 Engine Account Type that originally acquired the user. The type of engine used by the search engine account.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360KeywordText",
+      "ui_name": "First user SA360 keyword text",
+      "category": "Traffic Source",
+      "description": "The SA360 Keyword Text that originally acquired the user. The keywords that matched the search query.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360ManagerAccountId",
+      "ui_name": "First user SA360 manager account ID",
+      "category": "Traffic Source",
+      "description": "The SA360 Manager Account ID that originally acquired the user. Identifies the SA360 manager account.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360ManagerAccountName",
+      "ui_name": "First user SA360 manager account name",
+      "category": "Traffic Source",
+      "description": "The SA360 Manager Account Name that originally acquired the user. The top level of the Search Ads 360 account hierarchy and is used for administration and reporting across the lower-level sub-manager and client accounts.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360Medium",
+      "ui_name": "First user SA360 medium",
+      "category": "Traffic Source",
+      "description": "The SA360 Medium that originally acquired the user. The payment mode used in ad buying. For example, `cpc`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360Query",
+      "ui_name": "First user SA360 query",
+      "category": "Traffic Source",
+      "description": "The SA360 Query that originally acquired the user. The search query typed by the user.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360Source",
+      "ui_name": "First user SA360 source",
+      "category": "Traffic Source",
+      "description": "The SA360 Source that originally acquired the user. The search query happened on this site.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSa360SourceMedium",
+      "ui_name": "First user SA360 source / medium",
+      "category": "Traffic Source",
+      "description": "The SA360 Source Medium that originally acquired the user. A combination of the source and medium.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSource",
+      "ui_name": "First user source",
+      "category": "Traffic Source",
+      "description": "The source that first acquired the user to your website or app.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSourceMedium",
+      "ui_name": "First user source / medium",
+      "category": "Traffic Source",
+      "description": "The combined values of the dimensions `firstUserSource` and `firstUserMedium`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstUserSourcePlatform",
+      "ui_name": "First user source platform",
+      "category": "Traffic Source",
+      "description": "The source platform that first acquired the user. Don't depend on this field returning `Manual` for traffic that uses UTMs; this field will update from returning `Manual` to returning `(not set)` for an upcoming feature launch.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "fullPageUrl",
+      "ui_name": "Full page URL",
+      "category": "Page / Screen",
+      "description": "The hostname, page path, and query string for web pages visited; for example, the `fullPageUrl` portion of `https://www.example.com/store/contact-us?query_string=true` is `www.example.com/store/contact-us?query_string=true`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "googleAdsAccountName",
+      "ui_name": "Google Ads account name",
+      "category": "Attribution",
+      "description": "The Account name from Google Ads for the campaign that led to the key event. Corresponds to `customer.descriptive_name` in the Google Ads API.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "googleAdsAdGroupId",
+      "ui_name": "Google Ads ad group ID",
+      "category": "Attribution",
+      "description": "The Google Ads ad group ID attributed to the key event.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "googleAdsAdGroupName",
+      "ui_name": "Google Ads ad group name",
+      "category": "Attribution",
+      "description": "The ad group name attributed to the key event.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "googleAdsAdNetworkType",
+      "ui_name": "Google Ads ad network type",
+      "category": "Attribution",
+      "description": "The advertising network type of the key event. An enumeration which includes `Google search`, `Search partners`, `Google Display Network`, `Youtube Search`, `Youtube Videos`, `Cross-network`, `Social`, and `(universal campaign)`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "googleAdsCampaignId",
+      "ui_name": "Google Ads campaign ID",
+      "category": "Attribution",
+      "description": "The campaign ID for the Google Ads campaign attributed to the key event.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "googleAdsCampaignName",
+      "ui_name": "Google Ads campaign",
+      "category": "Attribution",
+      "description": "The campaign name for the Google Ads campaign attributed to the key event.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "googleAdsCampaignType",
+      "ui_name": "Google Ads campaign type",
+      "category": "Attribution",
+      "description": "The campaign type for the Google Ads campaign attributed to the key event. Campaign types determine where customers see your ads and the settings and options available to you in Google Ads. Campaign type is an enumeration that includes: Search, Display, Shopping, Video, Demand Gen, App, Smart, Hotel, Local, and Performance Max. To learn more, see [Choose the right campaign type](https://support.google.com/google-ads/answer/2567043).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "googleAdsCreativeId",
+      "ui_name": "Google Ads creative ID",
+      "category": "Attribution",
+      "description": "The ID of the Google Ads creative attributed to the key event. Creative IDs identify individual ads.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "googleAdsCustomerId",
+      "ui_name": "Google Ads customer ID",
+      "category": "Attribution",
+      "description": "The Customer ID from Google Ads for the campaign that led to key event. Customer IDs in Google Ads uniquely identify Google Ads accounts.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "googleAdsKeyword",
+      "ui_name": "Google Ads keyword text",
+      "category": "Attribution",
+      "description": "The matched keyword that led to the key event. Keywords are words or phrases describing your product or service that you choose to get your ad in front of the right customers. To learn more about Keywords, see [Keywords: Definition](https://support.google.com/google-ads/answer/6323).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "googleAdsQuery",
+      "ui_name": "Google Ads query",
+      "category": "Attribution",
+      "description": "The search query that led to the key event.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "groupId",
+      "ui_name": "Group ID",
+      "category": "Other",
+      "description": "The player group ID in a game for an event. Populated by the event parameter `group_id`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "hostName",
+      "ui_name": "Hostname",
+      "category": "Page / Screen",
+      "description": "Includes the subdomain and domain names of a URL; for example, the Host Name of www.example.com/contact.html is www.example.com.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "hour",
+      "ui_name": "Hour",
+      "category": "Time",
+      "description": "The two-digit hour of the day that the event was logged. This dimension ranges from 0-23 and is reported in your property's timezone.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "isKeyEvent",
+      "ui_name": "Is key event",
+      "category": "Event",
+      "description": "The string `true` if the event is a key event. Marking an event as a key event affects reports from time of creation. It doesn't change historic data. You can mark any event as key in Google Analytics, and some events (such as `first_open` or `purchase`) are marked as key events by default.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "isoWeek",
+      "ui_name": "ISO week of the year",
+      "category": "Time",
+      "description": "ISO week number, where each week starts on Monday. For details, see http://en.wikipedia.org/wiki/ISO_week_date. Example values include 01, 02, & 53.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "isoYear",
+      "ui_name": "ISO year",
+      "category": "Time",
+      "description": "The ISO year of the event. For details, see http://en.wikipedia.org/wiki/ISO_week_date. Example values include 2022 & 2023.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "isoYearIsoWeek",
+      "ui_name": "ISO week of ISO year",
+      "category": "Time",
+      "description": "The combined values of isoWeek and isoYear. Example values include 201652 & 201701.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemAffiliation",
+      "ui_name": "Item affiliation",
+      "category": "Ecommerce",
+      "description": "The name or code of the affiliate (partner/vendor; if any) associated with an individual item. Populated by the `affiliation` item parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemBrand",
+      "ui_name": "Item brand",
+      "category": "Ecommerce",
+      "description": "Brand name of the item.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemCategory",
+      "ui_name": "Item category",
+      "category": "Ecommerce",
+      "description": "The hierarchical category in which the item is classified. For example, in Apparel/Mens/Summer/Shirts/T-shirts, Apparel is the item category.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemCategory2",
+      "ui_name": "Item category 2",
+      "category": "Ecommerce",
+      "description": "The hierarchical category in which the item is classified. For example, in Apparel/Mens/Summer/Shirts/T-shirts, Mens is the item category 2.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemCategory3",
+      "ui_name": "Item category 3",
+      "category": "Ecommerce",
+      "description": "The hierarchical category in which the item is classified. For example, in Apparel/Mens/Summer/Shirts/T-shirts, Summer is the item category 3.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemCategory4",
+      "ui_name": "Item category 4",
+      "category": "Ecommerce",
+      "description": "The hierarchical category in which the item is classified. For example, in Apparel/Mens/Summer/Shirts/T-shirts, Shirts is the item category 4.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemCategory5",
+      "ui_name": "Item category 5",
+      "category": "Ecommerce",
+      "description": "The hierarchical category in which the item is classified. For example, in Apparel/Mens/Summer/Shirts/T-shirts, T-shirts is the item category 5.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemId",
+      "ui_name": "Item ID",
+      "category": "Ecommerce",
+      "description": "The ID of the item.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemListId",
+      "ui_name": "Item list ID",
+      "category": "Ecommerce",
+      "description": "The ID of the item list.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemListName",
+      "ui_name": "Item list name",
+      "category": "Ecommerce",
+      "description": "The name of the item list.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemListPosition",
+      "ui_name": "Item list position",
+      "category": "Ecommerce",
+      "description": "The position of an item in a list. For example, a product you sell in a list. This dimension is populated in tagging by the `index` parameter in the items array.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemLocationID",
+      "ui_name": "Item location ID",
+      "category": "Ecommerce",
+      "description": "The physical location associated with the item. For example, the physical store location. It's recommended to use the [Google Place ID](https://developers.google.com/maps/documentation/places/web-service/place-id) that corresponds to the associated item. A custom location ID can also be used. This field is populated in tagging by the `location_id` parameter in the items array.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemName",
+      "ui_name": "Item name",
+      "category": "Ecommerce",
+      "description": "The name of the item.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemPromotionCreativeName",
+      "ui_name": "Item promotion creative name",
+      "category": "Ecommerce",
+      "description": "The name of the item-promotion creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemPromotionCreativeSlot",
+      "ui_name": "Item promotion creative slot",
+      "category": "Ecommerce",
+      "description": "The name of the promotional creative slot associated with the item. This dimension can be specified in tagging by the `creative_slot` parameter at the event or item level. If the parameter is specified at both the event & item level, the item-level parameter is used.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemPromotionId",
+      "ui_name": "Item promotion ID",
+      "category": "Ecommerce",
+      "description": "The ID of the item promotion.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemPromotionName",
+      "ui_name": "Item promotion name",
+      "category": "Ecommerce",
+      "description": "The name of the promotion for the item.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemVariant",
+      "ui_name": "Item variant",
+      "category": "Ecommerce",
+      "description": "The specific variation of a product. For example, XS, S, M, or L for size; or Red, Blue, Green, or Black for color. Populated by the `item_variant` parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "landingPage",
+      "ui_name": "Landing page",
+      "category": "Page / Screen",
+      "description": "The page path associated with the first pageview in a session.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "landingPagePlusQueryString",
+      "ui_name": "Landing page + query string",
+      "category": "Page / Screen",
+      "description": "The page path + query string associated with the first pageview in a session.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "language",
+      "ui_name": "Language",
+      "category": "Platform / Device",
+      "description": "The language setting of the user's browser or device. For example, `English`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "languageCode",
+      "ui_name": "Language code",
+      "category": "Platform / Device",
+      "description": "The language setting (ISO 639) of the user's browser or device. For example, `en-us`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "level",
+      "ui_name": "Level",
+      "category": "Other",
+      "description": "The player's level in a game. Populated by the event parameter `level`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "linkClasses",
+      "ui_name": "Link classes",
+      "category": "Other",
+      "description": "The HTML class attribute for an outbound link. For example if a user clicks a link `<a class=\"center\" href=\"www.youtube.com\">`, this dimension will return `center`. Automatically populated if Enhanced Measurement is enabled. Populated by the event parameter `link_classes`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "linkDomain",
+      "ui_name": "Link domain",
+      "category": "Other",
+      "description": "The destination domain of the outbound link. For example if a user clicks a link `<a href=\"www.youtube.com\">`, this dimension will return `youtube.com`. Automatically populated if Enhanced Measurement is enabled. Populated by the event parameter `link_domain`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "linkId",
+      "ui_name": "Link ID",
+      "category": "Other",
+      "description": "The HTML ID attribute for an outbound link or file download. For example if a user clicks a link `<a id=\"socialLinks\" href=\"www.youtube.com\">`, this dimension will return `socialLinks`. Automatically populated if Enhanced Measurement is enabled. Populated by the event parameter `link_id`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "linkText",
+      "ui_name": "Link text",
+      "category": "Other",
+      "description": "The link text of the file download. Automatically populated if Enhanced Measurement is enabled. Populated by the event parameter `link_text`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "linkUrl",
+      "ui_name": "Link URL",
+      "category": "Other",
+      "description": "The full URL for an outbound link or file download. For example if a user clicks a link `<a href=\"https://www.youtube.com/results?search_query=analytics\">`, this dimension will return `https://www.youtube.com/results?search_query=analytics`. Automatically populated if Enhanced Measurement is enabled. Populated by the event parameter `link_url`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "manualAdContent",
+      "ui_name": "Manual ad content",
+      "category": "Attribution",
+      "description": "The ad content attributed to the key event. Populated by the utm_content parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "manualCampaignId",
+      "ui_name": "Manual campaign ID",
+      "category": "Attribution",
+      "description": "The manual Campaign ID that led to the key event. Identifies the manual campaign. Populated by `utm_id` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "manualCampaignName",
+      "ui_name": "Manual campaign name",
+      "category": "Attribution",
+      "description": "The manual Campaign Name that led to the key event. The name of the manual campaign. Populated by `utm_campaign` URL parameter. To learn more, see [Collect campaign data with custom URLs](https://support.google.com/analytics/answer/10917952).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "manualCreativeFormat",
+      "ui_name": "Manual creative format",
+      "category": "Attribution",
+      "description": "The manual Creative Format that led to the key event. Identifies the creative format used in the ad. Populated by `utm_creative_format` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "manualMarketingTactic",
+      "ui_name": "Manual marketing tactic",
+      "category": "Attribution",
+      "description": "The manual Marketing Tactic that led to the key event. The targeting criteria applied to a campaign. For example, remarketing or prospecting. Populated by `utm_marketing_tactic` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "manualMedium",
+      "ui_name": "Manual medium",
+      "category": "Attribution",
+      "description": "The manual Medium that led to the key event. The marketing medium used in the referral. For example, `cpc`. Populated by `utm_medium` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "manualSource",
+      "ui_name": "Manual source",
+      "category": "Attribution",
+      "description": "The manual Source that led to the key event. The referrer. Populated by `utm_source` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "manualSourceMedium",
+      "ui_name": "Manual source / medium",
+      "category": "Attribution",
+      "description": "The manual Source Medium that led to the key event. A combination of the source and medium.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "manualSourcePlatform",
+      "ui_name": "Manual source platform",
+      "category": "Attribution",
+      "description": "The manual Source Platform that led to the key event. The platform responsible for directing traffic to a given Analytics property. Populated by `utm_source_platform` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "manualTerm",
+      "ui_name": "Manual term",
+      "category": "Attribution",
+      "description": "The term attributed to the key event. Populated by the utm_term parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "medium",
+      "ui_name": "Medium",
+      "category": "Attribution",
+      "description": "The medium attributed to the key event.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "method",
+      "ui_name": "Method",
+      "category": "Other",
+      "description": "The method by which an event was triggered. Populated by the event parameter `method`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "minute",
+      "ui_name": "Minute",
+      "category": "Time",
+      "description": "The two-digit minute of the hour that the event was logged. This dimension ranges from 0-59 and is reported in your property's timezone.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "mobileDeviceBranding",
+      "ui_name": "Device brand",
+      "category": "Platform / Device",
+      "description": "Manufacturer or branded name (examples: Samsung, HTC, Verizon, T-Mobile).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "mobileDeviceMarketingName",
+      "ui_name": "Device",
+      "category": "Platform / Device",
+      "description": "The branded device name (examples: Galaxy S10 or P30 Pro).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "mobileDeviceModel",
+      "ui_name": "Mobile model",
+      "category": "Platform / Device",
+      "description": "The mobile device model name (examples: iPhone X or SM-G950F).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "month",
+      "ui_name": "Month",
+      "category": "Time",
+      "description": "The month of the event, a two digit integer from 01 to 12.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "newVsReturning",
+      "ui_name": "New / returning",
+      "category": "User",
+      "description": "New users have 0 previous sessions, and returning users have 1 or more previous sessions. This dimension returns two values: `new` or `returning`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "nthDay",
+      "ui_name": "Nth day",
+      "category": "Time",
+      "description": "The number of days since the start of the date range.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "nthHour",
+      "ui_name": "Nth hour",
+      "category": "Time",
+      "description": "The number of hours since the start of the date range. The starting hour is 0000.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "nthMinute",
+      "ui_name": "Nth minute",
+      "category": "Time",
+      "description": "The number of minutes since the start of the date range. The starting minute is 0000.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "nthMonth",
+      "ui_name": "Nth month",
+      "category": "Time",
+      "description": "The number of months since the start of a date range. The starting month is 0000.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "nthWeek",
+      "ui_name": "Nth week",
+      "category": "Time",
+      "description": "A number representing the number of weeks since the start of a date range.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "nthYear",
+      "ui_name": "Nth year",
+      "category": "Time",
+      "description": "The number of years since the start of the date range. The starting year is 0000.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "operatingSystem",
+      "ui_name": "Operating system",
+      "category": "Platform / Device",
+      "description": "The operating systems used by visitors to your app or website. Includes desktop and mobile operating systems such as Windows and Android.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "operatingSystemVersion",
+      "ui_name": "OS version",
+      "category": "Platform / Device",
+      "description": "The operating system versions used by visitors to your website or app. For example, Android 10's version is 10, and iOS 13.5.1's version is 13.5.1.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "operatingSystemWithVersion",
+      "ui_name": "Operating system with version",
+      "category": "Platform / Device",
+      "description": "The operating system and version. For example, Android 10 or Windows 7.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "orderCoupon",
+      "ui_name": "Order coupon",
+      "category": "Ecommerce",
+      "description": "Code for the order-level coupon.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "outbound",
+      "ui_name": "Outbound",
+      "category": "Other",
+      "description": "Returns `true` if the link led to a site that is not a part of the property's domain. Automatically populated if Enhanced Measurement is enabled. Populated by the event parameter `outbound`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "pageLocation",
+      "ui_name": "Page location",
+      "category": "Page / Screen",
+      "description": "The protocol, hostname, page path, and query string for web pages visited; for example, the `pageLocation` portion of `https://www.example.com/store/contact-us?query_string=true` is `https://www.example.com/store/contact-us?query_string=true`. Populated by the event parameter `page_location`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "pagePath",
+      "ui_name": "Page path",
+      "category": "Page / Screen",
+      "description": "The portion of the URL between the hostname and query string for web pages visited; for example, the pagePath portion of `https://www.example.com/store/contact-us?query_string=true` is `/store/contact-us`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "pagePathPlusQueryString",
+      "ui_name": "Page path + query string",
+      "category": "Page / Screen",
+      "description": "The portion of the URL following the hostname for web pages visited; for example, the `pagePathPlusQueryString` portion of `https://www.example.com/store/contact-us?query_string=true` is `/store/contact-us?query_string=true`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "pageReferrer",
+      "ui_name": "Page referrer",
+      "category": "Page / Screen",
+      "description": "The full referring URL including the hostname and path. This referring URL is the user's previous URL and can be this website's domain or other domains. Populated by the event parameter `page_referrer`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "pageTitle",
+      "ui_name": "Page title",
+      "category": "Page / Screen",
+      "description": "The web page titles used on your site.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "percentScrolled",
+      "ui_name": "Percent scrolled",
+      "category": "Other",
+      "description": "The percentage down the page that the user has scrolled (for example, `90`). Automatically populated if Enhanced Measurement is enabled. Populated by the event parameter `percent_scrolled`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "platform",
+      "ui_name": "Platform",
+      "category": "Platform / Device",
+      "description": "The platform on which your app or website ran; for example, web, iOS, or Android. To determine a stream's type in a report, use both platform and streamId.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "platformDeviceCategory",
+      "ui_name": "Platform / device category",
+      "category": "Platform / Device",
+      "description": "The platform and type of device on which your website or mobile app ran. (example: Android / mobile)",
+      "custom_definition": false
+    },
+    {
+      "api_name": "primaryChannelGroup",
+      "ui_name": "Primary channel group",
+      "category": "Attribution",
+      "description": "The primary channel group attributed to the key event. Primary channel groups are the channel groups used in standard reports in Google Analytics and serve as an active record of your property's data in alignment with channel grouping over time. To learn more, see [Custom channel groups](https://support.google.com/analytics/answer/13051316).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "region",
+      "ui_name": "Region",
+      "category": "Geography",
+      "description": "The geographic region from which the user activity originated, derived from their IP address.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360AdGroupId",
+      "ui_name": "SA360 ad group ID",
+      "category": "Attribution",
+      "description": "The SA360 Ad Group ID that led to the key event. Identifies the SA360 ad group.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360AdGroupName",
+      "ui_name": "SA360 ad group name",
+      "category": "Attribution",
+      "description": "The SA360 Ad Group Name that led to the key event. SA360 Ad groups contain ads and keywords that relate to each other.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360CampaignId",
+      "ui_name": "SA360 campaign ID",
+      "category": "Attribution",
+      "description": "The SA360 Campaign ID that led to the key event. Identifies the SA360 campaign.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360CampaignName",
+      "ui_name": "SA360 campaign",
+      "category": "Attribution",
+      "description": "The SA360 Campaign Name that led to the key event. A SA360 campaign lets you organize your ads and define a goal for your advertising.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360CreativeFormat",
+      "ui_name": "SA360 creative format",
+      "category": "Attribution",
+      "description": "The SA360 Creative Format that led to the key event. The creative format is the specific layout or design of the advertisement used in a campaign.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360EngineAccountId",
+      "ui_name": "SA360 engine account ID",
+      "category": "Attribution",
+      "description": "The SA360 Engine Account ID that led to the key event. Identifies the SA360 engine account.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360EngineAccountName",
+      "ui_name": "SA360 engine account name",
+      "category": "Attribution",
+      "description": "The SA360 Engine Account Name that led to the key event. A SA360 engine account contains campaigns, ad groups, and other items from an advertising account.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360EngineAccountType",
+      "ui_name": "SA360 engine account type",
+      "category": "Attribution",
+      "description": "The SA360 Engine Account Type that led to the key event. The type of engine used by the search engine account.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360KeywordText",
+      "ui_name": "SA360 keyword text",
+      "category": "Attribution",
+      "description": "The SA360 Keyword Text that led to the key event. The keywords that matched the search query.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360ManagerAccountId",
+      "ui_name": "SA360 manager account ID",
+      "category": "Attribution",
+      "description": "The SA360 Manager Account ID that led to the key event. Identifies the SA360 manager account.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360ManagerAccountName",
+      "ui_name": "SA360 manager account name",
+      "category": "Attribution",
+      "description": "The SA360 Manager Account Name that led to the key event. The top level of the Search Ads 360 account hierarchy and is used for administration and reporting across the lower-level sub-manager and client accounts.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360Medium",
+      "ui_name": "SA360 medium",
+      "category": "Attribution",
+      "description": "The SA360 Medium that led to the key event. The payment mode used in ad buying. For example, `cpc`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360Query",
+      "ui_name": "SA360 query",
+      "category": "Attribution",
+      "description": "The SA360 Query that led to the key event. The search query typed by the user.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360Source",
+      "ui_name": "SA360 source",
+      "category": "Attribution",
+      "description": "The SA360 Source that led to the key event. The search query happened on this site.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sa360SourceMedium",
+      "ui_name": "SA360 source / medium",
+      "category": "Attribution",
+      "description": "The SA360 Source Medium that led to the key event. A combination of the source and medium.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "screenResolution",
+      "ui_name": "Screen resolution",
+      "category": "Platform / Device",
+      "description": "The screen resolution of the user's monitor. For example, 1920x1080.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "searchTerm",
+      "ui_name": "Search term",
+      "category": "Other",
+      "description": "The term searched by the user. For example if the user visits `/some-page.html?q=some-term`, this dimension returns `some-term`. Automatically populated if Enhanced Measurement is enabled. Populated by the event parameter `search_term`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCampaignId",
+      "ui_name": "Session campaign ID",
+      "category": "Traffic Source",
+      "description": "The marketing campaign ID for a session. Includes Google Ads Campaigns, Manual Campaigns, & other Campaigns.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCampaignName",
+      "ui_name": "Session campaign",
+      "category": "Traffic Source",
+      "description": "The marketing campaign name for a session. Includes Google Ads Campaigns, Manual Campaigns, & other Campaigns.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360AccountId",
+      "ui_name": "Session CM360 account ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Account ID that led to the session. Identifies the CM360 account.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360AccountName",
+      "ui_name": "Session CM360 account name",
+      "category": "Traffic Source",
+      "description": "The CM360 Account Name that led to the session. A CM360 account consists of advertisers, sites, campaigns, and user profiles.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360AdvertiserId",
+      "ui_name": "Session CM360 advertiser ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Advertiser ID that led to the session. Identifies the CM360 advertiser.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360AdvertiserName",
+      "ui_name": "Session CM360 advertiser name",
+      "category": "Traffic Source",
+      "description": "The CM360 Advertiser Name that led to the session. A CM360 Advertiser contains a group of campaigns, creative assets, and other settings.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360CampaignId",
+      "ui_name": "Session CM360 campaign ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Campaign ID that led to the session. Identifies the CM360 campaign.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360CampaignName",
+      "ui_name": "Session CM360 campaign name",
+      "category": "Traffic Source",
+      "description": "The CM360 Campaign Name that led to the session. A CM360 campaign can be configured to specify when your ads run, what landing pages are used, and other properties.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360CreativeFormat",
+      "ui_name": "Session CM360 creative format",
+      "category": "Traffic Source",
+      "description": "The CM360 Creative Format that led to the session. CM360 creative formats are also referred to as creative types.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360CreativeId",
+      "ui_name": "Session CM360 creative ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Creative ID that led to the session. Identifies a CM360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360CreativeName",
+      "ui_name": "Session CM360 creative name",
+      "category": "Traffic Source",
+      "description": "The CM360 Creative Name that led to the session. The name given to a CM360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360CreativeType",
+      "ui_name": "Session CM360 creative type",
+      "category": "Traffic Source",
+      "description": "The CM360 Creative Type that led to the session. A category of CM360 creatives like 'Display' or 'Tracking'. To learn more, see [manage creatives](https://support.google.com/campaignmanager/answer/3068258)",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360CreativeTypeId",
+      "ui_name": "Session CM360 creative type ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Creative Type ID that led to the session. Identifies a CM360 creative type.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360CreativeVersion",
+      "ui_name": "Session CM360 creative version",
+      "category": "Traffic Source",
+      "description": "The CM360 Creative Version that led to the session. The version number helps you keep track of multiple versions of your creative in your reports. If you upload a new asset to an existing creative, the version number is increased by one.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360Medium",
+      "ui_name": "Session CM360 medium",
+      "category": "Traffic Source",
+      "description": "The CM360 Medium that led to the session. The CM360 medium is also referred to as the placement cost structure.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360PlacementCostStructure",
+      "ui_name": "Session CM360 placement cost structure",
+      "category": "Traffic Source",
+      "description": "The CM360 Placement Cost Structure that led to the session. Placement cost structures regulate how media cost will be calculated. For example 'CPM'.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360PlacementId",
+      "ui_name": "Session CM360 placement ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Placement ID that led to the session. Identifies a CM360 placement. A placement is the part of a website where your ad appears.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360PlacementName",
+      "ui_name": "Session CM360 placement name",
+      "category": "Traffic Source",
+      "description": "The CM360 Placement Name that led to the session. The given name for a CM360 placement. A placement is the part of a website where your ad appears.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360RenderingId",
+      "ui_name": "Session CM360 rendering ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Rendering ID that led to the session. Identifies a CM360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360SiteId",
+      "ui_name": "Session CM360 site ID",
+      "category": "Traffic Source",
+      "description": "The CM360 Site ID that led to the session. Identifies a CM360 site.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360SiteName",
+      "ui_name": "Session CM360 site name",
+      "category": "Traffic Source",
+      "description": "The CM360 Site Name that led to the session. The CM360 Site name from which the ad space was purchased.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360Source",
+      "ui_name": "Session CM360 source",
+      "category": "Traffic Source",
+      "description": "The CM360 Source that led to the session. The CM360 source is also referred to as the site name.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionCm360SourceMedium",
+      "ui_name": "Session CM360 source / medium",
+      "category": "Traffic Source",
+      "description": "The CM360 Source Medium that led to the session. A combination of the source and medium.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDefaultChannelGroup",
+      "ui_name": "Session default channel group",
+      "category": "Traffic Source",
+      "description": "The session's default channel group is based primarily on source and medium. An enumeration which includes `Direct`, `Organic Search`, `Paid Social`, `Organic Social`, `Email`, `Affiliates`, `Referral`, `Paid Search`, `Video`, and `Display`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360AdvertiserId",
+      "ui_name": "Session DV360 advertiser ID",
+      "category": "Traffic Source",
+      "description": "The DV360 Advertiser ID that led to the session. Identifies the DV360 advertiser.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360AdvertiserName",
+      "ui_name": "Session DV360 advertiser name",
+      "category": "Traffic Source",
+      "description": "The DV360 Advertiser Name that led to the session. DV360 advertisers represent real-life businesses that run advertising campaigns.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360CampaignId",
+      "ui_name": "Session DV360 campaign ID",
+      "category": "Traffic Source",
+      "description": "The DV360 Campaign ID that led to the session. Identifies the DV360 campaign.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360CampaignName",
+      "ui_name": "Session DV360 campaign name",
+      "category": "Traffic Source",
+      "description": "The DV360 Campaign Name that led to the session. DV360 campaigns group together related insertion orders with a common business goal.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360CreativeFormat",
+      "ui_name": "Session DV360 creative format",
+      "category": "Traffic Source",
+      "description": "The DV360 Creative Format that led to the session. Also referred to as the creative type. For example, expandable, video, or native.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360CreativeId",
+      "ui_name": "Session DV360 creative ID",
+      "category": "Traffic Source",
+      "description": "The DV360 Creative ID that led to the session. Identifies the DV360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360CreativeName",
+      "ui_name": "Session DV360 creative name",
+      "category": "Traffic Source",
+      "description": "The DV360 Creative Name that led to the session. The name given to a DV360 creative.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360ExchangeId",
+      "ui_name": "Session DV360 exchange ID",
+      "category": "Traffic Source",
+      "description": "The DV360 Exchange ID that led to the session. Identifies the DV360 exchange.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360ExchangeName",
+      "ui_name": "Session DV360 exchange name",
+      "category": "Traffic Source",
+      "description": "The DV360 Exchange Name that led to the session. The DV360 ad exchange involved in the ad click. To learn more, see [managing exchanges](https://support.google.com/displayvideo/answer/9230278).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360InsertionOrderId",
+      "ui_name": "Session DV360 insertion order ID",
+      "category": "Traffic Source",
+      "description": "The DV360 Insertion Order ID that led to the session. Identifies the DV360 insertion order.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360InsertionOrderName",
+      "ui_name": "Session DV360 insertion order name",
+      "category": "Traffic Source",
+      "description": "The DV360 Insertion Order Name that led to the session. A DV360 insertion order contains a set of line items that are related to the same advertising campaign.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360LineItemId",
+      "ui_name": "Session DV360 line item ID",
+      "category": "Traffic Source",
+      "description": "The DV360 Line Item ID that led to the session. Identifies the DV360 line item.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360LineItemName",
+      "ui_name": "Session DV360 line item name",
+      "category": "Traffic Source",
+      "description": "The DV360 Line Item Name that led to the session. A DV360 line item bids on impressions and serves creatives to inventory sources.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360Medium",
+      "ui_name": "Session DV360 medium",
+      "category": "Traffic Source",
+      "description": "The DV360 Medium that led to the session. The billable outcome of the insertion order. For example, `cpm`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360PartnerId",
+      "ui_name": "Session DV360 partner ID",
+      "category": "Traffic Source",
+      "description": "The DV360 Partner ID that led to the session. Identifies the DV360 partner.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360PartnerName",
+      "ui_name": "Session DV360 partner name",
+      "category": "Traffic Source",
+      "description": "The DV360 Partner Name that led to the session. DV360 partners represent agencies, trading desks, or large individual advertisers.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360Source",
+      "ui_name": "Session DV360 source",
+      "category": "Traffic Source",
+      "description": "The DV360 Source that led to the session. The DV360 site name where your ad was displayed.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionDv360SourceMedium",
+      "ui_name": "Session DV360 source / medium",
+      "category": "Traffic Source",
+      "description": "The DV360 Source Medium that led to the session. A combination of the source and medium.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionGoogleAdsAccountName",
+      "ui_name": "Session Google Ads account name",
+      "category": "Traffic Source",
+      "description": "The Account name from Google Ads that led to the session. Corresponds to customer.descriptive_name in the Google Ads API.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionGoogleAdsAdGroupId",
+      "ui_name": "Session Google Ads ad group ID",
+      "category": "Traffic Source",
+      "description": "The Ad Group Id in Google Ads for a session.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionGoogleAdsAdGroupName",
+      "ui_name": "Session Google Ads ad group name",
+      "category": "Traffic Source",
+      "description": "The Ad Group Name in Google Ads for a session.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionGoogleAdsAdNetworkType",
+      "ui_name": "Session Google Ads ad network type",
+      "category": "Traffic Source",
+      "description": "The advertising network that led to the session. An enumeration which includes `Google search`, `Search partners`, `Google Display Network`, `Youtube Search`, `Youtube Videos`, `Cross-network`, `Social`, and `(universal campaign)`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionGoogleAdsCampaignId",
+      "ui_name": "Session Google Ads campaign ID",
+      "category": "Traffic Source",
+      "description": "The Campaign ID for the Google Ads Campaign that led to this session.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionGoogleAdsCampaignName",
+      "ui_name": "Session Google Ads campaign",
+      "category": "Traffic Source",
+      "description": "The Campaign name for the Google Ads Campaign that led to this session.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionGoogleAdsCampaignType",
+      "ui_name": "Session Google Ads campaign type",
+      "category": "Traffic Source",
+      "description": "The campaign type for the Google Ads campaign that led to this session. Campaign types determine where customers see your ads and the settings and options available to you in Google Ads. Campaign type is an enumeration that includes: Search, Display, Shopping, Video, Demand Gen, App, Smart, Hotel, Local, and Performance Max. To learn more, see [Choose the right campaign type](https://support.google.com/google-ads/answer/2567043).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionGoogleAdsCreativeId",
+      "ui_name": "Session Google Ads creative ID",
+      "category": "Traffic Source",
+      "description": "The ID of the Google Ads creative that led to a session on your website or app. Creative IDs identify individual ads.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionGoogleAdsCustomerId",
+      "ui_name": "Session Google Ads customer ID",
+      "category": "Traffic Source",
+      "description": "The Customer ID from Google Ads that led to the session. Customer IDs in Google Ads uniquely identify Google Ads accounts.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionGoogleAdsKeyword",
+      "ui_name": "Session Google Ads keyword text",
+      "category": "Traffic Source",
+      "description": "The matched keyword that led to the session. Keywords are words or phrases describing your product or service that you choose to get your ad in front of the right customers. To learn more about Keywords, see [Keywords: Definition](https://support.google.com/google-ads/answer/6323).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionGoogleAdsQuery",
+      "ui_name": "Session Google Ads query",
+      "category": "Traffic Source",
+      "description": "The search query that led to the session.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionManualAdContent",
+      "ui_name": "Session manual ad content",
+      "category": "Traffic Source",
+      "description": "The ad content that led to a session. Populated by the utm_content parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionManualCampaignId",
+      "ui_name": "Session manual campaign ID",
+      "category": "Traffic Source",
+      "description": "The manual Campaign ID that led to the session. Identifies the manual campaign. Populated by `utm_id` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionManualCampaignName",
+      "ui_name": "Session manual campaign name",
+      "category": "Traffic Source",
+      "description": "The manual Campaign Name that led to the session. The name of the manual campaign. Populated by `utm_campaign` URL parameter. To learn more, see [Collect campaign data with custom URLs](https://support.google.com/analytics/answer/10917952).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionManualCreativeFormat",
+      "ui_name": "Session manual creative format",
+      "category": "Traffic Source",
+      "description": "The manual Creative Format that led to the session. Identifies the creative format used in the ad. Populated by `utm_creative_format` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionManualMarketingTactic",
+      "ui_name": "Session manual marketing tactic",
+      "category": "Traffic Source",
+      "description": "The manual Marketing Tactic that led to the session. The targeting criteria applied to a campaign. For example, remarketing or prospecting. Populated by `utm_marketing_tactic` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionManualMedium",
+      "ui_name": "Session manual medium",
+      "category": "Traffic Source",
+      "description": "The manual Medium that led to the session. The marketing medium used in the referral. For example, `cpc`. Populated by `utm_medium` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionManualSource",
+      "ui_name": "Session manual source",
+      "category": "Traffic Source",
+      "description": "The manual Source that led to the session. The referrer. Populated by `utm_source` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionManualSourceMedium",
+      "ui_name": "Session manual source / medium",
+      "category": "Traffic Source",
+      "description": "The manual Source Medium that led to the session. A combination of the source and medium.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionManualSourcePlatform",
+      "ui_name": "Session manual source platform",
+      "category": "Traffic Source",
+      "description": "The manual Source Platform that led to the session. The platform responsible for directing traffic to a given Analytics property. Populated by `utm_source_platform` URL parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionManualTerm",
+      "ui_name": "Session manual term",
+      "category": "Traffic Source",
+      "description": "The term that led to a session. Populated by the utm_term parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionMedium",
+      "ui_name": "Session medium",
+      "category": "Traffic Source",
+      "description": "The medium that initiated a session on your website or app.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionPrimaryChannelGroup",
+      "ui_name": "Session primary channel group",
+      "category": "Traffic Source",
+      "description": "The primary channel group that led to the session. Primary channel groups are the channel groups used in standard reports in Google Analytics and serve as an active record of your property's data in alignment with channel grouping over time. To learn more, see [Custom channel groups](https://support.google.com/analytics/answer/13051316).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360AdGroupId",
+      "ui_name": "Session SA360 ad group ID",
+      "category": "Traffic Source",
+      "description": "The SA360 Ad Group ID that led to the session. Identifies the SA360 ad group.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360AdGroupName",
+      "ui_name": "Session SA360 ad group name",
+      "category": "Traffic Source",
+      "description": "The SA360 Ad Group Name that led to the session. SA360 Ad groups contain ads and keywords that relate to each other.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360CampaignId",
+      "ui_name": "Session SA360 campaign ID",
+      "category": "Traffic Source",
+      "description": "The SA360 Campaign ID that led to the session. Identifies the SA360 campaign.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360CampaignName",
+      "ui_name": "Session SA360 campaign",
+      "category": "Traffic Source",
+      "description": "The SA360 Campaign Name that led to the session. A SA360 campaign lets you organize your ads and define a goal for your advertising.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360CreativeFormat",
+      "ui_name": "Session SA360 creative format",
+      "category": "Traffic Source",
+      "description": "The SA360 Creative Format that led to the session. The creative format is the specific layout or design of the advertisement used in a campaign.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360EngineAccountId",
+      "ui_name": "Session SA360 engine account ID",
+      "category": "Traffic Source",
+      "description": "The SA360 Engine Account ID that led to the session. Identifies the SA360 engine account.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360EngineAccountName",
+      "ui_name": "Session SA360 engine account name",
+      "category": "Traffic Source",
+      "description": "The SA360 Engine Account Name that led to the session. A SA360 engine account contains campaigns, ad groups, and other items from an advertising account.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360EngineAccountType",
+      "ui_name": "Session SA360 engine account type",
+      "category": "Traffic Source",
+      "description": "The SA360 Engine Account Type that led to the session. The type of engine used by the search engine account. For example, `google ads`, `bing`, or `baidu`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360Keyword",
+      "ui_name": "Session SA360 keyword text",
+      "category": "Traffic Source",
+      "description": "The SA360 Keyword Text that led to the session. The keywords that matched the search query.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360ManagerAccountId",
+      "ui_name": "Session SA360 manager account ID",
+      "category": "Traffic Source",
+      "description": "The SA360 Manager Account ID that led to the session. Identifies the SA360 manager account.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360ManagerAccountName",
+      "ui_name": "Session SA360 manager account name",
+      "category": "Traffic Source",
+      "description": "The SA360 Manager Account Name that led to the session. The top level of the Search Ads 360 account hierarchy and is used for administration and reporting across the lower-level sub-manager and client accounts.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360Medium",
+      "ui_name": "Session SA360 medium",
+      "category": "Traffic Source",
+      "description": "The SA360 Medium that led to the session. The payment mode used in ad buying. For example, `cpc`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360Query",
+      "ui_name": "Session SA360 query",
+      "category": "Traffic Source",
+      "description": "The SA360 Query that led to the session. The search query typed by the user.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360Source",
+      "ui_name": "Session SA360 source",
+      "category": "Traffic Source",
+      "description": "The SA360 Source that led to the session. The search query happened on this site.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSa360SourceMedium",
+      "ui_name": "Session SA360 source / medium",
+      "category": "Traffic Source",
+      "description": "The SA360 Source Medium that led to the session. A combination of the source and medium.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSource",
+      "ui_name": "Session source",
+      "category": "Traffic Source",
+      "description": "The source that initiated a session on your website or app.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSourceMedium",
+      "ui_name": "Session source / medium",
+      "category": "Traffic Source",
+      "description": "The combined values of the dimensions `sessionSource` and `sessionMedium`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionSourcePlatform",
+      "ui_name": "Session source platform",
+      "category": "Traffic Source",
+      "description": "The source platform of the session's campaign. Don't depend on this field returning `Manual` for traffic that uses UTMs; this field will update from returning `Manual` to returning `(not set)` for an upcoming feature launch.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "shippingTier",
+      "ui_name": "Shipping tier",
+      "category": "Ecommerce",
+      "description": "The shipping tier selected for delivery of the purchased item. For example, `Ground`, `Air`, or `Next-day`. Populated by the `shipping_tier` event parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "signedInWithUserId",
+      "ui_name": "Signed in with user ID",
+      "category": "User",
+      "description": "The string `yes` if the user signed in with the User-ID feature. To learn more about User-ID, see [Measure activity across platforms with User-ID](https://support.google.com/analytics/answer/9213390).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "source",
+      "ui_name": "Source",
+      "category": "Attribution",
+      "description": "The source attributed to the key event.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sourceMedium",
+      "ui_name": "Source / medium",
+      "category": "Attribution",
+      "description": "The combined values of the dimensions `source` and `medium`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sourcePlatform",
+      "ui_name": "Source platform",
+      "category": "Attribution",
+      "description": "The source platform of the key event's campaign. Don't depend on this field returning `Manual` for traffic that uses UTMs; this field will update from returning `Manual` to returning `(not set)` for an upcoming feature launch.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "streamId",
+      "ui_name": "Stream ID",
+      "category": "Platform / Device",
+      "description": "The numeric data stream identifier for your app or website.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "streamName",
+      "ui_name": "Stream name",
+      "category": "Platform / Device",
+      "description": "The data stream name for your app or website.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "testDataFilterId",
+      "ui_name": "Test data filter ID",
+      "category": "Other",
+      "description": "The numeric identifier of a data filter in testing state. You use data filters to include or exclude event data from your reports based on event-parameter values. To learn more, see [Data filters](https://support.google.com/analytics/answer/10108813).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "testDataFilterName",
+      "ui_name": "Test data filter name",
+      "category": "Other",
+      "description": "The name of data filters in testing state. You use data filters to include or exclude event data from your reports based on event-parameter values. To learn more, see [Data filters](https://support.google.com/analytics/answer/10108813).",
+      "custom_definition": false
+    },
+    {
+      "api_name": "transactionId",
+      "ui_name": "Transaction ID",
+      "category": "Ecommerce",
+      "description": "The ID of the ecommerce transaction.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "unifiedPagePathScreen",
+      "ui_name": "Page path and screen class",
+      "category": "Page / Screen",
+      "description": "The page path (web) or screen class (app) on which the event was logged.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "unifiedPageScreen",
+      "ui_name": "Page path + query string and screen class",
+      "category": "Page / Screen",
+      "description": "The page path and query string (web) or screen class (app) on which the event was logged.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "unifiedScreenClass",
+      "ui_name": "Page title and screen class",
+      "category": "Page / Screen",
+      "description": "The page title (web) or screen class (app) on which the event was logged.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "unifiedScreenName",
+      "ui_name": "Page title and screen name",
+      "category": "Page / Screen",
+      "description": "The page title (web) or screen name (app) on which the event was logged.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "userAgeBracket",
+      "ui_name": "Age",
+      "category": "Demographics",
+      "description": "User age brackets.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "userGender",
+      "ui_name": "Gender",
+      "category": "Demographics",
+      "description": "User gender.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "videoProvider",
+      "ui_name": "Video provider",
+      "category": "Other",
+      "description": "The source of the video (for example, `youtube`). Automatically populated for embedded videos if Enhanced Measurement is enabled. Populated by the event parameter `video_provider`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "videoTitle",
+      "ui_name": "Video title",
+      "category": "Other",
+      "description": "The title of the video. Automatically populated for embedded videos if Enhanced Measurement is enabled. Populated by the event parameter `video_title`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "videoUrl",
+      "ui_name": "Video URL",
+      "category": "Other",
+      "description": "The URL of the video. Automatically populated for embedded videos if Enhanced Measurement is enabled. Populated by the event parameter `video_url`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "virtualCurrencyName",
+      "ui_name": "Virtual currency name",
+      "category": "Other",
+      "description": "The name of a virtual currency with which the user is interacting. Such as spending or purchasing gems in a game. Populated by the `virtual_currency_name` event parameter.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "visible",
+      "ui_name": "Visible",
+      "category": "Other",
+      "description": "Returns `true` if the content is visible. Automatically populated for embedded videos if Enhanced Measurement is enabled. Populated by the event parameter `visible`.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "week",
+      "ui_name": "Week",
+      "category": "Time",
+      "description": "The week of the event, a two-digit number from 01 to 53. Each week starts on Sunday. January 1st is always in week 01. The first and last week of the year have fewer than 7 days in most years. Weeks other than the first and the last week of the year always have 7 days. For years where January 1st is a Sunday, the first week of that year and the last week of the prior year have 7 days.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "year",
+      "ui_name": "Year",
+      "category": "Time",
+      "description": "The four-digit year of the event. For example, 2020 or 2024.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "yearMonth",
+      "ui_name": "Year month",
+      "category": "Time",
+      "description": "The combined values of year and month. Example values include 202212 or 202301.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "yearWeek",
+      "ui_name": "Year week",
+      "category": "Time",
+      "description": "The combined values of year and week. Example values include 202253 or 202301.",
+      "custom_definition": false
+    },
+    {
+      "api_name": "customEvent:item_id",
+      "ui_name": "Job item id",
+      "category": "Event-scoped Custom Dimension",
+      "description": "An event scoped custom dimension for your Analytics property.",
+      "custom_definition": true
+    },
+    {
+      "api_name": "customEvent:method",
+      "ui_name": "Share method",
+      "category": "Event-scoped Custom Dimension",
+      "description": "An event scoped custom dimension for your Analytics property.",
+      "custom_definition": true
+    },
+    {
+      "api_name": "customEvent:share_surface",
+      "ui_name": "Share surface",
+      "category": "Event-scoped Custom Dimension",
+      "description": "An event scoped custom dimension for your Analytics property.",
+      "custom_definition": true
+    }
+  ],
+  "metrics": [
+    {
+      "api_name": "active1DayUsers",
+      "ui_name": "1-day active users",
+      "category": "User",
+      "description": "The number of distinct active users on your site or app within a 1 day period. The 1 day period includes the last day in the report's date range. Note: this is the same as Active Users.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "active28DayUsers",
+      "ui_name": "28-day active users",
+      "category": "User",
+      "description": "The number of distinct active users on your site or app within a 28 day period. The 28 day period includes the last day in the report's date range.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "active7DayUsers",
+      "ui_name": "7-day active users",
+      "category": "User",
+      "description": "The number of distinct active users on your site or app within a 7 day period. The 7 day period includes the last day in the report's date range.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "activeUsers",
+      "ui_name": "Active users",
+      "category": "User",
+      "description": "The number of distinct users who visited your site or app.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "addToCarts",
+      "ui_name": "Add to carts",
+      "category": "Ecommerce",
+      "description": "The number of times users added items to their shopping carts.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "adUnitExposure",
+      "ui_name": "Ad unit exposure",
+      "category": "Publisher",
+      "description": "The time that an ad unit was exposed to a user, in milliseconds.",
+      "type": "TYPE_MILLISECONDS",
+      "custom_definition": false
+    },
+    {
+      "api_name": "advertiserAdClicks",
+      "ui_name": "Ads clicks",
+      "category": "Other",
+      "description": "Total number of times users have clicked on an ad to reach the property. Includes clicks from linked integrations like linked Search Ads 360 advertisers. Also includes uploaded clicks from data import.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "advertiserAdCost",
+      "ui_name": "Ads cost",
+      "category": "Other",
+      "description": "The total amount you paid for your ads. Includes costs from linked integrations like linked Google Ads accounts. Also includes uploaded cost from data import; to learn more, see [Import cost data](https://support.google.com/analytics/answer/10071305).",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "advertiserAdCostPerClick",
+      "ui_name": "Ads cost per click",
+      "category": "Other",
+      "description": "Ads cost per click is ad cost divided by ad clicks and is often abbreviated CPC.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "advertiserAdCostPerKeyEvent",
+      "ui_name": "Cost per key event",
+      "category": "Other",
+      "description": "Cost per key event is ad cost divided by key events.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "advertiserAdImpressions",
+      "ui_name": "Ads impressions",
+      "category": "Other",
+      "description": "The total number of impressions. Includes impressions from linked integrations like linked Display & Video 360 advertisers. Also includes uploaded impressions from data import.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "averagePurchaseRevenue",
+      "ui_name": "Average purchase revenue",
+      "category": "Revenue",
+      "description": "The average purchase revenue in the transaction group of events.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "averagePurchaseRevenuePerPayingUser",
+      "ui_name": "ARPPU",
+      "category": "Revenue",
+      "description": "Average revenue per paying user (ARPPU) is the total purchase revenue per active user that logged a purchase event. The summary metric is for the time period selected.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "averagePurchaseRevenuePerUser",
+      "ui_name": "Average purchase revenue per user",
+      "category": "Revenue",
+      "description": "The average purchase revenue per active user is the total purchase revenue per active user that logged any event. The summary metric is for the time period selected.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "averageRevenuePerUser",
+      "ui_name": "ARPU",
+      "category": "Revenue",
+      "description": "Average revenue per active user (ARPU). The summary metric is for the time period selected. ARPU uses Total Revenue and includes AdMob estimated earnings.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "averageSessionDuration",
+      "ui_name": "Average session duration",
+      "category": "Session",
+      "description": "The average duration (in seconds) of users` sessions.",
+      "type": "TYPE_SECONDS",
+      "custom_definition": false
+    },
+    {
+      "api_name": "bounceRate",
+      "ui_name": "Bounce rate",
+      "category": "Session",
+      "description": "The percentage of sessions that were not engaged ((Sessions Minus Engaged sessions) divided by Sessions). This metric is returned as a fraction; for example, 0.2761 means 27.61% of sessions were bounces.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cartToViewRate",
+      "ui_name": "Cart-to-view rate",
+      "category": "Other",
+      "description": "The number of users who added a product(s) to their cart divided by the number of users who viewed the same product(s). This metric is returned as a fraction; for example, 0.1132 means 11.32% of users who viewed a product also added the same product to their cart.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "checkouts",
+      "ui_name": "Checkouts",
+      "category": "Ecommerce",
+      "description": "The number of times users started the checkout process. This metric counts the occurrence of the `begin_checkout` event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cohortActiveUsers",
+      "ui_name": "Cohort active users",
+      "category": "Cohort",
+      "description": "The number of users in the cohort who are active in the time window corresponding to the cohort nth day/week/month. For example in the row where cohortNthWeek = 0001, this metric is the number of users (in the cohort) who are active in week 1.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "cohortTotalUsers",
+      "ui_name": "Cohort total users",
+      "category": "Cohort",
+      "description": "The total number of users in the cohort. This metric is the same value in every row of the report for each cohort. Because cohorts are defined by a shared acquisition date, cohortTotalUsers is the same as cohortActiveUsers for the cohort's selection date range. For report rows later than the cohort's selection range, it is typical for cohortActiveUsers to be smaller than cohortTotalUsers. This difference represents users from the cohort that were not active for the later date. cohortTotalUsers is commonly used in the metric expression cohortActiveUsers/cohortTotalUsers to compute a user retention fraction for the cohort. The relationship between activeUsers and totalUsers is not equivalent to the relationship between cohortActiveUsers and cohortTotalUsers.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "crashAffectedUsers",
+      "ui_name": "Crash-affected users",
+      "category": "Other",
+      "description": "The number of users that logged a crash in this row of the report. For example if the report is time series by date, this metrics reports total users with at least one crash on this date. Crashes are events with the name \"app_exception\".",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "crashFreeUsersRate",
+      "ui_name": "Crash-free users rate",
+      "category": "Other",
+      "description": "The number of users without crash events (in this row of the report) divided by the total number of users. This metric is returned as a fraction; for example, 0.9243 means 92.43% of users were crash-free.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dauPerMau",
+      "ui_name": "DAU / MAU",
+      "category": "User",
+      "description": "The rolling percent of 30-day active users who are also 1-day active users. This metric is returned as a fraction; for example, 0.113 means 11.3% of 30-day active users were also 1-day active users.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "dauPerWau",
+      "ui_name": "DAU / WAU",
+      "category": "User",
+      "description": "The rolling percent of 7-day active users who are also 1-day active users. This metric is returned as a fraction; for example, 0.082 means 8.2% of 7-day active users were also 1-day active users.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "ecommercePurchases",
+      "ui_name": "Ecommerce purchases",
+      "category": "Ecommerce",
+      "description": "The number of times users completed a purchase. This metric counts `purchase` events; this metric does not count `in_app_purchase` and subscription events.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "engagedSessions",
+      "ui_name": "Engaged sessions",
+      "category": "Session",
+      "description": "The number of sessions that lasted longer than 10 seconds, or had a key event, or had 2 or more screen views.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "engagementRate",
+      "ui_name": "Engagement rate",
+      "category": "Session",
+      "description": "The percentage of engaged sessions (Engaged sessions divided by Sessions). This metric is returned as a fraction; for example, 0.7239 means 72.39% of sessions were engaged sessions.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "eventCount",
+      "ui_name": "Event count",
+      "category": "Event",
+      "description": "The count of events.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "eventCountPerUser",
+      "ui_name": "Event count per user",
+      "category": "Event",
+      "description": "The average number of events per user (Event count divided by Active users).",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "eventsPerSession",
+      "ui_name": "Events per session",
+      "category": "Event",
+      "description": "The average number of events per session (Event count divided by Sessions).",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "eventValue",
+      "ui_name": "Event value",
+      "category": "Event",
+      "description": "The sum of the event parameter named `value`.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstTimePurchaserRate",
+      "ui_name": "First-time purchaser rate",
+      "category": "User",
+      "description": "The percentage of active users who made their first purchase. This metric is returned as a fraction; for example, 0.092 means 9.2% of active users were first time purchasers.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstTimePurchasers",
+      "ui_name": "First time purchasers",
+      "category": "User",
+      "description": "The number of users that completed their first purchase event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "firstTimePurchasersPerNewUser",
+      "ui_name": "First-time purchasers per new user",
+      "category": "User",
+      "description": "The average number of first time purchasers per new user.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "grossItemRevenue",
+      "ui_name": "Gross item revenue",
+      "category": "Ecommerce",
+      "description": "The total revenue from items only. Gross item revenue is the product of its price and quantity. Item revenue excludes tax and shipping values; tax & shipping values are specified at the event and not item level. Gross item revenue does not include refunds.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "grossPurchaseRevenue",
+      "ui_name": "Gross purchase revenue",
+      "category": "Ecommerce",
+      "description": "The sum of revenue from purchases made in your app or site. Gross purchase revenue sums the revenue for these events: `purchase`, `ecommerce_purchase`, `in_app_purchase`, `app_store_subscription_convert`, and `app_store_subscription_renew`. Purchase revenue is specified by the `value` parameter in tagging.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemDiscountAmount",
+      "ui_name": "Item discount amount",
+      "category": "Ecommerce",
+      "description": "The monetary value of item discounts in eCommerce events. This metric is populated in tagging by the `discount` item parameter.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemListClickEvents",
+      "ui_name": "Item-list click events",
+      "category": "Ecommerce",
+      "description": "The number of times users clicked an item when it appeared in a list. This metric counts the occurrence of the `select_item` event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemListClickThroughRate",
+      "ui_name": "Item list click through rate",
+      "category": "Ecommerce",
+      "description": "The number of users who selected a list(s) divided by the number of users who viewed the same list(s). This metric is returned as a fraction; for example, 0.2145 means 21.45% of users who viewed a list also selected the same list.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemListViewEvents",
+      "ui_name": "Item-list view events",
+      "category": "Ecommerce",
+      "description": "The number of times the item list was viewed. This metric counts the occurrence of the `view_item_list` event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemPromotionClickThroughRate",
+      "ui_name": "Item promotion click through rate",
+      "category": "Ecommerce",
+      "description": "The number of users who selected a promotion(s) divided by the number of users who viewed the same promotion(s). This metric is returned as a fraction; for example, 0.1382 means 13.82% of users who viewed a promotion also selected the promotion.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemRefundAmount",
+      "ui_name": "Item refund amount",
+      "category": "Ecommerce",
+      "description": "Item refund amount is the total refunded transaction revenue from items only. Item refund amount is the product of price and quantity for the `refund` event.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemRevenue",
+      "ui_name": "Item revenue",
+      "category": "Ecommerce",
+      "description": "The total revenue from purchases minus refunded transaction revenue from items only. Item revenue is the product of its price and quantity. Item revenue excludes tax and shipping values; tax & shipping values are specified at the event and not item level.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemsAddedToCart",
+      "ui_name": "Items added to cart",
+      "category": "Ecommerce",
+      "description": "The number of units added to cart for a single item. This metric counts the quantity of items in `add_to_cart` events.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemsCheckedOut",
+      "ui_name": "Items checked out",
+      "category": "Ecommerce",
+      "description": "The number of units checked out for a single item. This metric counts the quantity of items in `begin_checkout` events.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemsClickedInList",
+      "ui_name": "Items clicked in list",
+      "category": "Ecommerce",
+      "description": "The number of units clicked in list for a single item. This metric counts the quantity of items in `select_item` events.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemsClickedInPromotion",
+      "ui_name": "Items clicked in promotion",
+      "category": "Ecommerce",
+      "description": "The number of units clicked in promotion for a single item. This metric counts the quantity of items in `select_promotion` events.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemsPurchased",
+      "ui_name": "Items purchased",
+      "category": "Ecommerce",
+      "description": "The number of units for a single item included in purchase events. This metric counts the quantity of items in purchase events.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemsViewed",
+      "ui_name": "Items viewed",
+      "category": "Ecommerce",
+      "description": "The number of units viewed for a single item. This metric counts the quantity of items in `view_item` events.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemsViewedInList",
+      "ui_name": "Items viewed in list",
+      "category": "Ecommerce",
+      "description": "The number of units viewed in list for a single item. This metric counts the quantity of items in `view_item_list` events.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemsViewedInPromotion",
+      "ui_name": "Items viewed in promotion",
+      "category": "Ecommerce",
+      "description": "The number of units viewed in promotion for a single item. This metric counts the quantity of items in `view_promotion` events.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "itemViewEvents",
+      "ui_name": "Item view events",
+      "category": "Ecommerce",
+      "description": "The number of times the item details were viewed. The metric counts the occurrence of the `view_item` event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "keyEvents",
+      "ui_name": "Key events",
+      "category": "Event",
+      "description": "The count of key events. Marking an event as a key event affects reports from time of creation. It doesn't change historic data. You can mark any event as key in Google Analytics, and some events (such as `first_open` or `purchase`) are marked as key events by default.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "newUsers",
+      "ui_name": "New users",
+      "category": "User",
+      "description": "The number of users who interacted with your site or launched your app for the first time (event triggered: first_open or first_visit).",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "organicGoogleSearchAveragePosition",
+      "ui_name": "Organic Google Search average position",
+      "category": "Other",
+      "description": "The average ranking of your website URLs for the query reported from Search Console. For example, if your site's URL appears at position 3 for one query and position 7 for another query, the average position would be (3+7)/2, or 5. This metric requires an active Search Console link.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "organicGoogleSearchClicks",
+      "ui_name": "Organic Google Search clicks",
+      "category": "Other",
+      "description": "The number of organic Google Search clicks reported from Search Console.  This metric requires an active Search Console link.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "organicGoogleSearchClickThroughRate",
+      "ui_name": "Organic Google Search click through rate",
+      "category": "Other",
+      "description": "The organic Google Search click through rate reported from Search Console. Click through rate is clicks per impression. This metric is returned as a fraction; for example, 0.0588 means about 5.88% of impressions resulted in a click. This metric requires an active Search Console link.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "organicGoogleSearchImpressions",
+      "ui_name": "Organic Google Search impressions",
+      "category": "Other",
+      "description": "The number of organic Google Search impressions reported from Search Console. This metric requires an active Search Console link.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "promotionClicks",
+      "ui_name": "Promotion clicks",
+      "category": "Ecommerce",
+      "description": "The number of times an item promotion was clicked. This metric counts the occurrence of the `select_promotion` event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "promotionViews",
+      "ui_name": "Promotion views",
+      "category": "Ecommerce",
+      "description": "The number of times an item promotion was viewed. This metric counts the occurrence of the `view_promotion` event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "publisherAdClicks",
+      "ui_name": "Publisher ad clicks",
+      "category": "Other",
+      "description": "The number of ad_click events.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "publisherAdImpressions",
+      "ui_name": "Publisher ad impressions",
+      "category": "Other",
+      "description": "The number of ad_impression events.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "purchaseRevenue",
+      "ui_name": "Purchase revenue",
+      "category": "Ecommerce",
+      "description": "The sum of revenue from purchases minus refunded transaction revenue made in your app or site. Purchase revenue sums the revenue for these events: `purchase`, `ecommerce_purchase`, `in_app_purchase`, `app_store_subscription_convert`, and `app_store_subscription_renew`. Purchase revenue is specified by the `value` parameter in tagging.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "purchaserRate",
+      "ui_name": "Purchaser rate",
+      "category": "User",
+      "description": "The percentage of active users who made 1 or more purchase transactions. This metric is returned as a fraction; for example, 0.412 means 41.2% of users were purchasers.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "purchaseToViewRate",
+      "ui_name": "Purchase-to-view rate",
+      "category": "Other",
+      "description": "The number of users who purchased a product(s) divided by the number of users who viewed the same product(s). This metric is returned as a fraction; for example, 0.128 means 12.8% of users that viewed a product(s) also purchased the same product(s).",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "refundAmount",
+      "ui_name": "Refund amount",
+      "category": "Ecommerce",
+      "description": "The total refunded transaction revenues. Refund amount sums refunded revenue for the `refund` and `app_store_refund` events.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "returnOnAdSpend",
+      "ui_name": "Return on ad spend",
+      "category": "Other",
+      "description": "Return On Ad Spend (ROAS) is total revenue divided by advertiser ad cost.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "screenPageViews",
+      "ui_name": "Views",
+      "category": "Page / Screen",
+      "description": "The number of app screens or web pages your users viewed. Repeated views of a single page or screen are counted. (screen_view + page_view events).",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "screenPageViewsPerSession",
+      "ui_name": "Views per session",
+      "category": "Page / Screen",
+      "description": "The number of app screens or web pages your users viewed per session. Repeated views of a single page or screen are counted. (screen_view + page_view events) / sessions.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "screenPageViewsPerUser",
+      "ui_name": "Views per user",
+      "category": "Page / Screen",
+      "description": "The number of app screens or web pages your users viewed per active user. Repeated views of a single page or screen are counted. (screen_view + page_view events) / active users.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "scrolledUsers",
+      "ui_name": "Scrolled users",
+      "category": "Other",
+      "description": "The number of unique users who scrolled down at least 90% of the page.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionKeyEventRate",
+      "ui_name": "Session key event rate",
+      "category": "Session",
+      "description": "The percentage of sessions in which any key event was triggered.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessions",
+      "ui_name": "Sessions",
+      "category": "Session",
+      "description": "The number of sessions that began on your site or app (event triggered: session_start).",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionsPerUser",
+      "ui_name": "Sessions per user",
+      "category": "Session",
+      "description": "The average number of sessions per user (Sessions divided by Active Users).",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "shippingAmount",
+      "ui_name": "Shipping amount",
+      "category": "Ecommerce",
+      "description": "Shipping amount associated with a transaction. Populated by the `shipping` event parameter.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "taxAmount",
+      "ui_name": "Tax amount",
+      "category": "Ecommerce",
+      "description": "Tax amount associated with a transaction. Populated by the `tax` event parameter.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "totalAdRevenue",
+      "ui_name": "Total ad revenue",
+      "category": "Revenue",
+      "description": "The total advertising revenue from both Admob and third-party sources.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "totalPurchasers",
+      "ui_name": "Total purchasers",
+      "category": "User",
+      "description": "The number of users that logged purchase events for the time period selected.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "totalRevenue",
+      "ui_name": "Total revenue",
+      "category": "Revenue",
+      "description": "The sum of revenue from purchases, subscriptions, and advertising (Purchase revenue plus Subscription revenue plus Ad revenue) minus refunded transaction revenue.",
+      "type": "TYPE_CURRENCY",
+      "custom_definition": false
+    },
+    {
+      "api_name": "totalUsers",
+      "ui_name": "Total users",
+      "category": "User",
+      "description": "The number of distinct users who have logged at least one event, regardless of whether the site or app was in use when that event was logged.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "transactions",
+      "ui_name": "Transactions",
+      "category": "Ecommerce",
+      "description": "The count of transaction events with purchase revenue. Transaction events are in_app_purchase, ecommerce_purchase, purchase, app_store_subscription_renew, app_store_subscription_convert, and refund.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "transactionsPerPurchaser",
+      "ui_name": "Transactions per purchaser",
+      "category": "Ecommerce",
+      "description": "The average number of transactions per purchaser.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "userEngagementDuration",
+      "ui_name": "User engagement",
+      "category": "User",
+      "description": "The total amount of time (in seconds) your website or app was in the foreground of users` devices.",
+      "type": "TYPE_SECONDS",
+      "custom_definition": false
+    },
+    {
+      "api_name": "userKeyEventRate",
+      "ui_name": "User key event rate",
+      "category": "User",
+      "description": "The percentage of users who triggered any key event.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "wauPerMau",
+      "ui_name": "WAU / MAU",
+      "category": "User",
+      "description": "The rolling percent of 30-day active users who are also 7-day active users. This metric is returned as a fraction; for example, 0.234 means 23.4% of 30-day active users were also 7-day active users.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "keyEvents:Choose Starter_plan",
+      "ui_name": "Key event count for Choose Starter_plan",
+      "category": "Event",
+      "description": "The count of a specific key event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "keyEvents:blog_scroll_60",
+      "ui_name": "Key event count for blog_scroll_60",
+      "category": "Event",
+      "description": "The count of a specific key event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "keyEvents:chatbot_interaction",
+      "ui_name": "Key event count for chatbot_interaction",
+      "category": "Event",
+      "description": "The count of a specific key event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "keyEvents:close_convert_lead",
+      "ui_name": "Key event count for close_convert_lead",
+      "category": "Event",
+      "description": "The count of a specific key event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "keyEvents:job_apply",
+      "ui_name": "Key event count for job_apply",
+      "category": "Event",
+      "description": "The count of a specific key event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "keyEvents:job_apply_verizon",
+      "ui_name": "Key event count for job_apply_verizon",
+      "category": "Event",
+      "description": "The count of a specific key event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "keyEvents:purchase",
+      "ui_name": "Key event count for purchase",
+      "category": "Event",
+      "description": "The count of a specific key event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "keyEvents:qualify_lead",
+      "ui_name": "Key event count for qualify_lead",
+      "category": "Event",
+      "description": "The count of a specific key event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "keyEvents:sign_in_click",
+      "ui_name": "Key event count for sign_in_click",
+      "category": "Event",
+      "description": "The count of a specific key event.",
+      "type": "TYPE_INTEGER",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionKeyEventRate:Choose Starter_plan",
+      "ui_name": "Session key event rate for Choose Starter_plan",
+      "category": "Session",
+      "description": "The percentage of sessions in which a specific key event was triggered.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionKeyEventRate:blog_scroll_60",
+      "ui_name": "Session key event rate for blog_scroll_60",
+      "category": "Session",
+      "description": "The percentage of sessions in which a specific key event was triggered.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionKeyEventRate:chatbot_interaction",
+      "ui_name": "Session key event rate for chatbot_interaction",
+      "category": "Session",
+      "description": "The percentage of sessions in which a specific key event was triggered.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionKeyEventRate:close_convert_lead",
+      "ui_name": "Session key event rate for close_convert_lead",
+      "category": "Session",
+      "description": "The percentage of sessions in which a specific key event was triggered.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionKeyEventRate:job_apply",
+      "ui_name": "Session key event rate for job_apply",
+      "category": "Session",
+      "description": "The percentage of sessions in which a specific key event was triggered.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionKeyEventRate:job_apply_verizon",
+      "ui_name": "Session key event rate for job_apply_verizon",
+      "category": "Session",
+      "description": "The percentage of sessions in which a specific key event was triggered.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionKeyEventRate:purchase",
+      "ui_name": "Session key event rate for purchase",
+      "category": "Session",
+      "description": "The percentage of sessions in which a specific key event was triggered.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionKeyEventRate:qualify_lead",
+      "ui_name": "Session key event rate for qualify_lead",
+      "category": "Session",
+      "description": "The percentage of sessions in which a specific key event was triggered.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "sessionKeyEventRate:sign_in_click",
+      "ui_name": "Session key event rate for sign_in_click",
+      "category": "Session",
+      "description": "The percentage of sessions in which a specific key event was triggered.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "userKeyEventRate:Choose Starter_plan",
+      "ui_name": "User key event rate for Choose Starter_plan",
+      "category": "User",
+      "description": "The percentage of users who triggered a specific key event.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "userKeyEventRate:blog_scroll_60",
+      "ui_name": "User key event rate for blog_scroll_60",
+      "category": "User",
+      "description": "The percentage of users who triggered a specific key event.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "userKeyEventRate:chatbot_interaction",
+      "ui_name": "User key event rate for chatbot_interaction",
+      "category": "User",
+      "description": "The percentage of users who triggered a specific key event.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "userKeyEventRate:close_convert_lead",
+      "ui_name": "User key event rate for close_convert_lead",
+      "category": "User",
+      "description": "The percentage of users who triggered a specific key event.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "userKeyEventRate:job_apply",
+      "ui_name": "User key event rate for job_apply",
+      "category": "User",
+      "description": "The percentage of users who triggered a specific key event.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "userKeyEventRate:job_apply_verizon",
+      "ui_name": "User key event rate for job_apply_verizon",
+      "category": "User",
+      "description": "The percentage of users who triggered a specific key event.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "userKeyEventRate:purchase",
+      "ui_name": "User key event rate for purchase",
+      "category": "User",
+      "description": "The percentage of users who triggered a specific key event.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "userKeyEventRate:qualify_lead",
+      "ui_name": "User key event rate for qualify_lead",
+      "category": "User",
+      "description": "The percentage of users who triggered a specific key event.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    },
+    {
+      "api_name": "userKeyEventRate:sign_in_click",
+      "ui_name": "User key event rate for sign_in_click",
+      "category": "User",
+      "description": "The percentage of users who triggered a specific key event.",
+      "type": "TYPE_FLOAT",
+      "custom_definition": false
+    }
+  ],
+  "events": [
+    {
+      "name": "blog_scroll_60",
+      "source": "gtm",
+      "from_tag": "GA4 - Blog Scroll"
+    },
+    {
+      "name": "book_a_consult",
+      "source": "gtm",
+      "from_tag": "booking a consult option"
+    },
+    {
+      "name": "chatbot_interaction",
+      "source": "gtm",
+      "from_tag": "chatbot_interaction"
+    },
+    {
+      "name": "gigs_submissions",
+      "source": "gtm",
+      "from_tag": "Gigs-page-tag"
+    },
+    {
+      "name": "job_apply",
+      "source": "gtm",
+      "from_tag": "Google Analytics GA4 Event"
+    },
+    {
+      "name": "k&b_submissions",
+      "source": "gtm",
+      "from_tag": "k&b_submissions"
+    },
+    {
+      "name": "search_button_click",
+      "source": "gtm",
+      "from_tag": "GA4 - Search Button Click"
+    },
+    {
+      "name": "share",
+      "source": "gtm",
+      "from_tag": "Share-GA4"
+    },
+    {
+      "name": "share_open",
+      "source": "gtm",
+      "from_tag": "Share Open"
+    },
+    {
+      "name": "sign_in_click",
+      "source": "gtm",
+      "from_tag": "Sign-In Click Events"
+    }
+  ],
+  "limitations": [
+    "Sampling kicks in above ~10M sessions per query (GA4 Data API).",
+    "Last 24-48h of data may be incomplete (GA4 ingestion lag).",
+    "Custom event names must match ^[a-zA-Z][a-zA-Z0-9_]*$. Names with '&' or '-' are silently rejected by GA4.",
+    "GA4 caps custom event names at 500 unique values per property; tags that emit job-specific event names (e.g. 'JD_VIEW_TAG') will lose data on the long tail.",
+    "Tag 'JD_VIEW_TAG' emits a templated eventName ({{dlv - job_title}}{{dlv - job_id}}{{dlv - job_company}}{{dlv - job_location}}) \u2014 high-cardinality, treated as untracked here.",
+    "Tag 'APPLY_TAG' emits a templated eventName ({{dlv - job_id}}{{dlv - job_company}}{{dlv - job_title}}) \u2014 high-cardinality, treated as untracked here.",
+    "Tag 'plan chose' emits a templated eventName ({{Click Text}}_plan) \u2014 high-cardinality, treated as untracked here."
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/registries/defaults.schema.json",
+  "title": "Defaults registry — per-field safe-default policies",
+  "description": "A3 consults this registry to decide DEFAULT_APPLIED vs NEEDS_CLARIFICATION. Per Phase-1 design: materiality lives in this registry, not in A3's logic. If a field has an entry with defaultable=true, A3 may auto-apply. Otherwise A3 must ask the user.",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": ["schema_version", "fields"],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "schema_version": { "const": "0.1.0" },
+
+    "fields": {
+      "type": "object",
+      "description": "Map of field identifier (matches A1 ambiguity_flags or A2 default_candidates.field) to its policy.",
+      "additionalProperties": { "$ref": "#/$defs/DefaultPolicy" }
+    }
+
+  },
+
+  "$defs": {
+
+    "DefaultPolicy": {
+      "type": "object",
+      "required": ["defaultable"],
+      "additionalProperties": false,
+      "properties": {
+        "defaultable": {
+          "type": "boolean",
+          "description": "If true, A3 may auto-apply default_value. If false, A3 must route to NEEDS_CLARIFICATION."
+        },
+
+        "default_value": {
+          "description": "The value A3 applies when defaultable=true. May be string, number, boolean, or object depending on the field."
+        },
+
+        "candidates": {
+          "type": "array",
+          "items": {},
+          "description": "Alternative values that could also be reasonable. When defaultable=true, the first entry equals default_value. When defaultable=false, candidates feed A3's clarification options."
+        },
+
+        "no_default_reason": {
+          "type": "string",
+          "description": "Required when defaultable=false. Factual explanation of why the answer can change materially based on the user's pick."
+        },
+
+        "disclosure_template": {
+          "type": "string",
+          "description": "Template for the user-facing disclosure when this default is applied. Placeholders: {chosen}, {field_human_name}. Example: 'Showing {chosen} (no time range specified).'"
+        },
+
+        "applies_to_report_types": {
+          "type": "array",
+          "items": { "$ref": "../_shared.schema.json#/$defs/ReportType" },
+          "description": "Optional scope. When set, policy applies only to listed report types. Otherwise applies to all."
+        },
+
+        "depends_on": {
+          "type": "object",
+          "description": "Optional. When set, the default depends on another field's value (e.g. comparison_period_implicit default = prior_period_matched_length, where 'matched_length' depends on current period choice).",
+          "additionalProperties": true
+        },
+
+        "registry_recommended": {
+          "type": "boolean",
+          "description": "Optional. When true and defaultable=false, A3 may surface the first candidate as a 'recommended' hint in clarification UI — but still asks the user."
+        }
+      }
+    }
+  }
+}

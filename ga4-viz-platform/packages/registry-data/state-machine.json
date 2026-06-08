@@ -1,0 +1,526 @@
+{
+  "schema_version": "0.1.0",
+  "states": [
+    {
+      "name": "IDLE",
+      "kind": "initial",
+      "description": "Session created or prior turn complete; waiting for user input.",
+      "agent_active": null,
+      "user_visible": false
+    },
+    {
+      "name": "A1_RUNNING",
+      "kind": "running",
+      "description": "Agent 1 (Intent Interpretation) is processing the user query.",
+      "agent_active": "A1",
+      "user_visible": false
+    },
+    {
+      "name": "A1_VALIDATING_OUTPUT",
+      "kind": "running",
+      "description": "Validating A1's output against a1-intent.schema.json.",
+      "agent_active": null,
+      "user_visible": false
+    },
+    {
+      "name": "A2_RUNNING",
+      "kind": "running",
+      "description": "Agent 2 (Query Planning) is processing the intent.",
+      "agent_active": "A2",
+      "user_visible": false
+    },
+    {
+      "name": "A2_VALIDATING_OUTPUT",
+      "kind": "running",
+      "description": "Validating A2's output and detecting staged vs single-pass mode.",
+      "agent_active": null,
+      "user_visible": false
+    },
+    {
+      "name": "A3_RUNNING",
+      "kind": "running",
+      "description": "Agent 3 (Validation/Clarification) is gating execution.",
+      "agent_active": "A3",
+      "user_visible": false
+    },
+    {
+      "name": "A3_VALIDATING_OUTPUT",
+      "kind": "running",
+      "description": "Validating A3's output and branching on decision.",
+      "agent_active": null,
+      "user_visible": false
+    },
+    {
+      "name": "HALTED_FOR_USER",
+      "kind": "halted",
+      "description": "A3 emitted NEEDS_CLARIFICATION; awaiting user answer.",
+      "agent_active": null,
+      "user_visible": true
+    },
+    {
+      "name": "RESUME_MERGE_USER_ANSWERS",
+      "kind": "running",
+      "description": "User answered; merging answers + preapplied_defaults into halted plan. Re-enters A3 (not A1 or A2).",
+      "agent_active": null,
+      "user_visible": false
+    },
+    {
+      "name": "A4_RUNNING_SINGLE",
+      "kind": "running",
+      "description": "Agent 4 executing a non-staged plan.",
+      "agent_active": "A4",
+      "user_visible": false
+    },
+    {
+      "name": "A4_RUNNING_STAGE",
+      "kind": "running",
+      "description": "Agent 4 executing one stage of a staged plan.",
+      "agent_active": "A4",
+      "user_visible": false
+    },
+    {
+      "name": "A4_EVALUATING_STAGE_TRIGGER",
+      "kind": "running",
+      "description": "Between stages: orchestrator evaluates the next stage's execute_if expression against accumulated results.",
+      "agent_active": null,
+      "user_visible": false
+    },
+    {
+      "name": "A4_VALIDATING_OUTPUT",
+      "kind": "running",
+      "description": "Validating A4's data record output.",
+      "agent_active": null,
+      "user_visible": false
+    },
+    {
+      "name": "A5_RUNNING",
+      "kind": "running",
+      "description": "Agent 5 (Data Handling) is transforming raw rows into blocks.",
+      "agent_active": "A5",
+      "user_visible": false
+    },
+    {
+      "name": "A5_VALIDATING_OUTPUT",
+      "kind": "running",
+      "description": "Validating A5's output against a5-data-blocks.schema.json.",
+      "agent_active": null,
+      "user_visible": false
+    },
+    {
+      "name": "A6_RUNNING",
+      "kind": "running",
+      "description": "Agent 6 (Visualisation) is rendering the report.",
+      "agent_active": "A6",
+      "user_visible": false
+    },
+    {
+      "name": "A6_VALIDATING_OUTPUT",
+      "kind": "running",
+      "description": "Validating A6's output and persisting viz spec.",
+      "agent_active": null,
+      "user_visible": false
+    },
+    {
+      "name": "COMPLETE",
+      "kind": "terminal_success",
+      "description": "Turn finished successfully. Viz spec returned to frontend.",
+      "agent_active": null,
+      "user_visible": true
+    },
+    {
+      "name": "FAILED",
+      "kind": "terminal_failure",
+      "description": "Turn ended with an error. Structured failure record returned to frontend.",
+      "agent_active": null,
+      "user_visible": true
+    }
+  ],
+  "initial_state": "IDLE",
+  "terminal_states": [
+    "COMPLETE",
+    "FAILED"
+  ],
+  "transitions": [
+    {
+      "from": "IDLE",
+      "to": "A1_RUNNING",
+      "trigger": "user_input_received",
+      "action": "load_prior_turn_context_if_any; invoke_a1"
+    },
+    {
+      "from": "A1_RUNNING",
+      "to": "A1_VALIDATING_OUTPUT",
+      "trigger": "a1_emitted_record",
+      "action": "validate_against(a1-intent.schema.json)"
+    },
+    {
+      "from": "A1_VALIDATING_OUTPUT",
+      "to": "A2_RUNNING",
+      "trigger": "validation_passed",
+      "action": "persist_intent; invoke_a2_with(intent)"
+    },
+    {
+      "from": "A1_VALIDATING_OUTPUT",
+      "to": "A1_RUNNING",
+      "trigger": "validation_failed",
+      "guard": "retries_for_A1 < max_retries_for_A1",
+      "action": "retry_with_prompt_nudge"
+    },
+    {
+      "from": "A1_VALIDATING_OUTPUT",
+      "to": "FAILED",
+      "trigger": "validation_failed",
+      "guard": "retries_for_A1 >= max_retries_for_A1",
+      "action": "emit_failure(schema_validation_failure, agent=A1)"
+    },
+    {
+      "from": "A2_RUNNING",
+      "to": "A2_VALIDATING_OUTPUT",
+      "trigger": "a2_emitted_record",
+      "action": "validate_against(a2-query-plan.schema.json)"
+    },
+    {
+      "from": "A2_VALIDATING_OUTPUT",
+      "to": "A3_RUNNING",
+      "trigger": "validation_passed",
+      "action": "persist_plan; detect_staged_mode; invoke_a3_with(intent, plan)"
+    },
+    {
+      "from": "A2_VALIDATING_OUTPUT",
+      "to": "A2_RUNNING",
+      "trigger": "validation_failed",
+      "guard": "retries_for_A2 < max_retries_for_A2",
+      "action": "retry_with_prompt_nudge"
+    },
+    {
+      "from": "A2_VALIDATING_OUTPUT",
+      "to": "FAILED",
+      "trigger": "validation_failed",
+      "guard": "retries_for_A2 >= max_retries_for_A2",
+      "action": "emit_failure(schema_validation_failure, agent=A2)"
+    },
+    {
+      "from": "A3_RUNNING",
+      "to": "A3_VALIDATING_OUTPUT",
+      "trigger": "a3_emitted_record",
+      "action": "validate_against(a3-decision.schema.json)"
+    },
+    {
+      "from": "A3_VALIDATING_OUTPUT",
+      "to": "A4_RUNNING_SINGLE",
+      "trigger": "validation_passed",
+      "guard": "decision in (APPROVED, DEFAULT_APPLIED) AND plan.stages is undefined",
+      "action": "persist_decision; invoke_a4_with(resolved_plan)"
+    },
+    {
+      "from": "A3_VALIDATING_OUTPUT",
+      "to": "A4_RUNNING_STAGE",
+      "trigger": "validation_passed",
+      "guard": "decision in (APPROVED, DEFAULT_APPLIED) AND plan.stages is defined",
+      "action": "persist_decision; init_stage_iterator; invoke_a4_with_stage(stage_0)"
+    },
+    {
+      "from": "A3_VALIDATING_OUTPUT",
+      "to": "HALTED_FOR_USER",
+      "trigger": "validation_passed",
+      "guard": "decision == NEEDS_CLARIFICATION",
+      "action": "persist_halted_state; return_clarification_to_frontend"
+    },
+    {
+      "from": "HALTED_FOR_USER",
+      "to": "RESUME_MERGE_USER_ANSWERS",
+      "trigger": "user_clarification_received",
+      "action": "retrieve_halted_state_by_turn_id; validate_answers_against_options"
+    },
+    {
+      "from": "HALTED_FOR_USER",
+      "to": "FAILED",
+      "trigger": "halt_ttl_exceeded",
+      "action": "emit_failure(halt_expired)"
+    },
+    {
+      "from": "RESUME_MERGE_USER_ANSWERS",
+      "to": "A3_RUNNING",
+      "trigger": "merge_complete",
+      "action": "construct_resumed_plan; invoke_a3_with(intent, resumed_plan)"
+    },
+    {
+      "from": "RESUME_MERGE_USER_ANSWERS",
+      "to": "HALTED_FOR_USER",
+      "trigger": "user_answer_invalid",
+      "action": "re_emit_clarification_with_note"
+    },
+    {
+      "from": "A4_RUNNING_SINGLE",
+      "to": "A4_VALIDATING_OUTPUT",
+      "trigger": "a4_completed_all_queries",
+      "action": "validate_against(a4-data-record.schema.json)"
+    },
+    {
+      "from": "A4_RUNNING_STAGE",
+      "to": "A4_EVALUATING_STAGE_TRIGGER",
+      "trigger": "stage_completed",
+      "action": "accumulate_stage_results; advance_iterator"
+    },
+    {
+      "from": "A4_EVALUATING_STAGE_TRIGGER",
+      "to": "A4_RUNNING_STAGE",
+      "trigger": "next_stage_triggered",
+      "guard": "more_stages AND (stage.execute=='always' OR evaluate(stage.execute_if)==true)",
+      "action": "invoke_a4_with_stage(next)"
+    },
+    {
+      "from": "A4_EVALUATING_STAGE_TRIGGER",
+      "to": "A4_EVALUATING_STAGE_TRIGGER",
+      "trigger": "next_stage_skipped",
+      "guard": "more_stages AND stage.execute=='conditional' AND evaluate(stage.execute_if)==false",
+      "action": "record_StageExecutionRecord(status=skipped); advance_iterator"
+    },
+    {
+      "from": "A4_EVALUATING_STAGE_TRIGGER",
+      "to": "A4_VALIDATING_OUTPUT",
+      "trigger": "all_stages_processed",
+      "action": "assemble_data_record; validate"
+    },
+    {
+      "from": "A4_VALIDATING_OUTPUT",
+      "to": "A5_RUNNING",
+      "trigger": "validation_passed",
+      "action": "persist_data_record; invoke_a5_with(data_record)"
+    },
+    {
+      "from": "A4_VALIDATING_OUTPUT",
+      "to": "FAILED",
+      "trigger": "validation_failed",
+      "action": "emit_failure(schema_validation_failure, agent=A4)"
+    },
+    {
+      "from": "A4_RUNNING_SINGLE",
+      "to": "FAILED",
+      "trigger": "ga4_fatal_failure",
+      "action": "emit_failure(ga4_unrecoverable, kind)"
+    },
+    {
+      "from": "A4_RUNNING_STAGE",
+      "to": "FAILED",
+      "trigger": "ga4_fatal_failure",
+      "action": "emit_failure(ga4_unrecoverable, kind)"
+    },
+    {
+      "from": "A5_RUNNING",
+      "to": "A5_VALIDATING_OUTPUT",
+      "trigger": "a5_emitted_record",
+      "action": "validate_against(a5-data-blocks.schema.json)"
+    },
+    {
+      "from": "A5_VALIDATING_OUTPUT",
+      "to": "A6_RUNNING",
+      "trigger": "validation_passed",
+      "action": "persist_blocks; invoke_a6_with(blocks)"
+    },
+    {
+      "from": "A5_VALIDATING_OUTPUT",
+      "to": "A5_RUNNING",
+      "trigger": "validation_failed",
+      "guard": "retries_for_A5 < max_retries_for_A5",
+      "action": "retry_with_prompt_nudge"
+    },
+    {
+      "from": "A5_VALIDATING_OUTPUT",
+      "to": "FAILED",
+      "trigger": "validation_failed",
+      "guard": "retries_for_A5 >= max_retries_for_A5",
+      "action": "emit_failure(schema_validation_failure, agent=A5)"
+    },
+    {
+      "from": "A6_RUNNING",
+      "to": "A6_VALIDATING_OUTPUT",
+      "trigger": "a6_emitted_record",
+      "action": "validate_against(a6-viz-spec.schema.json)"
+    },
+    {
+      "from": "A6_VALIDATING_OUTPUT",
+      "to": "COMPLETE",
+      "trigger": "validation_passed",
+      "action": "persist_viz_spec; return_to_frontend"
+    },
+    {
+      "from": "A6_VALIDATING_OUTPUT",
+      "to": "A6_RUNNING",
+      "trigger": "validation_failed",
+      "guard": "retries_for_A6 < max_retries_for_A6",
+      "action": "retry_with_prompt_nudge"
+    },
+    {
+      "from": "A6_VALIDATING_OUTPUT",
+      "to": "FAILED",
+      "trigger": "validation_failed",
+      "guard": "retries_for_A6 >= max_retries_for_A6",
+      "action": "emit_failure(schema_validation_failure, agent=A6)"
+    }
+  ],
+  "session_storage": {
+    "per_turn_fields": [
+      "turn_id",
+      "session_id",
+      "created_at",
+      "user_query",
+      "prior_turn_context",
+      "current_state",
+      "stages_completed",
+      "halt_count",
+      "clarification_rounds",
+      "intent",
+      "query_plan",
+      "decision",
+      "data_record",
+      "data_blocks",
+      "viz_spec",
+      "failures",
+      "completed_at"
+    ],
+    "per_session_fields": [
+      "session_id",
+      "created_at",
+      "last_active",
+      "turn_ids",
+      "resolved_metrics_by_user_term"
+    ],
+    "halt_ttl_hours": 24,
+    "completed_retention_days": 30
+  },
+  "retry_policy": {
+    "per_turn_llm_budget_seconds": 30,
+    "rules": [
+      {
+        "agent": "A1",
+        "failure_class": "schema_validation_failure",
+        "action": "retry_with_prompt_nudge",
+        "max_attempts": 1
+      },
+      {
+        "agent": "A1",
+        "failure_class": "llm_api_5xx",
+        "action": "exponential_backoff",
+        "max_attempts": 2,
+        "backoff_seconds": [
+          1,
+          4
+        ]
+      },
+      {
+        "agent": "A1",
+        "failure_class": "llm_api_timeout",
+        "action": "exponential_backoff",
+        "max_attempts": 2,
+        "backoff_seconds": [
+          1,
+          4
+        ]
+      },
+      {
+        "agent": "A1",
+        "failure_class": "llm_api_429",
+        "action": "honor_retry_after",
+        "max_attempts": 1
+      },
+      {
+        "agent": "A1",
+        "failure_class": "llm_api_4xx",
+        "action": "no_retry_surface",
+        "max_attempts": 0
+      },
+      {
+        "agent": "A2",
+        "failure_class": "schema_validation_failure",
+        "action": "retry_with_prompt_nudge",
+        "max_attempts": 1
+      },
+      {
+        "agent": "A2",
+        "failure_class": "catalog_read_error",
+        "action": "no_retry_escalate",
+        "max_attempts": 0
+      },
+      {
+        "agent": "A2",
+        "failure_class": "llm_api_5xx",
+        "action": "exponential_backoff",
+        "max_attempts": 2,
+        "backoff_seconds": [
+          1,
+          4
+        ]
+      },
+      {
+        "agent": "A2",
+        "failure_class": "llm_api_timeout",
+        "action": "exponential_backoff",
+        "max_attempts": 2,
+        "backoff_seconds": [
+          1,
+          4
+        ]
+      },
+      {
+        "agent": "A3",
+        "failure_class": "schema_validation_failure",
+        "action": "retry_with_prompt_nudge",
+        "max_attempts": 1
+      },
+      {
+        "agent": "A4",
+        "failure_class": "ga4_5xx",
+        "action": "exponential_backoff",
+        "max_attempts": 3,
+        "backoff_seconds": [
+          1,
+          4,
+          9
+        ]
+      },
+      {
+        "agent": "A4",
+        "failure_class": "ga4_429",
+        "action": "honor_retry_after",
+        "max_attempts": 2
+      },
+      {
+        "agent": "A4",
+        "failure_class": "ga4_403_404_400",
+        "action": "no_retry_surface",
+        "max_attempts": 0
+      },
+      {
+        "agent": "A4",
+        "failure_class": "ga4_401",
+        "action": "no_retry_escalate",
+        "max_attempts": 0
+      },
+      {
+        "agent": "A5",
+        "failure_class": "schema_validation_failure",
+        "action": "retry_with_prompt_nudge",
+        "max_attempts": 1
+      },
+      {
+        "agent": "A5",
+        "failure_class": "computation_overflow",
+        "action": "no_retry_surface",
+        "max_attempts": 0
+      },
+      {
+        "agent": "A6",
+        "failure_class": "schema_validation_failure",
+        "action": "retry_with_prompt_nudge",
+        "max_attempts": 1
+      },
+      {
+        "agent": "A6",
+        "failure_class": "io_write_failure",
+        "action": "no_retry_surface",
+        "max_attempts": 0
+      }
+    ]
+  }
+}

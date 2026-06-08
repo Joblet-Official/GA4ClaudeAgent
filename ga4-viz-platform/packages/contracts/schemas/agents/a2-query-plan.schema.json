@@ -1,0 +1,372 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/agents/a2-query-plan.schema.json",
+  "title": "A2 — Query plan + ambiguity report",
+  "description": "Output of Agent 2 (Query Planning). Catalog-grounded query specs per sub-question, plus an enumeration of ambiguities A3 must resolve. A2 does NOT apply defaults and does NOT pick among mapping_choices. For interpretation_request=true intents, A2 emits a staged investigation plan (see properties.stages).",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": [
+    "schema_version",
+    "propagated_a1_flags",
+    "query_plans",
+    "mapping_trace",
+    "ambiguity_report"
+  ],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "schema_version": { "const": "0.1.0" },
+
+    "propagated_a1_flags": {
+      "type": "object",
+      "required": ["is_followup", "out_of_scope", "interpretation_request"],
+      "additionalProperties": false,
+      "properties": {
+        "is_followup":            { "type": "boolean" },
+        "out_of_scope":           { "type": "boolean" },
+        "interpretation_request": { "type": "boolean" }
+      },
+      "description": "A1's three booleans carried forward verbatim so A3 can act on them without re-reading A1's record."
+    },
+
+    "query_plans": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One plan per A1 sub-question. Each plan may contain one or more queries.",
+      "items": {
+        "type": "object",
+        "required": ["sub_question_id", "queries"],
+        "additionalProperties": false,
+        "properties": {
+          "sub_question_id": { "$ref": "../_shared.schema.json#/$defs/SubQuestionId" },
+          "queries": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/Query" }
+          },
+          "derivation_required": {
+            "type": "array",
+            "description": "Formulas A5 must compute from raw fields. Each entry is a single derived metric expressed as 'name = expr'. A2 plans the raw inputs; A5 derives.",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+
+    "stages": {
+      "type": "array",
+      "description": "Present only when A1's interpretation_request=true. Each stage groups one or more queries with an execution gate. A4 evaluates execute_if against accumulated prior-stage results. Stage 1 must have execute='always'.",
+      "items": {
+        "type": "object",
+        "required": ["id", "execute", "query_refs"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stage identifier, e.g. 'foundation', 'dimensional_breakdowns', 'custom_funnel', 'path_exploration'."
+          },
+          "execute": {
+            "type": "string",
+            "enum": ["always", "conditional"],
+            "description": "If conditional, execute_if must be set."
+          },
+          "execute_if": {
+            "type": "string",
+            "description": "Trigger expression. DSL spec lives in pipeline/trigger-expressions.schema.json (Chunk 3). Examples: 'funnel_step_rate_drop(\"view_search_results\") > 0.5', 'top_n_dim_diff(\"landingPage\", n=20) >= 5'."
+          },
+          "query_refs": {
+            "type": "array",
+            "minItems": 1,
+            "description": "References to query_id values declared inside query_plans[].queries[].",
+            "items": { "$ref": "../_shared.schema.json#/$defs/QueryId" }
+          },
+          "rationale": {
+            "type": "string",
+            "description": "Factual explanation of why this stage exists, grounded in metric ontology. E.g. 'engagedSessions ← events_fired → probe event composition'."
+          }
+        }
+      }
+    },
+
+    "mapping_trace": {
+      "type": "array",
+      "description": "Records every deterministic user_term → catalog_term mapping A2 made. Empty when all terms were ambiguous and emitted to mapping_choices.",
+      "items": {
+        "type": "object",
+        "required": ["user_term", "mapped_to"],
+        "additionalProperties": false,
+        "properties": {
+          "user_term":  { "type": "string" },
+          "mapped_to":  { "type": "string", "description": "Catalog field name." },
+          "kind":       { "type": "string", "enum": ["metric", "dimension", "filter"] }
+        }
+      }
+    },
+
+    "ambiguity_report": {
+      "type": "object",
+      "required": ["mapping_choices", "range_choices", "default_candidates", "feasibility_failures"],
+      "additionalProperties": false,
+      "properties": {
+        "mapping_choices": {
+          "type": "array",
+          "items": { "$ref": "../_shared.schema.json#/$defs/MappingChoice" }
+        },
+        "range_choices": {
+          "type": "array",
+          "description": "Ambiguous date phrases (e.g. 'last week') with candidate interpretations.",
+          "items": {
+            "type": "object",
+            "required": ["user_term", "candidates"],
+            "additionalProperties": false,
+            "properties": {
+              "user_term":  { "type": "string" },
+              "candidates": {
+                "type": "array",
+                "minItems": 2,
+                "items": { "$ref": "../_shared.schema.json#/$defs/RelativeDateRange" }
+              }
+            }
+          }
+        },
+        "default_candidates": {
+          "type": "array",
+          "items": { "$ref": "../_shared.schema.json#/$defs/DefaultCandidate" }
+        },
+        "feasibility_failures": {
+          "type": "array",
+          "items": { "$ref": "../_shared.schema.json#/$defs/FeasibilityFailure" }
+        }
+      }
+    }
+
+  },
+
+  "$defs": {
+
+    "Query": {
+      "type": "object",
+      "required": ["query_id", "source"],
+      "additionalProperties": false,
+      "properties": {
+
+        "query_id": { "$ref": "../_shared.schema.json#/$defs/QueryId" },
+
+        "source": { "$ref": "../_shared.schema.json#/$defs/Source" },
+
+        "purpose": {
+          "type": "string",
+          "description": "Optional semantic label: 'current', 'comparison_baseline', 'sparkline', 'funnel_step', 'path_exploration', etc.",
+          "enum": [
+            "primary",
+            "current",
+            "comparison_baseline",
+            "sparkline",
+            "implied_comparison",
+            "funnel_step",
+            "path_exploration",
+            "structural_diff"
+          ]
+        },
+
+        "conditional_on_default": {
+          "type": "string",
+          "description": "Optional. When set, names an A1 ambiguity_flag this query is contingent on. If A3 does NOT apply the default for that field, A4 skips this query."
+        },
+
+        "metrics": { "$ref": "#/$defs/FieldList" },
+
+        "dimensions": { "$ref": "#/$defs/FieldList" },
+
+        "filters": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Filter" }
+        },
+
+        "date_range": { "$ref": "../_shared.schema.json#/$defs/DateRange" },
+
+        "order_by": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["field", "direction"],
+            "additionalProperties": false,
+            "properties": {
+              "field":     { "type": "string" },
+              "direction": { "type": "string", "enum": ["asc", "desc"] }
+            }
+          }
+        },
+
+        "limit": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        },
+
+        "grouping": {
+          "type": ["string", "null"],
+          "enum": ["by_dimension", "by_date", "by_dimension_and_date", "none", null]
+        },
+
+        "partial_period": {
+          "type": "boolean",
+          "description": "True if the requested date range extends past the latest complete data point. A5/A6 respect for rate handling and visual encoding."
+        }
+      }
+    },
+
+    "FieldList": {
+      "description": "A list of fields. Either fully resolved (an array of field names with optional purpose) or ambiguous (one mapping_choice).",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["status", "items"],
+          "additionalProperties": false,
+          "properties": {
+            "status": { "const": "resolved" },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["name"],
+                "additionalProperties": false,
+                "properties": {
+                  "name":    { "type": "string" },
+                  "purpose": { "type": "string", "description": "Optional semantic role for this field within the query." }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["status", "user_term", "candidates"],
+          "additionalProperties": false,
+          "properties": {
+            "status":    { "const": "ambiguous" },
+            "user_term": { "type": "string" },
+            "candidates": {
+              "type": "array",
+              "minItems": 2,
+              "items": { "type": "string" }
+            },
+            "preferred": { "type": "string" }
+          }
+        }
+      ]
+    },
+
+    "Filter": {
+      "description": "A filter expression. Either resolved (concrete expression) or ambiguous (multiple candidate expressions for the same user term).",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["status", "expression"],
+          "additionalProperties": false,
+          "properties": {
+            "status":     { "const": "resolved" },
+            "expression": { "type": "string", "description": "Catalog-grounded filter expression, e.g. \"sessionMedium == 'organic'\"." }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["status", "user_term", "candidates"],
+          "additionalProperties": false,
+          "properties": {
+            "status":    { "const": "ambiguous" },
+            "user_term": { "type": "string" },
+            "candidates": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "object",
+                "required": ["expression"],
+                "additionalProperties": false,
+                "properties": {
+                  "expression": { "type": "string" },
+                  "label":      { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+
+  "examples": [
+    {
+      "schema_version": "0.1.0",
+      "propagated_a1_flags": {
+        "is_followup": false,
+        "out_of_scope": false,
+        "interpretation_request": false
+      },
+      "query_plans": [
+        {
+          "sub_question_id": "sq_1",
+          "queries": [
+            {
+              "query_id": "q_1_main",
+              "source": "ga4",
+              "purpose": "primary",
+              "metrics": {
+                "status": "ambiguous",
+                "user_term": "traffic",
+                "candidates": ["sessions", "activeUsers", "totalUsers", "screenPageViews"]
+              },
+              "dimensions": {
+                "status": "ambiguous",
+                "user_term": "sources",
+                "candidates": ["sessionSource", "sessionMedium", "sessionSourceMedium", "defaultChannelGroup"]
+              },
+              "filters": [],
+              "date_range": {
+                "status": "missing",
+                "candidates": ["last_28_days"]
+              },
+              "order_by": [],
+              "limit": null,
+              "grouping": "by_dimension",
+              "partial_period": true
+            }
+          ]
+        }
+      ],
+      "mapping_trace": [],
+      "ambiguity_report": {
+        "mapping_choices": [
+          {
+            "user_term": "traffic",
+            "type": "metric",
+            "candidates": [
+              { "value": "sessions" },
+              { "value": "activeUsers" },
+              { "value": "totalUsers" },
+              { "value": "screenPageViews" }
+            ]
+          },
+          {
+            "user_term": "sources",
+            "type": "dimension",
+            "candidates": [
+              { "value": "sessionSource" },
+              { "value": "sessionMedium" },
+              { "value": "sessionSourceMedium" },
+              { "value": "defaultChannelGroup" }
+            ]
+          }
+        ],
+        "range_choices": [],
+        "default_candidates": [
+          { "field": "date_range",    "candidates": ["last_28_days"] },
+          { "field": "ranking_limit", "candidates": [10, 5, 20] }
+        ],
+        "feasibility_failures": []
+      }
+    }
+  ]
+}

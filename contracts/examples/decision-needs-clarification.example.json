@@ -1,0 +1,59 @@
+{
+  "$comment": "A3 decision = NEEDS_CLARIFICATION. Real trace from Phase 1: user asked 'top traffic sources'. Two material ambiguities (which metric, which dimension). A3 bundles into one round; auto-fillable items (date_range, ranking_limit) go to halted_state.preapplied_defaults_pending and are disclosed in rationale. Validates against ../agents/a3-decision.schema.json.",
+
+  "schema_version": "0.1.0",
+  "decision": "NEEDS_CLARIFICATION",
+
+  "clarification": {
+    "question": "Quick check before I pull this — what should 'traffic' mean, and what kind of 'sources' did you want?",
+    "decision_points": [
+      {
+        "field": "traffic_metric",
+        "user_term": "traffic",
+        "options": [
+          { "label": "Sessions",     "value": "sessions",        "hint": "visits to the site" },
+          { "label": "Active users", "value": "activeUsers",     "hint": "unique people in the period" },
+          { "label": "Total users",  "value": "totalUsers",      "hint": "all unique users in the period (engaged or not)" },
+          { "label": "Pageviews",    "value": "screenPageViews", "hint": "total page loads" }
+        ]
+      },
+      {
+        "field": "sources_dimension",
+        "user_term": "sources",
+        "options": [
+          { "label": "Source",          "value": "sessionSource",        "hint": "raw source like 'google', 'linkedin.com'" },
+          { "label": "Medium",          "value": "sessionMedium",        "hint": "channel medium like 'organic', 'cpc'" },
+          { "label": "Source / Medium", "value": "sessionSourceMedium",  "hint": "combined source/medium" },
+          { "label": "Channel Group",   "value": "defaultChannelGroup",  "hint": "GA4 channel bucket like 'Organic Social', 'Paid Search'" }
+        ]
+      }
+    ],
+    "rationale": "I'll use the last 28 days and top 10 by default. The metric and dimension need your call because the ranking can come out very differently depending on which you pick."
+  },
+
+  "deferred": [],
+
+  "halted_state": {
+    "turn_id": "turn_2026-05-22T14:03:22Z",
+    "a1_intent": {
+      "$comment": "Full A1 record from intent.example.json, embedded verbatim so resume can re-enter at A3 without re-running A1."
+    },
+    "a2_plan": {
+      "$comment": "Full A2 record from query-plan.example.json, embedded verbatim so A3 can validate user picks against the candidate set."
+    },
+    "preapplied_defaults_pending": [
+      {
+        "field": "date_range",
+        "chosen": "last_28_days",
+        "source": "registry",
+        "rationale": "no time scope specified; GA4 28-day window is conventional"
+      },
+      {
+        "field": "ranking_limit",
+        "chosen": 10,
+        "source": "registry",
+        "rationale": "no limit specified; top 10 is conventional for ranked tables"
+      }
+    ]
+  }
+}

@@ -1,0 +1,252 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/agents/a3-decision.schema.json",
+  "title": "A3 — Decision record",
+  "description": "Output of Agent 3 (Validation/Clarification). Exactly one of three discriminated outcomes: APPROVED, DEFAULT_APPLIED, NEEDS_CLARIFICATION. APPROVED/DEFAULT_APPLIED continue to A4; NEEDS_CLARIFICATION halts the pipeline and returns the question to the user. A3 is the ONLY agent that emits user-facing text and the ONLY agent that resolves ambiguity.",
+  "x-schema-version": "0.1.0",
+
+  "oneOf": [
+    { "$ref": "#/$defs/Approved" },
+    { "$ref": "#/$defs/DefaultApplied" },
+    { "$ref": "#/$defs/NeedsClarification" }
+  ],
+
+  "$defs": {
+
+    "Approved": {
+      "type": "object",
+      "required": ["schema_version", "decision", "query_plan", "carried_forward", "disclosures"],
+      "additionalProperties": false,
+      "description": "Empty ambiguity report from A2; nothing to clarify or default. Pass-through to A4.",
+      "properties": {
+        "schema_version": { "const": "0.1.0" },
+        "decision":       { "const": "APPROVED" },
+
+        "query_plan": {
+          "description": "Verbatim pass-through of A2's query_plan section (no defaults filled, none needed).",
+          "type": "object"
+        },
+
+        "carried_forward": {
+          "type": "array",
+          "items": { "$ref": "../_shared.schema.json#/$defs/CarriedForward" }
+        },
+
+        "disclosures": {
+          "type": "array",
+          "items": { "$ref": "../_shared.schema.json#/$defs/Disclosure" }
+        }
+      }
+    },
+
+    "DefaultApplied": {
+      "type": "object",
+      "required": ["schema_version", "decision", "query_plan", "applied_defaults", "carried_forward", "disclosures"],
+      "additionalProperties": false,
+      "description": "Ambiguities existed but every one had a safe default in the defaults registry. A3 applied them and continues to A4. Every applied default surfaces as a disclosure.",
+      "properties": {
+        "schema_version": { "const": "0.1.0" },
+        "decision":       { "const": "DEFAULT_APPLIED" },
+
+        "query_plan": {
+          "description": "A2's query_plan with ambiguous fields resolved to the chosen defaults. Same shape as A2's; status fields now 'resolved'.",
+          "type": "object"
+        },
+
+        "applied_defaults": {
+          "type": "array",
+          "items": { "$ref": "../_shared.schema.json#/$defs/AppliedDefault" }
+        },
+
+        "carried_forward": {
+          "type": "array",
+          "items": { "$ref": "../_shared.schema.json#/$defs/CarriedForward" }
+        },
+
+        "disclosures": {
+          "type": "array",
+          "items": { "$ref": "../_shared.schema.json#/$defs/Disclosure" }
+        }
+      }
+    },
+
+    "NeedsClarification": {
+      "type": "object",
+      "required": ["schema_version", "decision", "clarification", "deferred", "halted_state"],
+      "additionalProperties": false,
+      "description": "At least one material ambiguity has no safe default. Pipeline halts. User answers; orchestrator merges with halted_state and re-enters at A3.",
+      "properties": {
+        "schema_version": { "const": "0.1.0" },
+        "decision":       { "const": "NEEDS_CLARIFICATION" },
+
+        "clarification": { "$ref": "#/$defs/Clarification" },
+
+        "deferred": {
+          "type": "array",
+          "description": "Decision points punted to subsequent clarification rounds (one round per pause, per A3 spec). Each follows the DecisionPoint shape.",
+          "items": { "$ref": "#/$defs/DecisionPoint" }
+        },
+
+        "halted_state": { "$ref": "#/$defs/HaltedState" }
+      }
+    },
+
+    "Clarification": {
+      "type": "object",
+      "required": ["question", "decision_points", "rationale"],
+      "additionalProperties": false,
+      "properties": {
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "description": "ONE user-facing question. May bundle tightly-coupled decision points (same query, same round). NOT an interrogation."
+        },
+        "decision_points": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/DecisionPoint" }
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Short factual explanation of why we're asking. May disclose pre-applied defaults that will land on resume (per A3 trace: 'I'll use last 28 days and top 10 by default')."
+        }
+      }
+    },
+
+    "DecisionPoint": {
+      "type": "object",
+      "required": ["field", "user_term", "options"],
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "Schema-level field name (e.g. 'traffic_metric', 'sources_dimension', 'organic_filter')."
+        },
+        "user_term": {
+          "type": "string",
+          "description": "The term as the user wrote it, so the UI can surface the question in the user's own language."
+        },
+        "options": {
+          "type": "array",
+          "minItems": 2,
+          "description": "Closed list. A3 MUST NOT invent options outside A2's candidate set.",
+          "items": {
+            "type": "object",
+            "required": ["label", "value"],
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": "Display string. Templated from the catalog entry's display_name."
+              },
+              "value": {
+                "type": "string",
+                "description": "Machine value (catalog field name or filter expression)."
+              },
+              "hint": {
+                "type": "string",
+                "description": "Short factual disambiguating hint. MUST come from catalog.term_definitions (per A3 trace finding: hint text must be catalog-sourced, not model-generated)."
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "HaltedState": {
+      "type": "object",
+      "required": ["turn_id", "a1_intent", "a2_plan", "preapplied_defaults_pending"],
+      "additionalProperties": false,
+      "description": "Everything the orchestrator needs to resume on the user's next turn without re-running A1 and A2.",
+      "properties": {
+        "turn_id": {
+          "type": "string",
+          "description": "Stable id for the halted turn so the orchestrator can match user responses to the right halt."
+        },
+        "a1_intent": {
+          "type": "object",
+          "description": "Verbatim A1 record. Loaded as if just emitted."
+        },
+        "a2_plan": {
+          "type": "object",
+          "description": "Verbatim A2 record. Used to validate user answers against A2's candidate sets."
+        },
+        "preapplied_defaults_pending": {
+          "type": "array",
+          "description": "Defaults A3 had already decided to apply (registry-sanctioned) at halt time. On resume these are folded into applied_defaults of the DEFAULT_APPLIED outcome.",
+          "items": { "$ref": "../_shared.schema.json#/$defs/AppliedDefault" }
+        },
+        "user_facing_question_id": {
+          "type": "string",
+          "description": "Optional. If the frontend stored the rendered question with an id, store it here for telemetry."
+        }
+      }
+    }
+
+  },
+
+  "examples": [
+    {
+      "$comment": "APPROVED — no ambiguity at all",
+      "schema_version": "0.1.0",
+      "decision": "APPROVED",
+      "query_plan": { "$comment": "Full A2 query_plan section, copied as-is." },
+      "carried_forward": [],
+      "disclosures": []
+    },
+    {
+      "$comment": "DEFAULT_APPLIED — engagement-rate-style trace",
+      "schema_version": "0.1.0",
+      "decision": "DEFAULT_APPLIED",
+      "query_plan": { "$comment": "A2 plan with date_range resolved to last_28_days." },
+      "applied_defaults": [
+        { "field": "date_range", "chosen": "last_28_days", "source": "registry", "rationale": "no time scope specified" }
+      ],
+      "carried_forward": [],
+      "disclosures": [
+        "Showing last 28 days (no time range specified)."
+      ]
+    },
+    {
+      "$comment": "NEEDS_CLARIFICATION — top-traffic-sources-style trace",
+      "schema_version": "0.1.0",
+      "decision": "NEEDS_CLARIFICATION",
+      "clarification": {
+        "question": "Quick check before I pull this — what should 'traffic' mean, and what kind of 'sources' did you want?",
+        "decision_points": [
+          {
+            "field": "traffic_metric",
+            "user_term": "traffic",
+            "options": [
+              { "label": "Sessions",     "value": "sessions",          "hint": "visits to the site" },
+              { "label": "Active users", "value": "activeUsers",       "hint": "unique people in the period" },
+              { "label": "Total users",  "value": "totalUsers",        "hint": "all unique users in the period" },
+              { "label": "Pageviews",    "value": "screenPageViews",   "hint": "total page loads" }
+            ]
+          },
+          {
+            "field": "sources_dimension",
+            "user_term": "sources",
+            "options": [
+              { "label": "Source",          "value": "sessionSource",         "hint": "e.g. google, linkedin.com, t.co" },
+              { "label": "Medium",          "value": "sessionMedium",         "hint": "e.g. organic, referral, cpc" },
+              { "label": "Source / Medium", "value": "sessionSourceMedium",   "hint": "combined" },
+              { "label": "Channel Group",   "value": "defaultChannelGroup",   "hint": "e.g. Organic Social, Paid Search" }
+            ]
+          }
+        ],
+        "rationale": "I'll use the last 28 days and top 10 by default. The metric and dimension need your call because the ranking can come out very differently depending on which you pick."
+      },
+      "deferred": [],
+      "halted_state": {
+        "turn_id": "turn_2026-05-22T14:03:22Z",
+        "a1_intent": { "$comment": "verbatim A1 record" },
+        "a2_plan":   { "$comment": "verbatim A2 record" },
+        "preapplied_defaults_pending": [
+          { "field": "date_range",    "chosen": "last_28_days", "source": "registry", "rationale": "no time scope specified" },
+          { "field": "ranking_limit", "chosen": 10,             "source": "registry", "rationale": "no limit specified" }
+        ]
+      }
+    }
+  ]
+}

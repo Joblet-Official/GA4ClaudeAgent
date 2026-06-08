@@ -1,0 +1,24 @@
+{
+  "name": "ga4-viz-platform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Agent-first GA4 analytics visualisation platform. Phase 5 implementation of contracts/orchestration/tool-boundaries from ../contracts/.",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "codegen": "pnpm --filter @gvp/contracts run codegen",
+    "sync-schemas": "node scripts/sync-schemas.mjs",
+    "sync-schemas:check": "node scripts/sync-schemas.mjs --check",
+    "verify-contracts": "python ../contracts/verify.py"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0",
+    "@types/node": "^20.12.0"
+  },
+  "packageManager": "pnpm@11.3.0",
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@gvp/registry-data",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Concrete registry instances (catalog, defaults, ontology, domain profile, block-pattern, viz registry, etc). Validated at load time against @gvp/contracts schemas.",
+  "main": "./index.cjs",
+  "exports": {
+    "./catalog": "./catalog.json",
+    "./defaults": "./defaults.json",
+    "./metric-ontology": "./metric-ontology.json",
+    "./domain-profile": "./domain-profile.json",
+    "./block-pattern": "./block-pattern.json",
+    "./viz-registry": "./viz-registry.json",
+    "./trigger-expressions": "./trigger-expressions.json",
+    "./tool-boundaries": "./tool-boundaries.json",
+    "./state-machine": "./state-machine.json"
+  },
+  "files": [
+    "catalog.json",
+    "defaults.json",
+    "metric-ontology.json",
+    "domain-profile.json",
+    "block-pattern.json",
+    "viz-registry.json",
+    "trigger-expressions.json",
+    "tool-boundaries.json",
+    "state-machine.json"
+  ]
+}

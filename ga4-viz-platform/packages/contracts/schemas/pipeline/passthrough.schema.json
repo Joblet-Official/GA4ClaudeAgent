@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/pipeline/passthrough.schema.json",
+  "title": "Pipeline passthrough — canonical end-to-end metadata envelope",
+  "description": "Documents the cumulative passthrough envelope that flows from A1 through A6. Each agent's own `passthrough_pipeline` field declared in its own schema is a SUBSET of this envelope, growing as upstream metadata accumulates. This schema captures the union and serves as the integration reference for the orchestrator (Phase 3).",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": [
+    "intent",
+    "applied_defaults",
+    "carried_forward",
+    "a3_disclosures"
+  ],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "intent": {
+      "type": "object",
+      "description": "Verbatim A1 intent record. Carried unchanged from A1 onward (validates against ../agents/a1-intent.schema.json)."
+    },
+
+    "applied_defaults": {
+      "type": "array",
+      "description": "From A3 (DEFAULT_APPLIED outcome). Empty when no defaults were applied.",
+      "items": { "$ref": "../_shared.schema.json#/$defs/AppliedDefault" }
+    },
+
+    "carried_forward": {
+      "type": "array",
+      "description": "From A3 (sticky carryover from prior turns).",
+      "items": { "$ref": "../_shared.schema.json#/$defs/CarriedForward" }
+    },
+
+    "a3_disclosures": {
+      "type": "array",
+      "description": "Disclosures emitted by A3 (e.g. 'Showing last 28 days', interpretation-request disclosure, out-of-scope disclosure).",
+      "items": { "$ref": "../_shared.schema.json#/$defs/Disclosure" }
+    },
+
+    "a4_warnings": {
+      "type": "array",
+      "description": "Optional. Present after A4 has run. Sampling, thresholding, truncation, partial-period notes.",
+      "items": { "type": "string" }
+    },
+
+    "a4_execution_summary": {
+      "type": "object",
+      "description": "Optional. Compact A4 execution summary for downstream/telemetry. Full A4 metadata stays in A4's record.",
+      "additionalProperties": false,
+      "properties": {
+        "queries_executed": { "type": "integer" },
+        "total_latency_ms": { "type": "integer" },
+        "had_failures":     { "type": "boolean" },
+        "stages_executed":  { "type": "integer", "description": "For staged plans: count of stages that actually ran." },
+        "stages_skipped":   { "type": "integer", "description": "For staged plans: count of conditional stages whose trigger did not fire." }
+      }
+    },
+
+    "a5_data_quality_notes": {
+      "type": "array",
+      "description": "Optional. Present after A5 has run. Factual, neutral.",
+      "items": { "type": "string" }
+    }
+  }
+}

@@ -1,0 +1,200 @@
+{
+  "$comment": "Slice of GA4 catalog covering fields actually used in Phase 1 traces. Validates against ../registries/catalog.schema.json.",
+
+  "schema_version": "0.1.0",
+
+  "sources": {
+    "ga4": {
+      "source": "ga4",
+      "property_scope": "ga4:516147906",
+      "metrics": [
+        {
+          "name": "sessions",
+          "kind": "metric",
+          "data_type": "integer",
+          "display_name": "Sessions",
+          "short_definition": "Visits to the site. Counts repeat visits from the same person separately.",
+          "user_term_aliases": ["sessions", "visits", "traffic"],
+          "rate_handling": "sum_to_period"
+        },
+        {
+          "name": "engagedSessions",
+          "kind": "metric",
+          "data_type": "integer",
+          "display_name": "Engaged sessions",
+          "short_definition": "Sessions that triggered an engagement event or lasted >= 10 seconds with at least one pageview.",
+          "user_term_aliases": ["engaged sessions"],
+          "rate_handling": "sum_to_period"
+        },
+        {
+          "name": "activeUsers",
+          "kind": "metric",
+          "data_type": "integer",
+          "display_name": "Active users",
+          "short_definition": "Unique people in the period with at least one engaged session.",
+          "user_term_aliases": ["users", "active users", "traffic"],
+          "rate_handling": "sum_to_period"
+        },
+        {
+          "name": "totalUsers",
+          "kind": "metric",
+          "data_type": "integer",
+          "display_name": "Total users",
+          "short_definition": "All unique people in the period who triggered any event.",
+          "user_term_aliases": ["total users", "traffic"],
+          "gotchas": [
+            "Scoped to the date range, NOT all-history (a common misconception)."
+          ],
+          "rate_handling": "sum_to_period"
+        },
+        {
+          "name": "screenPageViews",
+          "kind": "metric",
+          "data_type": "integer",
+          "display_name": "Pageviews",
+          "short_definition": "Total page loads in the period; counts every page within a visit.",
+          "user_term_aliases": ["pageviews", "page views", "traffic"],
+          "rate_handling": "sum_to_period"
+        },
+        {
+          "name": "engagementRate",
+          "kind": "metric",
+          "data_type": "percent",
+          "display_name": "Engagement rate",
+          "short_definition": "Share of sessions that qualified as engaged. Formula: engagedSessions / sessions.",
+          "user_term_aliases": ["engagement rate", "engagement"],
+          "rate_handling": "ratio_of_sums",
+          "rate_components": ["engagedSessions", "sessions"],
+          "components": ["engagedSessions", "sessions"]
+        },
+        {
+          "name": "bounceRate",
+          "kind": "metric",
+          "data_type": "percent",
+          "display_name": "Bounce rate",
+          "short_definition": "Share of sessions that did not qualify as engaged. Formula: 1 - engagementRate.",
+          "user_term_aliases": ["bounce rate", "bounce"],
+          "rate_handling": "ratio_of_sums",
+          "rate_components": ["bounces", "sessions"],
+          "components": ["bounces", "sessions"]
+        },
+        {
+          "name": "averageSessionDuration",
+          "kind": "metric",
+          "data_type": "duration_seconds",
+          "display_name": "Average session duration",
+          "short_definition": "Mean session duration in seconds across all sessions in the period.",
+          "user_term_aliases": ["avg session duration", "average session"],
+          "rate_handling": "weighted_average",
+          "components": ["userEngagementDuration", "sessions"]
+        },
+        {
+          "name": "screenPageViewsPerSession",
+          "kind": "metric",
+          "data_type": "float",
+          "display_name": "Pages per session",
+          "short_definition": "Average number of page loads per session.",
+          "rate_handling": "weighted_average",
+          "components": ["screenPageViews", "sessions"]
+        }
+      ],
+      "dimensions": [
+        {
+          "name": "date",
+          "kind": "dimension",
+          "data_type": "date",
+          "display_name": "Date",
+          "short_definition": "Calendar date the session/event occurred (in the property's reporting timezone)."
+        },
+        {
+          "name": "sessionSource",
+          "kind": "dimension",
+          "data_type": "string",
+          "display_name": "Source",
+          "short_definition": "Raw source value (e.g. 'google', 'linkedin.com', 't.co'). Most granular acquisition dimension.",
+          "user_term_aliases": ["source", "sources"]
+        },
+        {
+          "name": "sessionMedium",
+          "kind": "dimension",
+          "data_type": "string",
+          "display_name": "Medium",
+          "short_definition": "How users arrived: 'organic', 'referral', 'cpc', 'social', '(none)' for direct.",
+          "user_term_aliases": ["medium", "sources"]
+        },
+        {
+          "name": "sessionSourceMedium",
+          "kind": "dimension",
+          "data_type": "string",
+          "display_name": "Source / Medium",
+          "short_definition": "Combined source + medium, e.g. 'google / organic'."
+        },
+        {
+          "name": "sessionDefaultChannelGroup",
+          "kind": "dimension",
+          "data_type": "string",
+          "display_name": "Channel group",
+          "short_definition": "GA4's bucketing of acquisition sources: Organic Search, Organic Social, Direct, Paid Search, Referral, etc.",
+          "user_term_aliases": ["channel", "channel group", "sources"]
+        },
+        {
+          "name": "landingPage",
+          "kind": "dimension",
+          "data_type": "string",
+          "display_name": "Landing page",
+          "short_definition": "First page URL visited in the session.",
+          "user_term_aliases": ["landing page", "entry page"]
+        },
+        {
+          "name": "pageTitle",
+          "kind": "dimension",
+          "data_type": "string",
+          "display_name": "Page title",
+          "short_definition": "Title of the page as set in the page's HTML at the time of view."
+        },
+        {
+          "name": "country",
+          "kind": "dimension",
+          "data_type": "string",
+          "display_name": "Country",
+          "short_definition": "Country where the session originated, derived from IP geolocation.",
+          "user_term_aliases": ["country", "geography"]
+        },
+        {
+          "name": "deviceCategory",
+          "kind": "dimension",
+          "data_type": "string",
+          "display_name": "Device",
+          "short_definition": "Device category: desktop, mobile, tablet.",
+          "user_term_aliases": ["device"]
+        },
+        {
+          "name": "newVsReturning",
+          "kind": "dimension",
+          "data_type": "string",
+          "display_name": "New vs returning",
+          "short_definition": "Whether the user is new (first session ever) or returning (had a prior session)."
+        },
+        {
+          "name": "eventName",
+          "kind": "dimension",
+          "data_type": "string",
+          "display_name": "Event name",
+          "short_definition": "Name of the GA4 event as fired."
+        }
+      ],
+      "filter_operators": [
+        { "name": "eq",          "valid_for_kinds": ["dimension", "metric"], "expression_format": "{field} == {value}" },
+        { "name": "in",          "valid_for_kinds": ["dimension"],           "expression_format": "{field} in {values}" },
+        { "name": "contains",    "valid_for_kinds": ["dimension"],           "expression_format": "{field} contains {value}" },
+        { "name": "starts_with", "valid_for_kinds": ["dimension"],           "expression_format": "{field} starts_with {value}" },
+        { "name": "gt",          "valid_for_kinds": ["metric"],              "expression_format": "{field} > {value}" }
+      ],
+      "term_aliases": [
+        { "user_term": "traffic",          "maps_to": "sessions",     "deterministic": false, "context": "ambiguous; emits mapping_choices" },
+        { "user_term": "engagement rate",  "maps_to": "engagementRate","deterministic": true },
+        { "user_term": "sources",          "maps_to": "sessionSource","deterministic": false, "context": "ambiguous with sessionMedium, sessionSourceMedium, sessionDefaultChannelGroup" }
+      ]
+    }
+  }
+}

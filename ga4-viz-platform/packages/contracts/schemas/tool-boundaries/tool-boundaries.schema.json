@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/tool-boundaries/tool-boundaries.schema.json",
+  "title": "Tool boundaries — tool catalog + per-agent permission matrix",
+  "description": "Validates the policy file that enumerates which tools exist and which agents may invoke each. The orchestrator binds tool-call surfaces per agent based on this. Schema-level constraints encode Rules 1 and 2 (no data access before A4; only A3 contacts the user).",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": ["schema_version", "tools", "agent_permissions", "invariants"],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "schema_version": { "const": "0.1.0" },
+
+    "tools": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The tool catalog. Every tool an agent may invoke must appear here.",
+      "items": { "$ref": "#/$defs/ToolDef" }
+    },
+
+    "agent_permissions": {
+      "type": "object",
+      "description": "Per-agent permission record. Keys are A1..A6.",
+      "required": ["A1", "A2", "A3", "A4", "A5", "A6"],
+      "additionalProperties": false,
+      "properties": {
+        "A1": { "$ref": "#/$defs/AgentPermissions" },
+        "A2": { "$ref": "#/$defs/AgentPermissions" },
+        "A3": { "$ref": "#/$defs/AgentPermissions" },
+        "A4": { "$ref": "#/$defs/AgentPermissions" },
+        "A5": { "$ref": "#/$defs/AgentPermissions" },
+        "A6": { "$ref": "#/$defs/AgentPermissions" }
+      }
+    },
+
+    "invariants": {
+      "type": "object",
+      "description": "Structural invariants that auditing must respect. Schema-encoded for verifiability.",
+      "required": [
+        "agents_permitted_data_apis",
+        "agents_permitted_user_surface",
+        "agents_permitted_file_write"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "agents_permitted_data_apis": {
+          "type": "array",
+          "const": ["A4"],
+          "description": "Rule 1: ONLY A4 may invoke any tool of kind=data_api."
+        },
+        "agents_permitted_user_surface": {
+          "type": "array",
+          "const": ["A3"],
+          "description": "Rule 2: ONLY A3 may invoke any tool of kind=user_surface."
+        },
+        "agents_permitted_file_write": {
+          "type": "array",
+          "const": ["A6"],
+          "description": "Only A6 may invoke any tool of kind=file_write."
+        }
+      }
+    }
+  },
+
+  "$defs": {
+
+    "ToolDef": {
+      "type": "object",
+      "required": ["tool_id", "name", "kind", "side_effect", "requires_credential"],
+      "additionalProperties": false,
+      "properties": {
+
+        "tool_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "Stable identifier. Snake case."
+        },
+
+        "name": {
+          "type": "string",
+          "description": "Human-readable tool name."
+        },
+
+        "kind": {
+          "type": "string",
+          "enum": ["data_api", "registry_read", "file_write", "user_surface", "session_storage", "telemetry"],
+          "description": "Tool category. Drives the structural invariants."
+        },
+
+        "side_effect": {
+          "type": "string",
+          "enum": ["read_only", "write"]
+        },
+
+        "requires_credential": { "type": "boolean" },
+
+        "credential_scope": {
+          "type": "string",
+          "description": "When requires_credential=true, the OAuth scope or equivalent. e.g. 'https://www.googleapis.com/auth/analytics.readonly'."
+        },
+
+        "typical_usage": { "type": "string" },
+
+        "constraints": {
+          "type": "object",
+          "description": "Tool-specific runtime constraints. Free-form by design; orchestrator enforces what it understands.",
+          "additionalProperties": true
+        }
+      }
+    },
+
+    "AgentPermissions": {
+      "type": "object",
+      "required": ["may_use", "rationale"],
+      "additionalProperties": false,
+      "properties": {
+
+        "may_use": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "description": "Allow-list of tool_ids this agent may invoke. Empty array = agent has no tools (e.g. A1)."
+        },
+
+        "may_not_use": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "description": "Optional explicit-deny list for clarity. Anything not in may_use is implicitly denied; this list documents the specifically-forbidden cases."
+        },
+
+        "can_contact_user": {
+          "type": "boolean",
+          "description": "True only for A3. The orchestrator structural invariant agents_permitted_user_surface=[A3] enforces this."
+        },
+
+        "can_generate_user_facing_text": {
+          "type": "string",
+          "enum": ["no", "only_via_templates", "only_via_catalog_hints"],
+          "description": "What level of user-facing text generation is permitted. 'no' = none. 'only_via_templates' = templated chip/label text (A6). 'only_via_catalog_hints' = hint text from catalog only (A3 clarification options)."
+        },
+
+        "rationale": {
+          "type": "string",
+          "minLength": 20,
+          "description": "Why this permission set; cross-references Phase 1 agent spec."
+        },
+
+        "per_tool_constraints": {
+          "type": "object",
+          "description": "Optional overrides of tool-level constraints for this specific agent.",
+          "additionalProperties": { "type": "object" }
+        }
+      }
+    }
+  }
+}

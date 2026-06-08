@@ -1,0 +1,31 @@
+{
+  "name": "@gvp/tools",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@gvp/contracts": "workspace:*",
+    "@gvp/registry-data": "workspace:*",
+    "@google-analytics/data": "^6.0.0",
+    "googleapis": "^160.0.0",
+    "google-auth-library": "^10.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0",
+    "@types/node": "^20.12.0"
+  }
+}

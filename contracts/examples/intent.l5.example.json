@@ -1,0 +1,40 @@
+{
+  "$comment": "A1 intent record for the user question: 'What's wrong with the site?' (Q41 from the training corpus). L5 (compound / open-ended, decomposition-then-expand) example. A2 runs a lightweight per-pillar scan, then A3 halts twice: once for the missing time anchor, then again for the pillar pick (cap 2 sub-questions). No headline metric is named, so metric_resolution_needed is flagged. analysis_level=L5 ⇔ interpretation_request=true. Validates against ../agents/a1-intent.schema.json.",
+
+  "schema_version": "0.1.0",
+  "report_type": "composite",
+  "analysis_level": "L5",
+  "business_objective": "scan site health across pillars",
+
+  "sub_questions": [
+    {
+      "id": "sq_1",
+      "verbatim": "What's wrong with the site?",
+      "report_type": "composite",
+      "scope_cues": {
+        "metric_term": null,
+        "dimension_term": null,
+        "time": null,
+        "geography": null,
+        "channel_filter": null,
+        "rank_direction": null,
+        "direction": null,
+        "device": null,
+        "page": null
+      }
+    }
+  ],
+
+  "comparison_intent": null,
+
+  "ambiguity_flags": [
+    "metric_resolution_needed",
+    "time_scope_missing",
+    "comparison_period_implicit"
+  ],
+
+  "is_followup": false,
+  "followup_delta": null,
+  "out_of_scope": false,
+  "interpretation_request": true
+}

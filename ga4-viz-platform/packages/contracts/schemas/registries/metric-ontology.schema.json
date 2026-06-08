@@ -1,0 +1,266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/registries/metric-ontology.schema.json",
+  "title": "Metric ontology — formula, components, affected-by, investigation branches",
+  "description": "A2 consults this when planning investigations for 'why' questions. Each entry describes how a metric DECOMPOSES (numerator/denominator), what affects each component, and the standard investigation branches with their trigger conditions. Phase-1 finding fold-in: path_exploration_strategy specifies how to sample landing pages (sample where the funnel-step event fires, not just structural-diff pages).",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": ["schema_version", "metrics"],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "schema_version": { "const": "0.1.0" },
+
+    "metrics": {
+      "type": "object",
+      "description": "Map of metric name (catalog field name) to its ontology entry.",
+      "additionalProperties": { "$ref": "#/$defs/MetricOntologyEntry" }
+    },
+
+    "universal_l2_playbook": {
+      "type": "object",
+      "description": "The 12-stage universal RCA playbook A2 expands for every L2 (diagnostic-shaped) intent. Tier-2 entries on individual metrics may add or override stages via #/$defs/RcaPlaybook. Metrics without an rca_playbook entry use this verbatim.",
+      "required": ["version", "stages"],
+      "additionalProperties": false,
+      "properties": {
+        "version": { "type": "string", "const": "1.0.0" },
+        "stages": {
+          "type": "array",
+          "minItems": 12,
+          "items": { "$ref": "#/$defs/PlaybookStage" }
+        }
+      }
+    }
+  },
+
+  "$defs": {
+
+    "MetricOntologyEntry": {
+      "type": "object",
+      "required": ["metric", "decomposition_kind"],
+      "additionalProperties": false,
+      "properties": {
+
+        "metric": { "type": "string", "description": "Catalog field name." },
+
+        "decomposition_kind": {
+          "type": "string",
+          "enum": ["ratio", "sum_of_parts", "average", "count", "atomic"],
+          "description": "How the metric decomposes mathematically. 'atomic' = not decomposable (e.g. raw sessions count)."
+        },
+
+        "formula": {
+          "type": "string",
+          "description": "Mathematical expression. Example: 'engagedSessions / sessions'. For 'atomic' metrics, omit or set to the metric name itself."
+        },
+
+        "components": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Names of the upstream metrics this metric derives from. Example for engagementRate: ['engagedSessions','sessions']."
+        },
+
+        "affected_by": {
+          "type": "object",
+          "description": "Map of component name → array of dimension/concept tags. Drives which dimensional breakdowns A2 plans for an investigation.",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+
+        "investigation_branches": {
+          "type": "array",
+          "description": "Ordered list of branches A2 considers when interpretation_request=true for this metric. Each branch becomes a stage in A2's staged plan.",
+          "items": { "$ref": "#/$defs/InvestigationBranch" }
+        },
+
+        "path_exploration_strategy": { "$ref": "#/$defs/PathExplorationStrategy" },
+
+        "rca_playbook": { "$ref": "#/$defs/RcaPlaybook" }
+      }
+    },
+
+    "RcaPlaybook": {
+      "type": "object",
+      "description": "Tier-2 RCA playbook for a specific metric. A2 mechanically merges this with the universal_l2_playbook when intent.analysis_level=L4 and headline_metric matches. (The 'l2' in universal_l2_playbook is a retained structural name from the original addendum, not the L2 spectrum level.)",
+      "required": ["inherits"],
+      "additionalProperties": false,
+      "properties": {
+        "inherits": {
+          "type": "string",
+          "enum": ["universal_l2", "none"],
+          "description": "'universal_l2' starts from the 12 universal stages and applies adds/overrides; 'none' uses only the adds (rare)."
+        },
+        "adds": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "stages": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/PlaybookStage" }
+            }
+          }
+        },
+        "overrides": {
+          "type": "object",
+          "description": "Map of universal-stage id → PlaybookStageOverride. 'replace: true' removes the universal stage when the Tier-2 stage applies.",
+          "additionalProperties": { "$ref": "#/$defs/PlaybookStageOverride" }
+        }
+      }
+    },
+
+    "PlaybookStage": {
+      "type": "object",
+      "description": "One stage in an L2 RCA playbook. Union of fields used across the 12 universal stages and Tier-2 additions.",
+      "required": ["id", "kind", "execute"],
+      "additionalProperties": false,
+      "properties": {
+        "id":          { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "kind":        {
+          "type": "string",
+          "enum": [
+            "confirm_headline",
+            "decompose_components",
+            "temporal_weekly",
+            "temporal_daily",
+            "dimensional_breakdown",
+            "structural_diff_derived",
+            "path_exploration",
+            "cohort_drilldown",
+            "funnel_run",
+            "funnel_step_dimensional_breakdown"
+          ]
+        },
+        "execute":     { "type": "string", "enum": ["always", "conditional"] },
+        "execute_if":  { "type": "string", "description": "Trigger DSL expression. Required iff execute=conditional." },
+        "dimension":   { "type": "string" },
+        "surface":     { "type": "string", "enum": ["traffic_acquisition", "pages", "events", "tech", "demographics", "domain_funnel"] },
+        "cap":         { "type": "integer", "minimum": 1, "maximum": 100 },
+        "sample_strategy": { "type": "string", "enum": ["landing_pages_in_structural_diff", "landing_pages_where_event_fired_in_baseline", "top_n_by_traffic"] },
+        "target_event": { "type": "string" },
+        "funnel_id":    { "type": "string" },
+        "components":   { "type": "array", "items": { "type": "string" }, "minItems": 2 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "execute": { "const": "conditional" } }, "required": ["execute"] },
+          "then": { "required": ["execute_if"] }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "dimensional_breakdown" } }, "required": ["kind"] },
+          "then": { "required": ["dimension", "surface"] }
+        }
+      ]
+    },
+
+    "PlaybookStageOverride": {
+      "type": "object",
+      "description": "Override fields for an existing universal-playbook stage. All fields optional; identified by the override key (universal stage id). 'replace: true' removes the universal stage entirely (used when Tier-2 supplies a fundamentally different version).",
+      "additionalProperties": false,
+      "properties": {
+        "id":          { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "kind":        {
+          "type": "string",
+          "enum": [
+            "confirm_headline",
+            "decompose_components",
+            "temporal_weekly",
+            "temporal_daily",
+            "dimensional_breakdown",
+            "structural_diff_derived",
+            "path_exploration",
+            "cohort_drilldown",
+            "funnel_run",
+            "funnel_step_dimensional_breakdown"
+          ]
+        },
+        "execute":     { "type": "string", "enum": ["always", "conditional"] },
+        "execute_if":  { "type": "string" },
+        "dimension":   { "type": "string" },
+        "surface":     { "type": "string", "enum": ["traffic_acquisition", "pages", "events", "tech", "demographics", "domain_funnel"] },
+        "cap":         { "type": "integer", "minimum": 1, "maximum": 100 },
+        "sample_strategy": { "type": "string", "enum": ["landing_pages_in_structural_diff", "landing_pages_where_event_fired_in_baseline", "top_n_by_traffic"] },
+        "target_event": { "type": "string" },
+        "funnel_id":    { "type": "string" },
+        "components":   { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+        "replace":     { "type": "boolean", "description": "When true, the universal stage with this id is removed (the Tier-2 version supersedes it; the Tier-2 version, if any, lives in adds.stages[])." }
+      }
+    },
+
+    "InvestigationBranch": {
+      "type": "object",
+      "required": ["branch_id", "trigger"],
+      "additionalProperties": false,
+      "properties": {
+        "branch_id": {
+          "type": "string",
+          "description": "Stable identifier, e.g. 'confirm_and_decompose', 'temporal_localisation', 'sessions_component_channel', 'engaged_component_landing_page', 'custom_funnel', 'path_exploration'."
+        },
+        "trigger": {
+          "type": "string",
+          "enum": ["always", "conditional"],
+          "description": "When='always', branch executes whenever this metric is investigated. When='conditional', condition must be set."
+        },
+        "condition": {
+          "type": "string",
+          "description": "Trigger expression for conditional branches. DSL spec: ../pipeline/trigger-expressions.schema.json. Example: 'funnel_step_rate_drop(\"view_search_results\") > 0.5 AND top_n_dim_diff(\"landingPage\", n=20) >= 5'."
+        },
+        "queries": {
+          "type": "array",
+          "description": "Query templates A2 instantiates for this branch.",
+          "items": { "$ref": "#/$defs/QueryTemplate" }
+        },
+        "rationale_template": {
+          "type": "string",
+          "description": "Templated factual explanation for why this branch runs. NEVER causal. Placeholder {ontology_relation}. Example: 'engagedSessions ← events_fired → probe event composition'."
+        }
+      }
+    },
+
+    "QueryTemplate": {
+      "type": "object",
+      "required": ["template_id", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "template_id":   { "type": "string", "description": "e.g. 'pop_totals', 'weekly_aggregate', 'channel_breakdown', 'landing_page_diff'." },
+        "source":        { "$ref": "../_shared.schema.json#/$defs/Source" },
+        "metrics":       { "type": "array", "items": { "type": "string" } },
+        "dimensions":    { "type": "array", "items": { "type": "string" } },
+        "date_window":   { "type": "string", "enum": ["current", "comparison", "both", "current_plus_baseline"] },
+        "limit":         { "type": ["integer", "null"] },
+        "ordering":      { "type": "string", "description": "Optional ordering hint." }
+      }
+    },
+
+    "PathExplorationStrategy": {
+      "type": "object",
+      "description": "Phase-1 finding fix: when path exploration is triggered by a funnel-step drop, sample landing pages where the collapsing event actually fired (in the baseline period), not just pages that appear in the structural diff. Captured here so A2 plans the correct sample.",
+      "additionalProperties": false,
+      "properties": {
+        "trigger_when": {
+          "type": "string",
+          "description": "DSL expression. Example: 'funnel_step_rate_drop(event) > 0.5 AND top_n_dim_diff(\"landingPage\", n=20) >= 5'."
+        },
+        "sample_strategy": {
+          "type": "array",
+          "description": "Ordered list of sampling sources. A2 plans queries against all of these.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "landing_pages_where_event_fired_in_baseline",
+              "landing_pages_in_structural_diff",
+              "top_landing_pages_by_volume_both_periods"
+            ]
+          }
+        },
+        "target_event_for_event_count": {
+          "type": "string",
+          "description": "The specific event whose count the visualisation MUST surface per-page (not collapse to a binary in-top-K badge). Example: 'view_search_results'. Resolves the view_search_results-0 finding."
+        }
+      }
+    }
+  }
+}

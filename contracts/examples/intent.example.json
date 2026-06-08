@@ -1,0 +1,41 @@
+{
+  "$comment": "A1 intent record for the user question: 'top traffic sources'. Real trace from Phase 1. Validates against ../agents/a1-intent.schema.json.",
+
+  "schema_version": "0.1.0",
+  "report_type": "ranking",
+  "analysis_level": "L1",
+  "business_objective": "identify top acquisition sources",
+
+  "sub_questions": [
+    {
+      "id": "sq_1",
+      "verbatim": "top traffic sources",
+      "report_type": "ranking",
+      "scope_cues": {
+        "metric_term": "traffic",
+        "dimension_term": "sources",
+        "time": null,
+        "geography": null,
+        "channel_filter": null,
+        "rank_direction": "top",
+        "direction": null,
+        "device": null,
+        "page": null
+      }
+    }
+  ],
+
+  "comparison_intent": null,
+
+  "ambiguity_flags": [
+    "time_scope_missing",
+    "metric_resolution_needed",
+    "dimension_resolution_needed",
+    "ranking_limit_missing"
+  ],
+
+  "is_followup": false,
+  "followup_delta": null,
+  "out_of_scope": false,
+  "interpretation_request": false
+}

@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joblet.ai/contracts/registries/viz-registry.schema.json",
+  "title": "Viz registry — block_type → component mapping + colour-purpose policy",
+  "description": "A6 consults this to map A5 block_types to render components, to look up the colour palette + colour-purpose policy, and to pick layout templates per report_type. Phase-1 finding fold-in: colour-purpose registry — peach is reserved for partial-period/data-freshness flags ONLY; editorial colour (red=bad, green=good) is forbidden everywhere.",
+  "x-schema-version": "0.1.0",
+
+  "type": "object",
+  "required": ["schema_version", "block_to_component", "colour_policy", "layouts"],
+  "additionalProperties": false,
+
+  "properties": {
+
+    "schema_version": { "const": "0.1.0" },
+
+    "block_to_component": {
+      "type": "object",
+      "description": "Map of A5 block_type to A6 component selection.",
+      "additionalProperties": { "$ref": "#/$defs/ComponentMapping" }
+    },
+
+    "colour_policy": { "$ref": "#/$defs/ColourPolicy" },
+
+    "layouts": {
+      "type": "object",
+      "description": "Per-report_type layout templates: ordering of sections, chip-row placement, footer composition.",
+      "propertyNames": { "$ref": "../_shared.schema.json#/$defs/ReportType" },
+      "additionalProperties": { "$ref": "#/$defs/LayoutTemplate" }
+    }
+  },
+
+  "$defs": {
+
+    "ComponentMapping": {
+      "type": "object",
+      "required": ["primary_component"],
+      "additionalProperties": false,
+      "properties": {
+        "primary_component": {
+          "type": "string",
+          "enum": [
+            "kpi_strip", "kpi_card", "bar_chart_table_pair", "line_chart",
+            "grouped_bar_chart", "donut_table_pair", "heatmap",
+            "funnel_diagram", "choropleth", "diverging_bar"
+          ]
+        },
+        "alternate_components": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Components A6 may pick from when context overrides (e.g. for ranked_table with delta intent, use diverging_bar instead of bar_chart_table_pair)."
+        },
+        "always_pair_table_with_chart": {
+          "type": "boolean",
+          "description": "True for chartable blocks — chart and table both render. Per A6 spec: never one without the other for chartable blocks."
+        }
+      }
+    },
+
+    "ColourPolicy": {
+      "type": "object",
+      "required": ["identity_palette", "colour_purposes", "forbidden_uses"],
+      "additionalProperties": false,
+      "properties": {
+
+        "identity_palette": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+          "description": "Hex colours assigned by rank order for categorical series. Consistent across charts in the same report."
+        },
+
+        "allowed_palette": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "Explicit allow-list of every colour value (identity blue scale + neutrals + grey, plus structural keywords like transparent/none/currentColor/inherit) that A6 may emit anywhere. assertPaletteAllowed enforces it. The partial-period peach is NOT in this list — it is allowed ONLY on .partial-tagged nodes (see partial_only_colour)."
+        },
+
+        "partial_only_colour": {
+          "type": "string",
+          "description": "The peach (partial-period / data-freshness) colour. Permitted ONLY on nodes tagged .partial; assertPaletteAllowed throws if it appears on any non-.partial node."
+        },
+
+        "colour_purposes": {
+          "type": "object",
+          "required": ["sentinel", "partial_period", "z_score_encoding"],
+          "additionalProperties": false,
+          "properties": {
+            "sentinel":           { "type": "string", "description": "Hex code for sentinel rows/bars (italic + muted)." },
+            "partial_period":     { "type": "string", "description": "Hex code (peach) reserved for partial-period chips, dashed segments, hatched fills. NEVER repurposed." },
+            "z_score_encoding":   { "type": "string", "enum": ["monochrome_intensity_blue", "monochrome_intensity_grey"], "description": "Direction-neutral. Darker = further from mean." },
+            "default_text":       { "type": "string" },
+            "muted_text":         { "type": "string" }
+          }
+        },
+
+        "forbidden_uses": {
+          "type": "array",
+          "description": "Explicit ban list. Schema enforces by rejecting any visual_encoding that names these as a colour purpose.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "red_green_evaluative_gradient",
+              "good_bad_indicator",
+              "performance_traffic_light",
+              "interpretive_highlight_box"
+            ]
+          }
+        }
+      }
+    },
+
+    "LayoutTemplate": {
+      "type": "object",
+      "required": ["sections_order"],
+      "additionalProperties": false,
+      "properties": {
+        "sections_order": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["title", "context_chips", "disclosure_chips", "kpi_strip", "main_blocks", "secondary_blocks", "quality_notes", "footer_meta"]
+          }
+        },
+        "supports_step_narration": {
+          "type": "boolean",
+          "description": "True when this layout displays step_rationale (the section's 'Why this step' logic box) per section (staged-investigation reports)."
+        }
+      }
+    }
+  }
+}
