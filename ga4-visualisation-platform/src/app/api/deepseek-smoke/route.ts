@@ -52,6 +52,55 @@ async function authJsonCheck(provider: Provider): Promise<Check> {
   }
 }
 
+/**
+ * Raw fetch() call (no OpenAI SDK) — isolates whether the SDK transport is the
+ * problem. If this passes where authJsonCheck() times out, the fix is to route
+ * the LLM calls through fetch instead of the SDK.
+ */
+async function rawFetchCheck(provider: "deepseek_pro" | "deepseek_flash"): Promise<Check> {
+  const t0 = Date.now();
+  const base = process.env.DEEPSEEK_BASE_URL || "https://integrate.api.nvidia.com/v1";
+  const isPro = provider === "deepseek_pro";
+  const model = isPro
+    ? process.env.DEEPSEEK_PRO_MODEL || "deepseek-ai/deepseek-v4-pro"
+    : process.env.DEEPSEEK_FLASH_MODEL || "deepseek-ai/deepseek-v4-flash";
+  const key = isPro ? process.env.DEEPSEEK_PRO_API_KEY : process.env.DEEPSEEK_FLASH_API_KEY;
+  if (!key) {
+    return { check: `rawfetch: ${provider}`, pass: false, error: `missing ${isPro ? "DEEPSEEK_PRO_API_KEY" : "DEEPSEEK_FLASH_API_KEY"}` };
+  }
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 9_000);
+  try {
+    const res = await fetch(base + "/chat/completions", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: "system", content: "Output only compact JSON." },
+          { role: "user", content: 'Return exactly {"ok":true,"n":42}' },
+        ],
+        max_tokens: 256,
+        temperature: 0,
+        response_format: { type: "json_object" },
+      }),
+      signal: ctrl.signal,
+    });
+    const text = await res.text();
+    let outer: unknown = null;
+    try { outer = JSON.parse(text); } catch { /* ignore */ }
+    const content = (outer as { choices?: Array<{ message?: { content?: string } }> })?.choices?.[0]?.message?.content ?? "";
+    let inner: unknown = null;
+    try { inner = JSON.parse(content); } catch { /* ignore */ }
+    const pass = res.status === 200 && (inner as { ok?: unknown })?.ok === true;
+    return { check: `rawfetch: ${provider}`, pass, status: res.status, ms: Date.now() - t0, content: String(content).slice(0, 80) };
+  } catch (e) {
+    return { check: `rawfetch: ${provider}`, pass: false, error: (e as Error).message, ms: Date.now() - t0 };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function escalationCheck(): Promise<Check> {
   try {
     const res = await withEscalation<string>(
@@ -108,15 +157,19 @@ async function orchestratorCheck(): Promise<Check> {
 export async function GET() {
   // Run the three network (LLM) checks IN PARALLEL so total latency ≈ the slowest
   // single call, not the sum — keeps the endpoint under the Hobby 10s limit.
-  const [proChk, flashChk, orchChk] = await Promise.all([
+  const [proChk, flashChk, rawPro, rawFlash, orchChk] = await Promise.all([
     authJsonCheck("deepseek_pro"),
     authJsonCheck("deepseek_flash"),
+    rawFetchCheck("deepseek_pro"),
+    rawFetchCheck("deepseek_flash"),
     orchestratorCheck(),
   ]);
   // The remaining checks are pure logic (no network) and instant.
   const checks: Check[] = [
     proChk,
     flashChk,
+    rawPro,
+    rawFlash,
     await escalationCheck(),
     await surfaceCheck(),
     routingCheck(),
