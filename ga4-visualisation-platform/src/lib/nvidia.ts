@@ -25,7 +25,14 @@
  */
 import OpenAI from "openai";
 
-type Provider = "nvidia" | "groq" | "cerebras" | "together" | "gemini";
+export type Provider =
+  | "nvidia"
+  | "groq"
+  | "cerebras"
+  | "together"
+  | "gemini"
+  | "deepseek_pro"
+  | "deepseek_flash";
 
 interface ProviderConfig {
   baseURL: string;
@@ -60,6 +67,20 @@ const PROVIDERS: Record<Provider, ProviderConfig> = {
     defaultModel: "gemini-2.0-flash",
     apiKeyEnv: "GEMINI_API_KEY",
   },
+  // DeepSeek V4 via the NVIDIA-hosted OpenAI-compatible endpoint. Two entries so
+  // Pro and Flash authenticate with independent keys (DEEPSEEK_PRO_API_KEY /
+  // DEEPSEEK_FLASH_API_KEY). Secrets come ONLY from env; base URL + model ids are
+  // overridable via DEEPSEEK_BASE_URL / DEEPSEEK_PRO_MODEL / DEEPSEEK_FLASH_MODEL.
+  deepseek_pro: {
+    baseURL: process.env.DEEPSEEK_BASE_URL || "https://integrate.api.nvidia.com/v1",
+    defaultModel: process.env.DEEPSEEK_PRO_MODEL || "deepseek-ai/deepseek-v4-pro",
+    apiKeyEnv: "DEEPSEEK_PRO_API_KEY",
+  },
+  deepseek_flash: {
+    baseURL: process.env.DEEPSEEK_BASE_URL || "https://integrate.api.nvidia.com/v1",
+    defaultModel: process.env.DEEPSEEK_FLASH_MODEL || "deepseek-ai/deepseek-v4-flash",
+    apiKeyEnv: "DEEPSEEK_FLASH_API_KEY",
+  },
 };
 
 function pickProvider(brain?: string): Provider {
@@ -87,13 +108,31 @@ export interface BrainClient {
 
 const clientCache = new Map<string, BrainClient>();
 
-export function getClient(brain?: string): BrainClient {
-  const cacheKey = brain ?? "_default";
+/**
+ * Optional per-call override. When omitted, behaviour is identical to before:
+ * provider + model resolve from env (LLM_PROVIDER_<BRAIN> / LLM_MODEL_<BRAIN>),
+ * timeout 25s. The escalation layer uses `provider`/`model` to obtain a Pro
+ * client for a Flash→Pro retry; `timeoutMs` lets reasoning models use a larger
+ * budget without changing the default for existing callers.
+ */
+export interface GetClientOverride {
+  provider?: Provider;
+  model?: string;
+  timeoutMs?: number;
+}
+
+export function getClient(brain?: string, override?: GetClientOverride): BrainClient {
+  const provider = override?.provider ?? pickProvider(brain);
+  const cfg = PROVIDERS[provider];
+  const model = override?.model ?? pickModel(provider, brain);
+  const timeoutMs = override?.timeoutMs ?? 25_000;
+
+  // Cache key includes provider/model/timeout so an escalated Pro client never
+  // collides with the Flash client for the same brain.
+  const cacheKey = `${brain ?? "_default"}::${provider}::${model}::${timeoutMs}`;
   const cached = clientCache.get(cacheKey);
   if (cached) return cached;
 
-  const provider = pickProvider(brain);
-  const cfg = PROVIDERS[provider];
   const apiKey = process.env[cfg.apiKeyEnv];
   if (!apiKey) {
     throw new Error(
@@ -101,12 +140,11 @@ export function getClient(brain?: string): BrainClient {
     );
   }
 
-  const model = pickModel(provider, brain);
   const client = new OpenAI({
     apiKey,
     baseURL: cfg.baseURL,
     maxRetries: 0,
-    timeout: 25_000,
+    timeout: timeoutMs,
   });
 
   const out: BrainClient = { client, model, provider };
