@@ -102,14 +102,21 @@ export class OrchestratorBrain {
    * endpoint). A minimal structured-JSON coordination call.
    */
   async ping(): Promise<{ ok: boolean; model: string; content: string }> {
-    const { client, model } = this.client();
+    const route = routeFor("orchestrator");
+    // Short timeout + small token budget so the validation endpoint stays well
+    // under the Hobby 10s function limit.
+    const { client, model } = getClient("orchestrator", {
+      provider: route.provider,
+      model: route.model,
+      timeoutMs: 8_000,
+    });
     const r = await client.chat.completions.create({
       model,
       messages: [
         { role: "system", content: "You are a pipeline coordinator. Output only compact JSON." },
         { role: "user", content: 'Return exactly {"coordinator":"ready"}' },
       ],
-      max_tokens: 2000,
+      max_tokens: 256,
       temperature: 0,
       response_format: { type: "json_object" },
     });

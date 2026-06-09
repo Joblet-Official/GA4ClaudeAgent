@@ -31,14 +31,14 @@ type Check = Record<string, unknown> & { check: string; pass: boolean };
 async function authJsonCheck(provider: Provider): Promise<Check> {
   const t0 = Date.now();
   try {
-    const { client, model } = getClient(undefined, { provider, timeoutMs: 60_000 });
+    const { client, model } = getClient(undefined, { provider, timeoutMs: 8_000 });
     const r = await client.chat.completions.create({
       model,
       messages: [
         { role: "system", content: "Output only compact JSON." },
         { role: "user", content: 'Return exactly {"ok":true,"n":42}' },
       ],
-      max_tokens: 4000,
+      max_tokens: 256,
       temperature: 0,
       response_format: { type: "json_object" },
     });
@@ -106,13 +106,22 @@ async function orchestratorCheck(): Promise<Check> {
 }
 
 export async function GET() {
-  const checks: Check[] = [];
-  checks.push(await authJsonCheck("deepseek_pro"));
-  checks.push(await authJsonCheck("deepseek_flash"));
-  checks.push(await escalationCheck());
-  checks.push(await surfaceCheck());
-  checks.push(routingCheck());
-  checks.push(await orchestratorCheck());
+  // Run the three network (LLM) checks IN PARALLEL so total latency ≈ the slowest
+  // single call, not the sum — keeps the endpoint under the Hobby 10s limit.
+  const [proChk, flashChk, orchChk] = await Promise.all([
+    authJsonCheck("deepseek_pro"),
+    authJsonCheck("deepseek_flash"),
+    orchestratorCheck(),
+  ]);
+  // The remaining checks are pure logic (no network) and instant.
+  const checks: Check[] = [
+    proChk,
+    flashChk,
+    await escalationCheck(),
+    await surfaceCheck(),
+    routingCheck(),
+    orchChk,
+  ];
 
   const allPass = checks.every((c) => c.pass);
   return NextResponse.json({ ok: allPass, summary: allPass ? "ALL PASS" : "FAILURES PRESENT", checks }, { status: allPass ? 200 : 500 });
