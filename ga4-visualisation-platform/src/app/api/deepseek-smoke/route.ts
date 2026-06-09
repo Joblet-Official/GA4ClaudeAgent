@@ -101,6 +101,34 @@ async function rawFetchCheck(provider: "deepseek_pro" | "deepseek_flash"): Promi
   }
 }
 
+/**
+ * Raw fetch() to an arbitrary NVIDIA model (using the Pro key, which is an NVIDIA
+ * key). Baseline to tell whether ALL NVIDIA models are slow from Vercel, or only
+ * the deepseek-v4 ones.
+ */
+async function rawModelCheck(label: string, model: string): Promise<Check> {
+  const t0 = Date.now();
+  const base = process.env.DEEPSEEK_BASE_URL || "https://integrate.api.nvidia.com/v1";
+  const key = process.env.DEEPSEEK_PRO_API_KEY;
+  if (!key) return { check: label, pass: false, error: "missing DEEPSEEK_PRO_API_KEY" };
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 9_000);
+  try {
+    const res = await fetch(base + "/chat/completions", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ model, messages: [{ role: "user", content: 'Return {"ok":true}' }], max_tokens: 64, temperature: 0 }),
+      signal: ctrl.signal,
+    });
+    const text = await res.text();
+    return { check: label, pass: res.status === 200, status: res.status, ms: Date.now() - t0, content: text.slice(0, 80) };
+  } catch (e) {
+    return { check: label, pass: false, error: (e as Error).message, ms: Date.now() - t0 };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function escalationCheck(): Promise<Check> {
   try {
     const res = await withEscalation<string>(
@@ -157,23 +185,19 @@ async function orchestratorCheck(): Promise<Check> {
 export async function GET() {
   // Run the three network (LLM) checks IN PARALLEL so total latency ≈ the slowest
   // single call, not the sum — keeps the endpoint under the Hobby 10s limit.
-  const [proChk, flashChk, rawPro, rawFlash, orchChk] = await Promise.all([
-    authJsonCheck("deepseek_pro"),
-    authJsonCheck("deepseek_flash"),
+  const [rawPro, rawFlash, rawLlama] = await Promise.all([
     rawFetchCheck("deepseek_pro"),
     rawFetchCheck("deepseek_flash"),
-    orchestratorCheck(),
+    rawModelCheck("nvidia baseline: llama-3.3-70b", "meta/llama-3.3-70b-instruct"),
   ]);
   // The remaining checks are pure logic (no network) and instant.
   const checks: Check[] = [
-    proChk,
-    flashChk,
     rawPro,
     rawFlash,
+    rawLlama,
     await escalationCheck(),
     await surfaceCheck(),
     routingCheck(),
-    orchChk,
   ];
 
   const allPass = checks.every((c) => c.pass);
