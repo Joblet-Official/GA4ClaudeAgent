@@ -1,5 +1,5 @@
 /**
- * GET /api/_deepseek_smoke  — Phase 1 deployed validation endpoint.
+ * GET /api/deepseek-smoke  — Phase 1 deployed validation endpoint.
  *
  * Runs on Vercel (where the OpenAI SDK transport works and the DeepSeek keys
  * live in env) and validates the DeepSeek integration end-to-end:
@@ -12,6 +12,9 @@
  *
  * Reads secrets only from env (DEEPSEEK_PRO_API_KEY / DEEPSEEK_FLASH_API_KEY).
  * Read-only and additive; touches no existing brain.
+ *
+ * NOTE: folder name has NO leading underscore — a `_folder` is a Next.js
+ * "private folder" and is excluded from routing.
  */
 import { NextResponse } from "next/server";
 import { getClient, type Provider } from "@/lib/nvidia";
