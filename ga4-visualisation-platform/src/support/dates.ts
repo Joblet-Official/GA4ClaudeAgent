@@ -51,7 +51,9 @@ function endOfQuarter(d: Date): Date {
 
 /**
  * Resolve a single DateRange to absolute dates. Falls back to last_30_days if
- * input is null — matches Brain 3's documented default.
+ * input is null — this keeps Brain 2's draft queries valid, but per the
+ * timeline rule Brain 3 will pause and ASK the user rather than silently
+ * shipping this default (the fallback only ever feeds best-guess drafts).
  */
 export function resolveDateRange(
   dr: DateRange | null,

@@ -42,9 +42,11 @@ const CASES: Case[] = [
     expect: { acceptableStatuses: ["approved"] },
   },
   {
-    name: "no date specified — should default_applied or approved",
+    // TIMELINE RULE (user decision): a missing time window is never defaulted —
+    // Brain 3 must ask, exactly like an ambiguous metric.
+    name: "no date specified — should ASK the timeline",
     question: "sessions by country",
-    expect: { acceptableStatuses: ["default_applied", "approved"] },
+    expect: { acceptableStatuses: ["needs_clarification"], requiresQuestion: true },
   },
   {
     name: "ambiguous metric 'engagement' — should ask",
