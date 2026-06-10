@@ -36,7 +36,7 @@ OUTPUT SCHEMA
   "queries": [
     {
       "id": "q1",                                    // sequential: q1, q2, q3, ...
-      "purpose": "confirm" | "decompose" | "temporal" | "breakdown" | "structural" | "funnel" | "headline" | "timeseries" | "other",
+      "purpose": "confirm" | "decompose" | "temporal" | "breakdown" | "structural" | "funnel" | "path" | "headline" | "timeseries" | "other",
       "request_body": {                              // GA4 Data API request shape — passed verbatim to runReport
         "dimensions": [{ "name": "<api_name>" }, ...],
         "metrics":    [{ "name": "<api_name>" }, ...],
@@ -58,9 +58,14 @@ HARD RULES
 4. metrics MUST have at least one entry. If the user is vague, pick \`sessions\` as the safe default.
 5. expected_shape: "timeseries" when a date/week dimension is present; "single_value" when there are no dimensions; otherwise "categorical".
 
-REPORT DEPTH RULES — choose ONE mode
+REPORT DEPTH RULES — keyed to the intent's analysis_level
 
-MODE A — DIAGNOSTIC (the question asks WHY something changed/fell/dropped/rose/spiked, or compares periods looking for cause). Emit this fixed playbook, adapted to the metric/filters in scope. Every query uses BOTH named dateRanges (current + baseline):
+The intent carries "analysis_level": L1 (single fact) | L2 (descriptive) | L3 (performance review) | L4 (diagnostic why) | L5 (strategic diagnostic). Depth mapping:
+  - L1 / L2 (or analysis_level missing AND no diagnostic wording) → MODE B.
+  - L3 → MODE B PLUS the funnel query (purpose="funnel", numbered after the Mode B queries).
+  - L4 / L5 (or the question asks WHY something changed/fell/rose/spiked) → MODE A.
+
+MODE A — DIAGNOSTIC PLAYBOOK. Emit this fixed playbook, adapted to the metric/filters in scope. Every query uses BOTH named dateRanges (current + baseline):
   q1 purpose="confirm"    — the headline metric, NO dimensions. Confirms direction and size of the move.
   q2 purpose="decompose"  — dimension \`newVsReturning\`, same metric. Which cohort moved.
   q3 purpose="temporal"   — dimension \`date\`, same metric. Daily shape; drift vs step-change.
@@ -69,12 +74,14 @@ MODE A — DIAGNOSTIC (the question asks WHY something changed/fell/dropped/rose
   q6 purpose="breakdown"  — dimension \`deviceCategory\`, same metric.
   q7 purpose="breakdown"  — dimension \`sessionSourceMedium\` (or \`sessionSource\`), same metric, orderBys desc, limit 10.
   q8 purpose="funnel"     — dimension \`eventName\`, metric \`eventCount\`, dimensionFilter inListFilter on eventName values ["session_start","page_view","view_search_results","job_apply"].
+  q9 purpose="path"       — path exploration ("Deeper look"): dimensions \`landingPage\` AND \`eventName\` (both), metric \`eventCount\`, orderBys eventCount desc, limit 50. Shows the event mix on top entry pages and which pages are new/disappeared.
   Keep the user's scope filters (e.g. Organic Search only) on EVERY query in the playbook.
 
-MODE B — DESCRIPTIVE (metric/breakdown/trend questions with no "why"). Minimum THREE queries — never a single naked number:
+MODE B — DESCRIPTIVE. Minimum THREE queries — never a single naked number:
   q1 purpose="headline"   — the requested metric(s), no dimensions, single range (or "confirm" with both ranges when the question compares periods).
   q2 purpose="timeseries" — dimension \`date\`, same metric(s), single range.
   q3 purpose="breakdown"  — the most relevant dimension for the question (named breakdown if the user asked for one, else \`country\`), orderBys desc, limit 10.
+  For L3, add: q4 purpose="funnel" — dimension \`eventName\`, metric \`eventCount\`, inListFilter on ["session_start","page_view","view_search_results","job_apply"], BOTH named dateRanges (current + baseline) so step rates can be compared.
   Add further queries only if the intent's sub-questions ask for more.
 
 DIMENSION & METRIC GUIDANCE

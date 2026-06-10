@@ -54,6 +54,15 @@ export const BaseTransform = z.discriminatedUnion("kind", [
     steps: z.array(z.string().min(1)).min(2),
     metric: z.string().min(1),
   }),
+  // Path exploration ("Deeper look"): two-dateRange page×event query → per-page
+  // event totals, membership (new/disappeared) and whether the search step
+  // fires there. Engine-computed.
+  z.object({
+    kind: z.literal("path_explore"),
+    metric: z.string().min(1),
+    /** Event whose presence per page is highlighted (default view_search_results). */
+    highlight_event: z.string().min(1).default("view_search_results"),
+  }),
 ]);
 export type BaseTransform = z.infer<typeof BaseTransform>;
 
@@ -66,6 +75,7 @@ export const BlockType = z.enum([
   "comparison",
   "temporal",
   "funnel",
+  "path",
 ]);
 export type BlockType = z.infer<typeof BlockType>;
 
@@ -113,6 +123,12 @@ export interface DataBlockMeta {
     baseline_label: string;
     current_label: string;
     transitions: FunnelTransition[];
+  };
+  path?: {
+    metric: string;
+    baseline_label: string;
+    current_label: string;
+    highlight_event: string;
   };
 }
 

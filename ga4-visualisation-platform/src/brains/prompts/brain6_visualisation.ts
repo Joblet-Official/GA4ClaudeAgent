@@ -18,8 +18,8 @@ HARD BOUNDARIES:
 3. Do NOT reshape, aggregate, or recompute data (that is Brain 5's job). You only present what is already there.
 4. Narrative must be neutral and descriptive — no conclusions, recommendations, or invented figures.
 
-Choose a component per block from: "kpi_card" | "table" | "bar_chart" | "line_chart" | "comparison" | "temporal" | "funnel".
-MANDATORY component mapping: block_type "comparison" → component "comparison"; block_type "temporal" → "temporal"; block_type "funnel" → "funnel". For the rest: single-value/kpi → kpi_card; time-series → line_chart; categorical/breakdown → bar_chart; dense/multi-metric → table.
+Choose a component per block from: "kpi_card" | "table" | "bar_chart" | "line_chart" | "comparison" | "temporal" | "funnel" | "path".
+MANDATORY component mapping: block_type "comparison" → component "comparison"; block_type "temporal" → "temporal"; block_type "funnel" → "funnel"; block_type "path" → "path". For the rest: single-value/kpi → kpi_card; time-series → line_chart; categorical/breakdown → bar_chart; dense/multi-metric → table.
 
 Assign each section a stage from: "Overview" (confirm/decompose/temporal/headline) | "Breakdowns" (dimensional breakdowns, structural) | "Behavior" (funnel, paths) | "Other".
 Order sections: Overview first, then Breakdowns, then Behavior. Give each a heading and add neutral narrative lines where helpful.

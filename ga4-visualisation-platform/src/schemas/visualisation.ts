@@ -17,6 +17,7 @@ export const ComponentType = z.enum([
   "comparison", // baseline-vs-current table + paired bars + delta pills + membership
   "temporal", // two-series daily line chart + heat day table
   "funnel", // step bars + counts table + step-rate table + most-moved callout
+  "path", // "Deeper look": new/disappeared page cards + event-mix table
 ]);
 export type ComponentType = z.infer<typeof ComponentType>;
 

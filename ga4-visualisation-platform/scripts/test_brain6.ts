@@ -204,6 +204,39 @@ async function main() {
   check("tracking: provenance chips rendered", availHtml.includes("source: manual") && availHtml.includes("source: gtm_snapshot"));
   check("tracking: absent when no annotations", !goldHtml.includes("Data Quality / Tracking Availability"));
 
+  // 3d. Path component ("Deeper look") renders cards + table + deeper styling.
+  const pathBlocks: DataBlocksOutput = {
+    blocks: [
+      {
+        id: "p1",
+        title: "Deeper look — event mix on top entry pages",
+        block_type: "path",
+        source_query_ids: ["q9"],
+        purpose: "path",
+        columns: ["landingPage", "baseline", "current", "membership", "view_search_results"],
+        rows: [
+          { landingPage: "/jobs", baseline: 250, current: 351, membership: "both", view_search_results: "yes" },
+          { landingPage: "/about-us", baseline: 0, current: 90, membership: "new", view_search_results: "no" },
+          { landingPage: "/old-page", baseline: 40, current: 0, membership: "disappeared", view_search_results: "no" },
+        ],
+        derived_metric_names: [],
+        flags: [],
+        notes: [],
+        meta: { path: { metric: "eventCount", baseline_label: "baseline", current_label: "current", highlight_event: "view_search_results" } },
+      },
+    ],
+    summary_notes: [],
+  };
+  const pathSpec = defaultSpec(pathBlocks, "t");
+  check("path: defaultSpec picks 'path' component", pathSpec.sections[0]!.blocks[0]!.component === "path");
+  const pathHtml = renderReport(pathSpec, pathBlocks, "2026-06-10 18:00");
+  check("path: deeper section styling + tag", pathHtml.includes('class="deeper"') && pathHtml.includes("Deeper look"));
+  check("path: new/disappeared card columns", pathHtml.includes("New in current") && pathHtml.includes("Disappeared from baseline"));
+  check("path: page card with vsr badge", pathHtml.includes('class="page-path"') && pathHtml.includes("view_search_results: no"));
+  check("path: table marks /jobs vsr=yes", pathHtml.includes("<td>yes</td>"));
+  check("path: Behavior stage", pathHtml.includes(">Behavior<"));
+  check("path: caption names firing page", pathHtml.includes("fires on 1 entry page"));
+
   // 4. writeReport produces a file.
   const outDir = path.join(process.cwd(), "reports");
   const file = await writeReport(html, { outDir, slug: "brain6-test", stamp: "20260610T1530" });

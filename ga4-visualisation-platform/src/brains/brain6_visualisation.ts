@@ -181,6 +181,15 @@ table.report tbody tr.muted td{color:var(--muted);font-style:italic;}
 .chart-wrap svg{display:block;max-width:100%;height:auto;}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:4px 0 8px;}
 .legend .sw{display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:2px;vertical-align:middle;}
+section.deeper{border:1px solid #3730a3;border-top:4px solid #3730a3;border-radius:8px;padding:18px 22px;background:#f8fafc;}
+.cond-tag{background:#3730a3;color:#fff;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:999px;margin-left:10px;vertical-align:middle;}
+.path-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+.col-count{font-size:11px;font-weight:600;color:var(--muted);background:#fff;border:1px solid var(--rule);border-radius:999px;padding:1px 8px;margin-left:8px;}
+.page-card{border:1px solid var(--rule);border-radius:8px;padding:10px 12px;margin:0 0 10px;background:#fff;}
+.page-path{font-family:"SFMono-Regular",Consolas,monospace;font-size:12px;font-weight:600;color:var(--navy);word-break:break-all;margin-bottom:6px;}
+.vsr-badge{display:inline-block;font-size:10.5px;font-weight:600;letter-spacing:.04em;color:#1f2937;background:var(--neutral-bg);border:1px solid var(--neutral-line);border-radius:999px;padding:2px 9px;margin-bottom:6px;}
+.page-events{font-size:12px;color:var(--muted);}
+@media (max-width:760px){.path-cols{grid-template-columns:1fr;}}
 .kpi-row{display:flex;gap:18px;flex-wrap:wrap}
 .kpi{padding:10px 16px;border:1px solid var(--rule);border-radius:8px;min-width:120px;background:#fff}
 .kpi-val{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
@@ -439,6 +448,38 @@ function renderFunnel(block: DataBlock, periodLabels: { baseline: string; curren
   return bars + callout + counts + rates;
 }
 
+function renderPath(block: DataBlock, periodLabels: { baseline: string; current: string }): string {
+  const pageCol = block.columns[0] ?? "landingPage";
+  const highlight = block.meta?.path?.highlight_event ?? "view_search_results";
+  const card = (r: Record<string, string | number>) =>
+    `<div class="page-card"><div class="page-path">${esc(r[pageCol])}</div>` +
+    `<span class="vsr-badge">${esc(highlight)}: ${esc(r[highlight] ?? "no")}</span>` +
+    `<div class="page-events">total events ${fmt(num(r.current))} (${esc(periodLabels.current)}) · ${fmt(num(r.baseline))} (${esc(periodLabels.baseline)})</div></div>`;
+
+  const news = block.rows.filter((r) => String(r.membership) === "new").slice(0, 5);
+  const gone = block.rows.filter((r) => String(r.membership) === "disappeared").slice(0, 5);
+  const cols =
+    news.length || gone.length
+      ? `<div class="path-cols">
+<div><h4 class="sub-h">New in ${esc(periodLabels.current)} <span class="col-count">${news.length}</span></h4>${news.map(card).join("") || '<p class="caption">none</p>'}</div>
+<div><h4 class="sub-h">Disappeared from ${esc(periodLabels.baseline)} <span class="col-count">${gone.length}</span></h4>${gone.map(card).join("") || '<p class="caption">none</p>'}</div>
+</div>`
+      : "";
+
+  // Top pages table (event totals + highlight presence).
+  const top = block.rows.slice(0, 10);
+  const max = Math.max(0, ...top.map((r) => num(r.current)));
+  const body = top
+    .map(
+      (r) =>
+        `<tr><td>${esc(r[pageCol])}</td><td class="num">${fmt(num(r.baseline))}</td><td${heatStyle(num(r.current), max)}>${fmt(num(r.current))}</td><td>${memTag(r.membership)}</td><td>${esc(r[highlight] ?? "no")}</td></tr>`,
+    )
+    .join("");
+  const table = `<table class="report"><thead><tr><th>Entry page</th><th class="num">${esc(periodLabels.baseline)}</th><th class="num">${esc(periodLabels.current)}</th><th>Membership</th><th>${esc(highlight)}</th></tr></thead><tbody>${body}</tbody></table>`;
+
+  return cols + table;
+}
+
 // ---------------------------------------------------------------------------
 // Deterministic narrative: logic boxes + captions (values from block rows only)
 // ---------------------------------------------------------------------------
@@ -450,6 +491,7 @@ const LOGIC_TEXT: Record<string, string> = {
   breakdown: "Break the volume by this dimension to see whether the move concentrates or is broad-based.",
   structural: "Composition shift across the set between the two periods.",
   funnel: "Ordered domain funnel; step-to-step conversion rates show which step's rate moved between the two periods.",
+  path: "On the top entry pages, render the event mix and check whether the search event fires there.",
   headline: "Establish the headline value for the requested metric.",
   timeseries: "Plot the metric over time to show its shape across the period.",
   other: "Supporting view for the question.",
@@ -496,6 +538,16 @@ function caption(block: DataBlock, labels: { baseline: string; current: string }
   } else if (block.meta?.funnel) {
     const parts = block.rows.map((r) => `${String(r.step)} ${fmt(num(r.baseline))} to ${fmt(num(r.current))}`);
     text = `Funnel step counts (${labels.baseline} → ${labels.current}): ${parts.join(", ")}.`;
+  } else if (block.meta?.path) {
+    const pageCol = block.columns[0] ?? "page";
+    const highlight = block.meta.path.highlight_event;
+    const firing = block.rows.filter((r) => String(r[highlight]) === "yes").map((r) => String(r[pageCol]));
+    const news = block.rows.filter((r) => String(r.membership) === "new").length;
+    const gone = block.rows.filter((r) => String(r.membership) === "disappeared").length;
+    text = firing.length
+      ? `${highlight} fires on ${firing.length} entry page(s) in ${labels.current}: ${firing.slice(0, 3).join(", ")}.`
+      : `${highlight} fires on none of the top entry pages in ${labels.current}.`;
+    if (news || gone) text += ` Entry-page set shifted: ${news} new, ${gone} disappeared.`;
   } else if (block.rows.length > 0) {
     text = `${block.rows.length} row(s).`;
   } else {
@@ -552,6 +604,7 @@ const PURPOSE_STAGE: Record<string, StageName> = {
   breakdown: "Breakdowns",
   structural: "Breakdowns",
   funnel: "Behavior",
+  path: "Behavior",
   other: "Other",
 };
 
@@ -560,13 +613,14 @@ function stageOf(block: DataBlock): StageName {
   // grouping survives a dropped/missing purpose field.
   const byPurpose = block.purpose ? PURPOSE_STAGE[block.purpose] : undefined;
   if (byPurpose) return byPurpose;
-  if (block.meta?.funnel) return "Behavior";
+  if (block.meta?.funnel || block.meta?.path) return "Behavior";
   if (block.meta?.temporal) return "Overview";
   if (block.meta?.comparison) return block.meta.comparison.dimension ? "Breakdowns" : "Overview";
   return "Other";
 }
 
 function autoComponent(block: DataBlock): ComponentType {
+  if (block.meta?.path) return "path";
   if (block.meta?.funnel) return "funnel";
   if (block.meta?.temporal) return "temporal";
   if (block.meta?.comparison) return "comparison";
@@ -583,6 +637,8 @@ function autoComponent(block: DataBlock): ComponentType {
       return "temporal";
     case "funnel":
       return "funnel";
+    case "path":
+      return "path";
     default:
       return "bar_chart";
   }
@@ -631,6 +687,8 @@ function renderComponent(block: DataBlock, component: ComponentType, labels: { b
       return renderTemporal(block, labels);
     case "funnel":
       return renderFunnel(block, labels);
+    case "path":
+      return renderPath(block, labels);
     case "kpi_card":
       return renderKpiCard(block);
     case "bar_chart":
@@ -666,6 +724,8 @@ export function renderReport(
     ctx.push(`<span class="ctx"><span class="k">Period</span>${esc(period)}</span>`);
   }
   if (opts?.propertyId) ctx.push(`<span class="ctx"><span class="k">Property</span>GA4 ${esc(opts.propertyId)}</span>`);
+  const level = (opts?.intent as { analysis_level?: unknown } | undefined)?.analysis_level;
+  if (typeof level === "string") ctx.push(`<span class="ctx"><span class="k">Level</span>${esc(level)}</span>`);
   const scope = opts?.intent?.scope as { regions?: string[] | null; filters_hint?: string[] } | undefined;
   if (scope) {
     const parts: string[] = [];
@@ -701,8 +761,9 @@ export function renderReport(
         const notes = block.notes.length
           ? block.notes.map((n) => `<div class="callout neutral">${esc(n)}</div>`).join("")
           : "";
+        const isDeeper = !!block.meta?.path;
         return (
-          `<section id="${esc(block.id)}"><h3 class="block-title">${esc(block.title)}</h3>` +
+          `<section id="${esc(block.id)}"${isDeeper ? ' class="deeper"' : ""}><h3 class="block-title">${esc(block.title)}${isDeeper ? '<span class="cond-tag">Deeper look</span>' : ""}</h3>` +
           logicBox(block) +
           caption(block, labels) +
           renderComponent(block, sb.component, labels) +

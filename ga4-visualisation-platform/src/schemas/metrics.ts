@@ -63,6 +63,7 @@ export const QueryPurpose = z.enum([
   "breakdown", // dimensional breakdown (landing page / country / device / source)
   "structural", // composition shift (membership diff)
   "funnel", // ordered event funnel
+  "path", // path exploration: event mix on top entry pages (the "Deeper look")
   "headline", // single-period headline (descriptive reports)
   "timeseries", // single-period daily series
   "other",

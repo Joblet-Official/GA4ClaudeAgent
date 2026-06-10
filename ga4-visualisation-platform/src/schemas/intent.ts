@@ -68,8 +68,20 @@ export const Scope = z.object({
 });
 export type Scope = z.infer<typeof Scope>;
 
+/**
+ * Analysis depth (ported from the v5 agent architecture's Agent 1):
+ *   L1 single fact · L2 descriptive trend/breakdown · L3 performance
+ *   review/evaluation · L4 diagnostic (why did X change) · L5 strategic /
+ *   multi-factor diagnostic. Brain 2 keys report depth off this — L3 adds the
+ *   funnel, L4/L5 get the full RCA playbook incl. funnel + path exploration.
+ * OPTIONAL so pre-existing intent outputs remain valid.
+ */
+export const AnalysisLevel = z.enum(["L1", "L2", "L3", "L4", "L5"]);
+export type AnalysisLevel = z.infer<typeof AnalysisLevel>;
+
 export const IntentOutput = z.object({
   report_type: ReportType,
+  analysis_level: AnalysisLevel.optional(),
   sub_questions: z.array(SubQuestion).min(1),
   scope: Scope,
   is_followup: z.boolean(),

@@ -133,6 +133,9 @@ export function groundPlan(plan: DataHandlingPlanT, dataset: Dataset): PlanIssue
     } else if (t.kind === "funnel") {
       if (!dims.has(RANGE_DIM)) issues.push({ block_id: b.id, problem: `funnel requires two dateRanges in ${src.query_id}` });
       if (!mets.has(t.metric)) issues.push({ block_id: b.id, problem: `metric '${t.metric}' not in ${src.query_id}` });
+    } else if (t.kind === "path_explore") {
+      if (!dims.has(RANGE_DIM)) issues.push({ block_id: b.id, problem: `path_explore requires two dateRanges in ${src.query_id}` });
+      if (!mets.has(t.metric)) issues.push({ block_id: b.id, problem: `metric '${t.metric}' not in ${src.query_id}` });
     }
     for (const dm of b.derived_metrics) {
       for (const op of dm.operands) if (!mets.has(op)) issues.push({ block_id: b.id, problem: `derived operand '${op}' not in ${src.query_id}` });
@@ -329,6 +332,48 @@ function applyFunnel(
   return { columns: ["step", "baseline", "current"], rows, transitions };
 }
 
+/**
+ * path_explore: two-range page×event pivot → per-page event totals per range,
+ * membership, and whether the highlight event fires on that page (current).
+ */
+function applyPathExplore(
+  src: DataAccessQueryResult,
+  metric: string,
+  highlightEvent: string,
+): { columns: string[]; rows: Row[]; pageDim: string } {
+  const { current, baseline } = rangeLabels(src);
+  const eventDim = src.dimensionHeaders.includes("eventName") ? "eventName" : src.dimensionHeaders[1] ?? "eventName";
+  const pageDim = src.dimensionHeaders.find((d) => d !== RANGE_DIM && d !== eventDim) ?? "landingPage";
+
+  const pages = new Map<string, { baseline: number; current: number; highlight: boolean }>();
+  for (const row of src.rows) {
+    const page = String(row[pageDim] ?? "");
+    let slot = pages.get(page);
+    if (!slot) {
+      slot = { baseline: 0, current: 0, highlight: false };
+      pages.set(page, slot);
+    }
+    const v = num(row[metric]);
+    const range = String(row[RANGE_DIM] ?? "");
+    if (range === current) {
+      slot.current += v;
+      if (String(row[eventDim]) === highlightEvent && v > 0) slot.highlight = true;
+    } else if (range === baseline) {
+      slot.baseline += v;
+    }
+  }
+  const rows: Row[] = [...pages.entries()]
+    .map(([page, s]) => ({
+      [pageDim]: page,
+      baseline: s.baseline,
+      current: s.current,
+      membership: membershipOf(s.baseline, s.current),
+      [highlightEvent]: s.highlight ? "yes" : "no",
+    }))
+    .sort((a, b) => num(b.current) - num(a.current));
+  return { columns: [pageDim, "baseline", "current", "membership", highlightEvent], rows, pageDim };
+}
+
 function computeDerived(columns: string[], rows: Row[], derived: DerivedMetric[]): { columns: string[]; rows: Row[] } {
   if (!derived.length) return { columns, rows };
   const outCols = [...columns];
@@ -396,6 +441,19 @@ function buildBlock(b: BlockPlan, dataset: Dataset): DataBlock {
         baseline_label: labels.baseline,
         current_label: labels.current,
         transitions: f.transitions,
+      },
+    };
+  } else if (t.kind === "path_explore") {
+    const labels = rangeLabels(src);
+    const p = applyPathExplore(src, t.metric, t.highlight_event);
+    columns = p.columns;
+    rows = p.rows;
+    meta = {
+      path: {
+        metric: t.metric,
+        baseline_label: labels.baseline,
+        current_label: labels.current,
+        highlight_event: t.highlight_event,
       },
     };
   } else {
@@ -473,6 +531,31 @@ export function defaultShaping(dataset: Dataset): DataBlocksOutput {
           flags,
           notes,
           meta: { temporal: { metric, baseline_label: labels.baseline, current_label: labels.current } },
+        };
+      }
+
+      // path exploration: page × event pivot (two non-range dims incl. eventName)
+      if (d.purpose === "path" || (otherDims.length >= 2 && otherDims.includes("eventName"))) {
+        const p = applyPathExplore(d, metric, "view_search_results");
+        return {
+          id,
+          title: `Deeper look — event mix on top entry pages`,
+          block_type: "path" as const,
+          source_query_ids: [d.query_id],
+          purpose: d.purpose ?? "path",
+          columns: p.columns,
+          rows: p.rows,
+          derived_metric_names: [],
+          flags,
+          notes,
+          meta: {
+            path: {
+              metric,
+              baseline_label: labels.baseline,
+              current_label: labels.current,
+              highlight_event: "view_search_results",
+            },
+          },
         };
       }
 
@@ -766,10 +849,13 @@ export async function runBrain5DataHandling(input: Brain5Input): Promise<Brain5R
       if (!src || !hasRangeDim(src)) return false;
       if (!compareKinds.has(b.transform.kind)) return true;
       // Funnel-shaped sources (eventName × eventCount, or purpose=funnel) must
-      // get the funnel transform — a plain comparison loses step rates.
-      const otherDim = src.dimensionHeaders.find((d) => d !== RANGE_DIM);
+      // get the funnel transform — a plain comparison loses step rates. Same
+      // logic for path-shaped sources (page × event pivots).
+      const otherDims = src.dimensionHeaders.filter((d) => d !== RANGE_DIM);
+      const isPathSrc = src.purpose === "path" || (otherDims.length >= 2 && otherDims.includes("eventName"));
+      if (isPathSrc) return b.transform.kind !== "path_explore";
       const isFunnelSrc =
-        src.purpose === "funnel" || (otherDim === "eventName" && src.metricHeaders[0]?.name === "eventCount");
+        src.purpose === "funnel" || (otherDims[0] === "eventName" && src.metricHeaders[0]?.name === "eventCount");
       return isFunnelSrc && b.transform.kind !== "funnel";
     });
     if (inadequate) {

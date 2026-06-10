@@ -24,6 +24,7 @@ Available per-block transforms (the engine knows these):
   - {"kind":"compare_by","dimension":D_or_null,"metric":M}   TWO-dateRange pivot: baseline/current/Δ/membership per key (null dimension = the total)
   - {"kind":"temporal_compare","metric":M}                   TWO-dateRange daily series aligned by day-of-month
   - {"kind":"funnel","steps":[E1,E2,...],"metric":"eventCount"}  ordered event funnel + step-to-step rates
+  - {"kind":"path_explore","metric":"eventCount","highlight_event":"view_search_results"}  TWO-dateRange page×event pivot: per-page event totals, membership, highlight-event presence
 Optional per-block derived_metrics (computed from two EXISTING metrics):
   {"name":NAME,"op":"ratio|percent|difference|sum","operands":[M1,M2]}
 

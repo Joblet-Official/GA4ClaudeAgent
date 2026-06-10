@@ -204,6 +204,36 @@ async function main() {
   const tmpBlk = gold.blocks[2]!;
   check("temporal block aligned by day", tmpBlk.block_type === "temporal" && tmpBlk.rows.length === 2 && Number(tmpBlk.rows[0]!.baseline) === 4 && Number(tmpBlk.rows[0]!.current) === 153, JSON.stringify(tmpBlk.rows));
 
+  // 3c. path_explore: page × event pivot with highlight-event detection.
+  const pathDataset: Dataset = [
+    {
+      query_id: "q9",
+      expected_shape: "categorical",
+      purpose: "path",
+      dimensionHeaders: ["dateRange", "landingPage", "eventName"],
+      metricHeaders: [{ name: "eventCount", type: "TYPE_INTEGER" }],
+      rows: [
+        { dateRange: "current", landingPage: "/jobs", eventName: "view_search_results", eventCount: 51 },
+        { dateRange: "current", landingPage: "/jobs", eventName: "page_view", eventCount: 300 },
+        { dateRange: "baseline", landingPage: "/jobs", eventName: "page_view", eventCount: 250 },
+        { dateRange: "current", landingPage: "/about-us", eventName: "page_view", eventCount: 90 },
+        { dateRange: "baseline", landingPage: "/old-page", eventName: "page_view", eventCount: 40 },
+      ],
+      rowCount: 5,
+      metadata: { sampled: false, dataLossFromOtherRow: false },
+    },
+  ];
+  const pathOut = defaultShaping(pathDataset);
+  const pathBlk = pathOut.blocks[0]!;
+  check("path: block_type=path with meta.path", pathBlk.block_type === "path" && !!pathBlk.meta?.path);
+  const jobs = pathBlk.rows.find((r) => r.landingPage === "/jobs");
+  const about = pathBlk.rows.find((r) => r.landingPage === "/about-us");
+  const old = pathBlk.rows.find((r) => r.landingPage === "/old-page");
+  check("path: /jobs totals 351 current / 250 baseline, vsr=yes",
+    !!jobs && Number(jobs.current) === 351 && Number(jobs.baseline) === 250 && jobs.view_search_results === "yes", JSON.stringify(jobs));
+  check("path: /about-us membership=new, vsr=no", !!about && about.membership === "new" && about.view_search_results === "no");
+  check("path: /old-page membership=disappeared", !!old && old.membership === "disappeared");
+
   const funBlk = gold.blocks[3]!;
   check("funnel block ordered steps", funBlk.block_type === "funnel" && String(funBlk.rows[0]!.step) === "session_start" && String(funBlk.rows[2]!.step) === "view_search_results");
   const trans = funBlk.meta?.funnel?.transitions ?? [];
