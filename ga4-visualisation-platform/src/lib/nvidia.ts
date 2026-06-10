@@ -125,7 +125,12 @@ export function getClient(brain?: string, override?: GetClientOverride): BrainCl
   const provider = override?.provider ?? pickProvider(brain);
   const cfg = PROVIDERS[provider];
   const model = override?.model ?? pickModel(provider, brain);
-  const timeoutMs = override?.timeoutMs ?? 25_000;
+  // DeepSeek v4 (reasoning) on NVIDIA is slow + highly variable (Pro 47s–120s+).
+  // The 25s default — fine for Groq/Cerebras/NVIDIA-llama — would abort every
+  // DeepSeek call mid-flight, so DeepSeek providers get a much larger default.
+  // An explicit override (e.g. the escalation/orchestrator layers) still wins.
+  const isDeepSeek = provider === "deepseek_pro" || provider === "deepseek_flash";
+  const timeoutMs = override?.timeoutMs ?? (isDeepSeek ? 150_000 : 25_000);
 
   // Cache key includes provider/model/timeout so an escalated Pro client never
   // collides with the Flash client for the same brain.

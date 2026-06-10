@@ -38,8 +38,11 @@ export interface BrainRoute {
   fallbackModel?: string;
 }
 
-export const DEEPSEEK_PRO_MODEL = "deepseek-ai/deepseek-v4-pro";
-export const DEEPSEEK_FLASH_MODEL = "deepseek-ai/deepseek-v4-flash";
+// Model ids are host-specific (NVIDIA gateway: "deepseek-ai/..."; official
+// DeepSeek API: bare ids). Env wins so a host switch is config-only; the NVIDIA
+// ids remain the fallback.
+export const DEEPSEEK_PRO_MODEL = process.env.DEEPSEEK_PRO_MODEL || "deepseek-ai/deepseek-v4-pro";
+export const DEEPSEEK_FLASH_MODEL = process.env.DEEPSEEK_FLASH_MODEL || "deepseek-ai/deepseek-v4-flash";
 
 export const BRAIN_ROUTING: Record<BrainName, BrainRoute> = {
   orchestrator: { provider: "deepseek_pro", model: DEEPSEEK_PRO_MODEL, escalate: false },
