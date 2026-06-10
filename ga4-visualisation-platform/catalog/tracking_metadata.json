@@ -1,0 +1,623 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-20T12:31:20.026873+00:00",
+  "source": {
+    "gtm_snapshot": "gtm_snapshot.latest.json",
+    "ga4_catalog": "ga4_catalog.json"
+  },
+  "limitations": [
+    "GTM's API exposes no creation date; deployed_on requires manual seeding (precision 'exact').",
+    "Removal dates are only bracketed by snapshot diffs; deactivated_on requires manual seeding.",
+    "Snapshot history begins 2026-05-20 — nothing before it is automatically verifiable."
+  ],
+  "tags": [
+    {
+      "tag_name": "Apply Start Google Ads",
+      "tag_type": "awct",
+      "events": [],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-04-24",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-04-24",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "APPLY_TAG",
+      "tag_type": "gaawe",
+      "events": [],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-04-24",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-04-24",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "booking a consult option",
+      "tag_type": "gaawe",
+      "events": [
+        "book_a_consult"
+      ],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-02-25",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-02-25",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "chatbot_interaction",
+      "tag_type": "gaawe",
+      "events": [
+        "chatbot_interaction"
+      ],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-02-13",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-02-13",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "Conversion Linker",
+      "tag_type": "gclidw",
+      "events": [],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-03-23",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-03-23",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "GA4 - Blog Scroll",
+      "tag_type": "gaawe",
+      "events": [
+        "blog_scroll_60"
+      ],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-01-08",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-01-08",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "GA4 - Search Button Click",
+      "tag_type": "gaawe",
+      "events": [
+        "search_button_click"
+      ],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-01-21",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-01-21",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "Gigs-page-tag",
+      "tag_type": "gaawe",
+      "events": [
+        "gigs_submissions"
+      ],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-05-06",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-05-06",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "google ads",
+      "tag_type": "sp",
+      "events": [],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-02-09",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-02-09",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "Google Analytics GA4 Event",
+      "tag_type": "gaawe",
+      "events": [
+        "job_apply"
+      ],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-01-08",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-01-08",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "Google Tag",
+      "tag_type": "googtag",
+      "events": [],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-02-09",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-02-09",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "Google Tag 1",
+      "tag_type": "googtag",
+      "events": [],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-01-07",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-01-07",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "Google Tag AW-17797388504",
+      "tag_type": "googtag",
+      "events": [],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-02-09",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-02-09",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "JD_VIEW_TAG",
+      "tag_type": "gaawe",
+      "events": [],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-04-24",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-04-24",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "Job View Google Ads",
+      "tag_type": "awct",
+      "events": [],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-04-24",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-04-24",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "k&b_submissions",
+      "tag_type": "gaawe",
+      "events": [
+        "k&b_submissions"
+      ],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-04-15",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-04-15",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "Mouseflow",
+      "tag_type": "html",
+      "events": [],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-02-04",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-02-04",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "plan chose",
+      "tag_type": "gaawe",
+      "events": [],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-02-25",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-02-25",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "Share Open",
+      "tag_type": "gaawe",
+      "events": [
+        "share_open"
+      ],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-05-11",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-05-11",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "Share-GA4",
+      "tag_type": "gaawe",
+      "events": [
+        "share"
+      ],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-05-11",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-05-11",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    },
+    {
+      "tag_name": "Sign-In Click Events",
+      "tag_type": "gaawe",
+      "events": [
+        "sign_in_click"
+      ],
+      "availability": {
+        "deployed_on": null,
+        "deployed_on_precision": "unknown",
+        "first_observed": "2026-01-12",
+        "deactivated_on": null,
+        "deactivated_on_precision": "unknown",
+        "last_observed": "2026-05-20",
+        "paused": false,
+        "provenance": "gtm_snapshot"
+      },
+      "ownership": {
+        "owner": null,
+        "team": null,
+        "contact": null
+      },
+      "deployment_notes": [],
+      "change_history": [
+        {
+          "date": "2026-01-12",
+          "change": "last modified (GTM fingerprint)",
+          "source": "gtm_fingerprint"
+        }
+      ]
+    }
+  ]
+}

@@ -721,6 +721,27 @@ export function renderReport(
     .map((st) => `<h2 class="stage-head">${esc(st)}</h2>` + byStage.get(st)!.join(""))
     .join("");
 
+  // --- data quality / tracking availability (deterministic, registry-driven) ---
+  let availabilityHtml = "";
+  if (blocks.availability?.length) {
+    const items = blocks.availability
+      .map((a) => {
+        const chips =
+          `<span class="mem-tag">${esc(a.status === "not_covered" ? "unavailable" : "unverified")}</span> ` +
+          `<span class="mem-tag">tag: ${esc(a.tag_name)}</span> ` +
+          `<span class="mem-tag">event: ${esc(a.events.join(", "))}</span> ` +
+          `<span class="mem-tag">source: ${esc(a.provenance)}</span>`;
+        return `<div class="callout neutral">${esc(a.message)}<div style="margin-top:6px">${chips}</div></div>`;
+      })
+      .join("");
+    availabilityHtml =
+      `<h2 class="stage-head">Data Quality / Tracking Availability</h2>` +
+      `<section id="tracking-availability">` +
+      `<p class="caption">The queries below reference events whose GTM tags have known or unverifiable availability gaps for the requested period. Affected blocks carry a tracking flag; values shown there reflect only the period the tag was actually live.</p>` +
+      items +
+      `</section>`;
+  }
+
   // --- notes & caveats ---
   const notes: string[] = [];
   if (premise?.contradicted) notes.push(`<div class="callout neutral"><strong>premise vs data</strong> — ${esc(premise.text)}</div>`);
@@ -749,7 +770,7 @@ export function renderReport(
 <div class="context-strip">${ctx.join("")}</div>
 ${premiseCallout}
 </header>
-<main>${stageHtml}${notesHtml}</main>
+<main>${stageHtml}${availabilityHtml}${notesHtml}</main>
 </body></html>`;
 }
 

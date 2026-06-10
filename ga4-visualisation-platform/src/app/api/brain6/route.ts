@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     }
 
     const b4 = await runBrain4DataAccess({ approvedQueries: b3.output.approved_queries, intent: b1.output, catalog });
-    const b5 = await runBrain5DataHandling({ dataset: b4.dataset, intent: b1.output });
+    const b5 = await runBrain5DataHandling({ dataset: b4.dataset, intent: b1.output, approvedQueries: b3.output.approved_queries });
     const periods = (b3.output.approved_queries[0]?.request_body.dateRanges ?? []) as Array<{
       startDate: string;
       endDate: string;

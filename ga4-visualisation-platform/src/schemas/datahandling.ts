@@ -136,7 +136,20 @@ export interface DataBlock {
   meta?: DataBlockMeta;
 }
 
+/** Tracking-availability finding attached by Brain 5's deterministic analysis. */
+export interface TrackingAvailabilityNote {
+  tag_name: string;
+  events: string[];
+  query_ids: string[];
+  status: "not_covered" | "unverified";
+  message: string;
+  provenance: string;
+}
+
 export interface DataBlocksOutput {
   blocks: DataBlock[];
   summary_notes: string[];
+  /** Present when the approved queries referenced GTM-tagged events with
+   * availability gaps for the requested range (engine-computed). */
+  availability?: TrackingAvailabilityNote[];
 }

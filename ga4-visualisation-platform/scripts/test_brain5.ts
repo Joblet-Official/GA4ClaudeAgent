@@ -19,8 +19,14 @@ import {
   defaultShaping,
   groundPlan,
   runBrain5DataHandling,
+  attachTrackingAvailability,
 } from "@/brains/brain5_datahandling";
 import { DataHandlingPlan } from "@/schemas/datahandling";
+import type { Query } from "@/schemas/metrics";
+import {
+  analyzeTrackingAvailability,
+  type TrackingRegistry,
+} from "@/support/tracking/availability";
 
 const dataset: Dataset = [
   {
@@ -221,6 +227,116 @@ async function main() {
   const mobile = findRow(aggOut.blocks[0]!.rows, "deviceCategory", "mobile");
   check("aggregate_by sums mobile sessions = 12 (5 + 7)", !!mobile && Number(mobile!.sessions) === 12, JSON.stringify(mobile));
   check("aggregate_by yields 2 device rows", aggOut.blocks[0]!.rows.length === 2);
+
+  // 5. Tracking availability — three-state analysis with a synthetic registry.
+  const registry: TrackingRegistry = {
+    schema_version: 1,
+    generated_at: "2026-06-10",
+    limitations: [],
+    tags: [
+      {
+        tag_name: "GA4 - Blog Scroll",
+        tag_type: "gaawe",
+        events: ["blog_scroll_60"],
+        availability: {
+          deployed_on: "2026-03-15",
+          deployed_on_precision: "exact",
+          first_observed: "2026-03-15",
+          deactivated_on: "2026-05-10",
+          deactivated_on_precision: "exact",
+          last_observed: "2026-05-10",
+          provenance: "manual",
+        },
+        ownership: { owner: null, team: null, contact: null },
+        deployment_notes: [],
+        change_history: [],
+      },
+      {
+        tag_name: "Share Open",
+        tag_type: "gaawe",
+        events: ["share_open"],
+        availability: {
+          deployed_on: null,
+          deployed_on_precision: "unknown",
+          first_observed: "2026-05-11",
+          deactivated_on: null,
+          deactivated_on_precision: "unknown",
+          last_observed: "2026-05-20",
+          provenance: "gtm_snapshot",
+        },
+        ownership: { owner: null, team: null, contact: null },
+        deployment_notes: [],
+        change_history: [],
+      },
+    ],
+  };
+  const availQueries: Query[] = [
+    {
+      id: "q1",
+      expected_shape: "categorical",
+      request_body: {
+        dimensions: [{ name: "eventName" }],
+        metrics: [{ name: "eventCount" }],
+        dateRanges: [{ startDate: "2026-01-01", endDate: "2026-06-30" }],
+        dimensionFilter: {
+          filter: { fieldName: "eventName", inListFilter: { values: ["blog_scroll_60", "session_start"] } },
+        },
+      },
+    },
+    {
+      id: "q2",
+      expected_shape: "single_value",
+      request_body: {
+        dimensions: [],
+        metrics: [{ name: "eventCount" }],
+        dateRanges: [{ startDate: "2026-04-01", endDate: "2026-04-30" }],
+        dimensionFilter: { filter: { fieldName: "eventName", stringFilter: { value: "share_open" } } },
+      },
+    },
+    {
+      id: "q3",
+      expected_shape: "single_value",
+      request_body: {
+        dimensions: [],
+        metrics: [{ name: "sessions" }],
+        dateRanges: [{ startDate: "2026-01-01", endDate: "2026-06-30" }],
+      },
+    },
+  ];
+  const anns = analyzeTrackingAvailability(availQueries, registry);
+  check("availability: q1 'before deployed' definitive finding (user-example wording)",
+    anns.some((a) => a.message === 'Data before 2026-03-15 is unavailable because tag "GA4 - Blog Scroll" had not yet been deployed.'),
+    JSON.stringify(anns.map((a) => a.message)));
+  check("availability: q1 'after deactivated' definitive finding",
+    anns.some((a) => a.message === 'Data after 2026-05-10 is unavailable because tag "GA4 - Blog Scroll" was no longer active.'));
+  check("availability: q2 unverified (no known deployment date, range before first_observed)",
+    anns.some((a) => a.status === "unverified" && a.tag_name === "Share Open" && a.message.includes("cannot be verified")));
+  check("availability: built-in event (session_start) produces no annotation",
+    !anns.some((a) => a.events.includes("session_start")));
+  check("availability: q3 (no event reference) produces no annotation",
+    !anns.some((a) => a.query_ids.includes("q3")));
+  check("availability: not_covered sorted before unverified",
+    anns.length >= 2 && anns[0]!.status === "not_covered" && anns[anns.length - 1]!.status === "unverified");
+
+  // 6. attachTrackingAvailability — flags + notes land on affected blocks only.
+  const availDataset: Dataset = availQueries.map((q) => ({
+    query_id: q.id,
+    expected_shape: q.expected_shape,
+    dimensionHeaders: q.request_body.dimensions.map((d) => d.name),
+    metricHeaders: q.request_body.metrics.map((m) => ({ name: m.name, type: "TYPE_INTEGER" })),
+    rows: [],
+    rowCount: 0,
+    metadata: { sampled: false, dataLossFromOtherRow: false },
+  }));
+  const shaped = attachTrackingAvailability(defaultShaping(availDataset), availQueries, registry);
+  const b1blk = shaped.blocks.find((b) => b.source_query_ids.includes("q1"))!;
+  const b2blk = shaped.blocks.find((b) => b.source_query_ids.includes("q2"))!;
+  const b3blk = shaped.blocks.find((b) => b.source_query_ids.includes("q3"))!;
+  check("attach: q1 block flagged tracking_unavailable_partial", b1blk.flags.includes("tracking_unavailable_partial"));
+  check("attach: q1 block carries the templated note", b1blk.notes.some((n) => n.includes("had not yet been deployed")));
+  check("attach: q2 block flagged tracking_unverified", b2blk.flags.includes("tracking_unverified"));
+  check("attach: q3 block untouched", !b3blk.flags.some((f) => f.startsWith("tracking_")) && b3blk.notes.length === 0);
+  check("attach: top-level availability array present", (shaped.availability?.length ?? 0) >= 3);
 
   console.log("\n" + "-".repeat(70));
   console.log(`Deterministic engine: ${pass} pass / ${fail} fail`);

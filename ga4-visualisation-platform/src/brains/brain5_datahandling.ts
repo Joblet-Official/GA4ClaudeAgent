@@ -22,7 +22,12 @@ import { getClient, type Provider } from "@/lib/nvidia";
 import { routeFor } from "@/lib/modelRouting";
 import { withEscalation } from "@/lib/escalate";
 import type { IntentOutput } from "@/schemas/intent";
+import type { Query } from "@/schemas/metrics";
 import type { Dataset, DataAccessQueryResult } from "@/brains/brain4_dataaccess";
+import {
+  analyzeTrackingAvailability,
+  type TrackingRegistry,
+} from "@/support/tracking/availability";
 import {
   DataHandlingPlan,
   type DataHandlingPlan as DataHandlingPlanT,
@@ -62,6 +67,13 @@ export interface Brain5Input {
   dataset: Dataset;
   /** Brain 1 intent — context for titling/ordering blocks. */
   intent?: IntentOutput;
+  /**
+   * Brain 3's approved queries (OPTIONAL, additive) — needed only for the
+   * tracking-availability analysis, which compares each query's requested
+   * dateRanges against the GTM tag windows in the tracking registry. When
+   * absent, behaviour is identical to before.
+   */
+  approvedQueries?: Query[];
 }
 
 export class Brain5PlanError extends Error {
@@ -533,6 +545,54 @@ export function defaultShaping(dataset: Dataset): DataBlocksOutput {
 }
 
 // ---------------------------------------------------------------------------
+// Tracking availability (deterministic; metadata analysis only)
+// ---------------------------------------------------------------------------
+
+/**
+ * Annotate the shaped output with tracking-availability findings: top-level
+ * `availability` array + per-block flags and templated notes on every block
+ * sourced from an affected query. Pure — registry injectable for tests.
+ */
+export function attachTrackingAvailability(
+  output: DataBlocksOutput,
+  approvedQueries: Query[],
+  registry?: TrackingRegistry,
+): DataBlocksOutput {
+  const annotations = registry
+    ? analyzeTrackingAvailability(approvedQueries, registry)
+    : analyzeTrackingAvailability(approvedQueries);
+  if (!annotations.length) return output;
+
+  const affected = new Map<string, Set<string>>(); // query_id → set of messages
+  const statusByQuery = new Map<string, "not_covered" | "unverified">();
+  for (const a of annotations) {
+    for (const qid of a.query_ids) {
+      if (!affected.has(qid)) affected.set(qid, new Set());
+      affected.get(qid)!.add(a.message);
+      // not_covered outranks unverified for the flag
+      if (a.status === "not_covered" || !statusByQuery.has(qid)) statusByQuery.set(qid, a.status);
+    }
+  }
+
+  for (const b of output.blocks) {
+    const msgs = new Set<string>();
+    let worst: "not_covered" | "unverified" | undefined;
+    for (const qid of b.source_query_ids) {
+      for (const m of affected.get(qid) ?? []) msgs.add(m);
+      const s = statusByQuery.get(qid);
+      if (s === "not_covered" || (s && !worst)) worst = s;
+    }
+    if (!msgs.size) continue;
+    const flag = worst === "not_covered" ? "tracking_unavailable_partial" : "tracking_unverified";
+    if (!b.flags.includes(flag)) b.flags.push(flag);
+    for (const m of msgs) if (!b.notes.includes(m)) b.notes.push(m);
+  }
+
+  output.availability = annotations;
+  return output;
+}
+
+// ---------------------------------------------------------------------------
 // LLM plan path (Flash → Pro)
 // ---------------------------------------------------------------------------
 
@@ -727,6 +787,15 @@ export async function runBrain5DataHandling(input: Brain5Input): Promise<Brain5R
   } else {
     output = defaultShaping(input.dataset);
     source = "deterministic_default";
+  }
+
+  // Tracking availability — deterministic metadata analysis (never blocks).
+  if (input.approvedQueries?.length) {
+    try {
+      output = attachTrackingAvailability(output, input.approvedQueries);
+    } catch {
+      /* registry unreadable → skip annotation rather than fail the report */
+    }
   }
 
   return {

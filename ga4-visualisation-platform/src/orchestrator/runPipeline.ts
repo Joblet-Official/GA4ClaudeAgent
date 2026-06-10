@@ -173,7 +173,11 @@ export async function runPipeline(
       deps.dataAccess({ approvedQueries: b3.output.approved_queries, intent: b1.output, catalog }),
     );
     const b5 = await orch.runStage("brain5", () =>
-      deps.dataHandling({ dataset: b4.dataset, intent: b1.output }),
+      deps.dataHandling({
+        dataset: b4.dataset,
+        intent: b1.output,
+        approvedQueries: b3.output.approved_queries,
+      }),
     );
     // Context for the gold-standard report header: the user's question, the
     // resolved date windows from the approved plan, and the GA4 property id.

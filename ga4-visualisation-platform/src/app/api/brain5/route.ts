@@ -61,7 +61,7 @@ export async function POST(req: Request) {
       catalog,
     });
 
-    const b5 = await runBrain5DataHandling({ dataset: b4.dataset, intent: b1.output });
+    const b5 = await runBrain5DataHandling({ dataset: b4.dataset, intent: b1.output, approvedQueries: b3.output.approved_queries });
 
     return NextResponse.json({
       ok: true,

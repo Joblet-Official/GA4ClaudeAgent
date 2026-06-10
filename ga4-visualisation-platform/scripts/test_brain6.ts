@@ -175,6 +175,35 @@ async function main() {
   check("gold: caption with computed numbers", goldHtml.includes("rose from 640") && goldHtml.includes("1,177"));
   check("gold: Notes & caveats section", goldHtml.includes("Notes &amp; caveats"));
 
+  // 3c. Tracking-availability section renders when annotations are present.
+  const availBlocks: DataBlocksOutput = {
+    ...goldBlocks,
+    availability: [
+      {
+        tag_name: "GA4 - Blog Scroll",
+        events: ["blog_scroll_60"],
+        query_ids: ["q1"],
+        status: "not_covered",
+        message: 'Data before 2026-03-15 is unavailable because tag "GA4 - Blog Scroll" had not yet been deployed.',
+        provenance: "manual",
+      },
+      {
+        tag_name: "Share Open",
+        events: ["share_open"],
+        query_ids: ["q2"],
+        status: "unverified",
+        message: 'Tag "Share Open" has no known deployment date; data completeness before 2026-05-11 (first observed) cannot be verified.',
+        provenance: "gtm_snapshot",
+      },
+    ],
+  };
+  const availHtml = renderReport(defaultSpec(availBlocks, "t"), availBlocks, "2026-06-10 16:30");
+  check("tracking: section heading rendered", availHtml.includes("Data Quality / Tracking Availability"));
+  check("tracking: definitive message rendered", availHtml.includes("had not yet been deployed"));
+  check("tracking: unverified message rendered", availHtml.includes("cannot be verified"));
+  check("tracking: provenance chips rendered", availHtml.includes("source: manual") && availHtml.includes("source: gtm_snapshot"));
+  check("tracking: absent when no annotations", !goldHtml.includes("Data Quality / Tracking Availability"));
+
   // 4. writeReport produces a file.
   const outDir = path.join(process.cwd(), "reports");
   const file = await writeReport(html, { outDir, slug: "brain6-test", stamp: "20260610T1530" });
