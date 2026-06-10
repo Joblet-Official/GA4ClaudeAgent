@@ -31,7 +31,7 @@ type Check = Record<string, unknown> & { check: string; pass: boolean };
 async function authJsonCheck(provider: Provider): Promise<Check> {
   const t0 = Date.now();
   try {
-    const { client, model } = getClient(undefined, { provider, timeoutMs: 8_000 });
+    const { client, model } = getClient(undefined, { provider, timeoutMs: 50_000 });
     const r = await client.chat.completions.create({
       model,
       messages: [
@@ -69,11 +69,16 @@ async function rawFetchCheck(provider: "deepseek_pro" | "deepseek_flash"): Promi
     return { check: `rawfetch: ${provider}`, pass: false, error: `missing ${isPro ? "DEEPSEEK_PRO_API_KEY" : "DEEPSEEK_FLASH_API_KEY"}` };
   }
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 9_000);
+  const timer = setTimeout(() => ctrl.abort(), 120_000); // pro is slow+variable (47s–75s+ solo); no function cap on localhost
   try {
+    // ROOT CAUSE: deepseek-v4-pro/flash on NVIDIA are reasoning models that HANG
+    // on a non-streamed request (the gateway buffers the full reasoning trace and
+    // never returns). They respond correctly only with stream:true. So we stream
+    // and accumulate the content deltas. (response_format json_object is dropped —
+    // the prompt alone yields valid JSON, and it isn't needed under streaming.)
     const res = await fetch(base + "/chat/completions", {
       method: "POST",
-      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json", Accept: "text/event-stream" },
       body: JSON.stringify({
         model,
         messages: [
@@ -82,14 +87,22 @@ async function rawFetchCheck(provider: "deepseek_pro" | "deepseek_flash"): Promi
         ],
         max_tokens: 256,
         temperature: 0,
-        response_format: { type: "json_object" },
+        stream: true,
       }),
       signal: ctrl.signal,
     });
-    const text = await res.text();
-    let outer: unknown = null;
-    try { outer = JSON.parse(text); } catch { /* ignore */ }
-    const content = (outer as { choices?: Array<{ message?: { content?: string } }> })?.choices?.[0]?.message?.content ?? "";
+    const raw = await res.text();
+    let content = "";
+    for (const line of raw.split("\n")) {
+      const s = line.trim();
+      if (!s.startsWith("data:")) continue;
+      const payload = s.slice(5).trim();
+      if (payload === "[DONE]") break;
+      try {
+        const j = JSON.parse(payload) as { choices?: Array<{ delta?: { content?: string } }> };
+        content += j?.choices?.[0]?.delta?.content ?? "";
+      } catch { /* ignore keepalive / partial frames */ }
+    }
     let inner: unknown = null;
     try { inner = JSON.parse(content); } catch { /* ignore */ }
     const pass = res.status === 200 && (inner as { ok?: unknown })?.ok === true;
@@ -112,7 +125,7 @@ async function rawModelCheck(label: string, model: string): Promise<Check> {
   const key = process.env.DEEPSEEK_PRO_API_KEY;
   if (!key) return { check: label, pass: false, error: "missing DEEPSEEK_PRO_API_KEY" };
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 9_000);
+  const timer = setTimeout(() => ctrl.abort(), 120_000); // pro is slow+variable (47s–75s+ solo); no function cap on localhost
   try {
     const res = await fetch(base + "/chat/completions", {
       method: "POST",
@@ -183,13 +196,13 @@ async function orchestratorCheck(): Promise<Check> {
 }
 
 export async function GET() {
-  // Run the three network (LLM) checks IN PARALLEL so total latency ≈ the slowest
-  // single call, not the sum — keeps the endpoint under the Hobby 10s limit.
-  const [rawPro, rawFlash, rawLlama] = await Promise.all([
-    rawFetchCheck("deepseek_pro"),
-    rawFetchCheck("deepseek_flash"),
-    rawModelCheck("nvidia baseline: llama-3.3-70b", "meta/llama-3.3-70b-instruct"),
-  ]);
+  // SEQUENTIAL, not parallel: deepseek-v4 on NVIDIA has a low concurrency limit —
+  // firing pro+flash together makes them queue and balloon (10s solo -> 80s+
+  // concurrent). Run them one at a time. The llama baseline is a separate fast
+  // model, run last. (This means total latency ≈ pro ~47s + flash ~10s.)
+  const rawPro = await rawFetchCheck("deepseek_pro");
+  const rawFlash = await rawFetchCheck("deepseek_flash");
+  const rawLlama = await rawModelCheck("nvidia baseline: llama-3.3-70b", "meta/llama-3.3-70b-instruct");
   // The remaining checks are pure logic (no network) and instant.
   const checks: Check[] = [
     rawPro,
