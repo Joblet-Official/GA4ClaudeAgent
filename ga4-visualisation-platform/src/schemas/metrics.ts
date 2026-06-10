@@ -52,10 +52,28 @@ export type RequestBody = z.infer<typeof RequestBody>;
 export const ExpectedShape = z.enum(["categorical", "timeseries", "single_value"]);
 export type ExpectedShape = z.infer<typeof ExpectedShape>;
 
+/**
+ * What role a query plays in the report (drives Brain 5 shaping + Brain 6
+ * section order). OPTIONAL — older outputs without it remain valid.
+ */
+export const QueryPurpose = z.enum([
+  "confirm", // headline metric, current vs baseline
+  "decompose", // new-vs-returning (or similar) cohort split
+  "temporal", // daily series, current vs baseline
+  "breakdown", // dimensional breakdown (landing page / country / device / source)
+  "structural", // composition shift (membership diff)
+  "funnel", // ordered event funnel
+  "headline", // single-period headline (descriptive reports)
+  "timeseries", // single-period daily series
+  "other",
+]);
+export type QueryPurpose = z.infer<typeof QueryPurpose>;
+
 export const Query = z.object({
   id: z.string().regex(/^q\d+$/, "query id must look like q1, q2, ..."),
   request_body: RequestBody,
   expected_shape: ExpectedShape,
+  purpose: QueryPurpose.optional(),
 });
 export type Query = z.infer<typeof Query>;
 

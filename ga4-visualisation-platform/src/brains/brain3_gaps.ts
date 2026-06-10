@@ -15,7 +15,9 @@ import { BRAIN3_SYSTEM_PROMPT } from "@/brains/prompts/brain3_gaps";
 
 const BRAIN_KEY = "brain3";
 const TEMPERATURE = 0.1;
-const MAX_TOKENS = 2000;
+// Reasoning models think inside max_tokens — and Brain 3 must re-emit the full
+// approved_queries array (large for diagnostic playbooks). Generous budget.
+const MAX_TOKENS = 8000;
 
 export interface BrainTiming {
   ttft_ms: number;

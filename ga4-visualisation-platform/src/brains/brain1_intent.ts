@@ -23,7 +23,10 @@ import { BRAIN1_SYSTEM_PROMPT } from "@/brains/prompts/brain1_intent";
 const BRAIN_KEY = "brain1";
 
 const TEMPERATURE = 0.1;
-const MAX_TOKENS = 800;
+// DeepSeek v4 (reasoning) spends its thinking tokens INSIDE max_tokens; 800
+// starved complex questions into empty responses (finish_reason=length with
+// zero content). 4000 leaves room for reasoning + the JSON.
+const MAX_TOKENS = 4000;
 
 export interface BrainTiming {
   ttft_ms: number;     // time-to-first-token of the winning attempt

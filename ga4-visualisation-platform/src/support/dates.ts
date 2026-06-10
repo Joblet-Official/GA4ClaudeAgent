@@ -121,3 +121,26 @@ export function comparisonDefaults(today: Date = new Date()): [ResolvedDateRange
     { ...resolveRelative("last_week", today), name: "previous" },
   ];
 }
+
+/**
+ * Equal-length period immediately preceding `range` — the baseline window for
+ * comparison/diagnostic queries. If `range` is exactly a calendar month, the
+ * baseline is the previous calendar month (matches analyst expectation: May vs
+ * April, not May vs a 31-day offset window).
+ */
+export function previousPeriod(range: ResolvedDateRange): ResolvedDateRange {
+  const start = new Date(range.startDate + "T00:00:00Z");
+  const end = new Date(range.endDate + "T00:00:00Z");
+
+  const isMonthStart = start.getUTCDate() === 1;
+  const isMonthEnd = fmt(endOfMonth(start)) === range.endDate;
+  if (isMonthStart && isMonthEnd) {
+    const prevEnd = offsetDays(start, -1);
+    return { startDate: fmt(startOfMonth(prevEnd)), endDate: fmt(prevEnd), name: "baseline" };
+  }
+
+  const days = Math.round((end.getTime() - start.getTime()) / 86_400_000) + 1;
+  const prevEnd = offsetDays(start, -1);
+  const prevStart = offsetDays(prevEnd, -(days - 1));
+  return { startDate: fmt(prevStart), endDate: fmt(prevEnd), name: "baseline" };
+}

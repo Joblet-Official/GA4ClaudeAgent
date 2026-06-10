@@ -22,11 +22,12 @@ import {
 } from "@/schemas/metrics";
 import { buildBrain2SystemPrompt } from "@/brains/prompts/brain2_metrics";
 import type { Catalog } from "@/support/catalog/loadCatalog";
-import { resolveDateRange, comparisonDefaults } from "@/support/dates";
+import { resolveDateRange, comparisonDefaults, previousPeriod } from "@/support/dates";
 import { validateAgainstCatalog, type CatalogValidationIssue } from "@/orchestrator/validate";
 
 const TEMPERATURE = 0.1;
-const MAX_TOKENS = 1600;
+// Diagnostic playbooks emit ~8 queries (~3-4k tokens of JSON); 1600 truncated them.
+const MAX_TOKENS = 6000;
 
 export interface BrainTiming {
   ttft_ms: number;
@@ -74,17 +75,22 @@ export interface Brain2Input {
 function buildUserPrompt(input: Brain2Input): string {
   const today = (input.today ?? new Date()).toISOString().slice(0, 10);
 
-  // Resolve dates in code so the LLM doesn't have to.
+  // Resolve dates in code so the LLM doesn't have to. ALWAYS provide both the
+  // current window and the equal-length baseline window: diagnostic playbooks
+  // and confirm-style queries need both, and the LLM must never do date math.
   let dateBlock: string;
   if (input.intent.report_type === "comparison" && input.intent.scope.dateRange == null) {
     const [curr, prev] = comparisonDefaults(input.today);
     dateBlock =
       `Resolved comparison windows (use BOTH in dateRanges):\n` +
       `  current:  { startDate: "${curr.startDate}", endDate: "${curr.endDate}", name: "current" }\n` +
-      `  previous: { startDate: "${prev.startDate}", endDate: "${prev.endDate}", name: "previous" }`;
+      `  baseline: { startDate: "${prev.startDate}", endDate: "${prev.endDate}", name: "baseline" }`;
   } else {
     const r = resolveDateRange(input.intent.scope.dateRange, input.today);
-    dateBlock = `Resolved date range: { startDate: "${r.startDate}", endDate: "${r.endDate}" }`;
+    const base = previousPeriod(r);
+    dateBlock =
+      `Resolved current window: { startDate: "${r.startDate}", endDate: "${r.endDate}", name: "current" }\n` +
+      `Equal-length baseline window (for comparison/diagnostic queries): { startDate: "${base.startDate}", endDate: "${base.endDate}", name: "baseline" }`;
   }
 
   return `Today's date (UTC): ${today}

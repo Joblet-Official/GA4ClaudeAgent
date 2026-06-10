@@ -213,6 +213,7 @@ export default function RunPage() {
           <a href="/brain2" className="text-neutral-500 hover:text-neutral-300">Brain 2</a>
           <a href="/brain3" className="text-neutral-500 hover:text-neutral-300">Brain 3</a>
           <span className="text-neutral-200 font-medium">Run (full pipeline)</span>
+          <a href="/orchestrate" className="text-neutral-500 hover:text-neutral-300">Orchestrate (B1→B6)</a>
         </nav>
         <h1 className="text-2xl font-semibold">Run — full pipeline with GA4 data</h1>
         <p className="text-sm text-neutral-400 mt-1">

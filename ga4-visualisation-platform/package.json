@@ -10,6 +10,10 @@
     "test:brain2": "tsx --env-file=.env.local scripts/test_brain2.ts",
     "test:brain3": "tsx --env-file=.env.local scripts/test_brain3.ts",
     "test:brain3:isolated": "tsx --env-file=.env.local scripts/test_brain3_isolated.ts",
+    "test:brain4": "tsx --env-file=.env.local scripts/test_brain4.ts",
+    "test:brain5": "tsx --env-file=.env.local scripts/test_brain5.ts",
+    "test:brain6": "tsx --env-file=.env.local scripts/test_brain6.ts",
+    "test:orchestrator": "tsx --env-file=.env.local scripts/test_orchestrator.ts",
     "test:tool": "tsx --env-file=.env.local scripts/test_tool_layer.ts",
     "refresh:catalog": "python scripts/refresh_catalog.py",
     "typecheck": "tsc --noEmit"
