@@ -1,5 +1,17 @@
 # Brains on Claude Fable (`claude-fable-5`) — migration record (2026-06-11)
 
+> **STATUS UPDATE (2026-06-11, same day): ACTIVE ROUTING REVERTED TO DEEPSEEK
+> by user directive.** `src/lib/modelRouting.ts` is restored to the DeepSeek
+> canonical map (byte-identical to commit `0e54882`) and `.env.local`'s
+> provider vars are back to `deepseek_pro`/`deepseek_flash` (verified against
+> the pre-switch backup). Everything below the routing layer is RETAINED as an
+> inert opt-in capability: the `fable` provider in `nvidia.ts`, the
+> `anthropicChat.ts` adapter, the `npm run test:fable` suite (route checks now
+> assert the DeepSeek canonical map), and the `@anthropic-ai/sdk` dependency.
+> To use Fable for any brain: set `ANTHROPIC_API_KEY` and
+> `LLM_PROVIDER_<BRAIN>=fable` — no code changes. The sections below document
+> the adapter as built; read "canonical/active" claims as historical.
+
 User directive: rebuild the brains on the Fable model while preserving the
 B1–B6 architecture **exactly** as implemented. This document records what
 changed, and — per the directive — only the changes that Fable compatibility

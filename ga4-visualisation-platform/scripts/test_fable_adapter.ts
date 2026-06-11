@@ -208,12 +208,14 @@ async function part4() {
   check("fable client exposes the brains' call surface",
     typeof (bc.client as unknown as AnthropicChatClient).chat?.completions?.create === "function");
 
+  // Canonical routing is DeepSeek (reverted 2026-06-11); fable is an inert
+  // opt-in provider reached via env (LLM_PROVIDER_<BRAIN>=fable) or override.
   const r4 = routeFor("brain4");
-  check("canonical route brain4 → fable with escalation preserved",
-    r4.provider === "fable" && r4.escalate === true && r4.fallbackProvider === "fable");
+  check("canonical route brain4 → deepseek_flash → deepseek_pro (escalation preserved)",
+    r4.provider === "deepseek_flash" && r4.escalate === true && r4.fallbackProvider === "deepseek_pro");
   const r1 = routeFor("brain1");
-  check("canonical route brain1 → fable (no escalation, as before)",
-    r1.provider === "fable" && r1.escalate === false);
+  check("canonical route brain1 → deepseek_pro (no escalation, as before)",
+    r1.provider === "deepseek_pro" && r1.escalate === false);
   clearClientCache();
 }
 
