@@ -62,8 +62,8 @@ REPORT DEPTH RULES — keyed to the intent's analysis_level
 
 The intent carries "analysis_level": L1 (single fact) | L2 (descriptive) | L3 (performance review) | L4 (diagnostic why) | L5 (strategic diagnostic). Depth mapping:
   - L1 / L2 (or analysis_level missing AND no diagnostic wording) → MODE B.
-  - L3 → MODE B PLUS the funnel query (purpose="funnel", numbered after the Mode B queries).
-  - L4 / L5 (or the question asks WHY something changed/fell/rose/spiked) → MODE A.
+  - L3 → MODE A WITHOUT q9 — emit q1–q8 of the playbook exactly (confirm, decompose, temporal, all four breakdowns, funnel), every query with BOTH named dateRanges. A performance review gets the same assessment-grade evidence as a diagnostic; only the path-exploration "Deeper look" (q9) is reserved for L4/L5.
+  - L4 / L5 (or the question asks WHY something changed/fell/rose/spiked) → MODE A (all of q1–q9).
 
 MODE A — DIAGNOSTIC PLAYBOOK. Emit this fixed playbook, adapted to the metric/filters in scope. Every query uses BOTH named dateRanges (current + baseline):
   q1 purpose="confirm"    — the headline metric, NO dimensions. Confirms direction and size of the move.
@@ -74,14 +74,13 @@ MODE A — DIAGNOSTIC PLAYBOOK. Emit this fixed playbook, adapted to the metric/
   q6 purpose="breakdown"  — dimension \`deviceCategory\`, same metric.
   q7 purpose="breakdown"  — dimension \`sessionSourceMedium\` (or \`sessionSource\`), same metric, orderBys desc, limit 10.
   q8 purpose="funnel"     — dimension \`eventName\`, metric \`eventCount\`, dimensionFilter inListFilter on eventName values ["session_start","page_view","view_search_results","job_apply"].
-  q9 purpose="path"       — path exploration ("Deeper look"): dimensions \`landingPage\` AND \`eventName\` (both), metric \`eventCount\`, orderBys eventCount desc, limit 50. Shows the event mix on top entry pages and which pages are new/disappeared.
+  q9 purpose="path"       — L4/L5 ONLY (omit for L3) — path exploration ("Deeper look"): dimensions \`landingPage\` AND \`eventName\` (both), metric \`eventCount\`, orderBys eventCount desc, limit 50. Shows the event mix on top entry pages and which pages are new/disappeared.
   Keep the user's scope filters (e.g. Organic Search only) on EVERY query in the playbook.
 
 MODE B — DESCRIPTIVE. Minimum THREE queries — never a single naked number:
   q1 purpose="headline"   — the requested metric(s), no dimensions, single range (or "confirm" with both ranges when the question compares periods).
   q2 purpose="timeseries" — dimension \`date\`, same metric(s), single range.
   q3 purpose="breakdown"  — the most relevant dimension for the question (named breakdown if the user asked for one, else \`country\`), orderBys desc, limit 10.
-  For L3, add: q4 purpose="funnel" — dimension \`eventName\`, metric \`eventCount\`, inListFilter on ["session_start","page_view","view_search_results","job_apply"], BOTH named dateRanges (current + baseline) so step rates can be compared.
   Add further queries only if the intent's sub-questions ask for more.
 
 DIMENSION & METRIC GUIDANCE
