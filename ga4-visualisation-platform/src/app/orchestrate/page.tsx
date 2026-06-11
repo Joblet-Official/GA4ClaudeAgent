@@ -43,6 +43,8 @@ interface CompleteResp {
   ok: true;
   status: "complete";
   report_path: string;
+  /** Inline report HTML — opened as a Blob so it works on Vercel's read-only FS. */
+  report_html?: string;
   brain4: { source: string; reconciled: boolean };
   brain5: { source: string; blocks: number };
   brain6: { source: string; sections: number };
@@ -317,7 +319,19 @@ export default function OrchestratePage() {
               B6: {result.brain6.source} · {result.brain6.sections} section{result.brain6.sections === 1 ? "" : "s"}
             </span>
           </div>
-          {reportFile && (
+          {result.report_html ? (
+            <button
+              onClick={() => {
+                // Blob URL: renders the report without any server file read —
+                // required on Vercel, where the /tmp report file is per-instance.
+                const url = URL.createObjectURL(new Blob([result.report_html!], { type: "text/html" }));
+                window.open(url, "_blank", "noreferrer");
+              }}
+              className="inline-block bg-green-700 hover:bg-green-600 text-white text-sm font-medium px-4 py-2 rounded-md"
+            >
+              Open report ↗
+            </button>
+          ) : reportFile ? (
             <a
               href={`/api/reports/${encodeURIComponent(reportFile)}`}
               target="_blank"
@@ -326,7 +340,7 @@ export default function OrchestratePage() {
             >
               Open report ↗
             </a>
-          )}
+          ) : null}
           <div className="text-xs text-neutral-500 mt-3 font-mono break-all">{result.report_path}</div>
         </section>
       )}

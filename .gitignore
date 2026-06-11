@@ -38,7 +38,9 @@ _ga4_q1.json
 
 # Generated outputs - keep this repo source-only
 # (HTML reports, smoke/demo outputs, generated .docx)
-reports/
+# generated report archives only — NOT src/app/api/reports (the serving route)
+/reports/
+ga4-visualisation-platform/reports/
 *.docx
 
 # Vercel

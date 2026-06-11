@@ -1031,7 +1031,12 @@ export async function writeReport(
   html: string,
   opts?: { outDir?: string; slug?: string; stamp?: string },
 ): Promise<string> {
-  const outDir = opts?.outDir ?? path.join(process.cwd(), "reports");
+  // Vercel's serverless filesystem is read-only except /tmp — write there in
+  // production (best-effort, per-instance); locally ./reports stays the
+  // persistent archive. The orchestrate API also returns the HTML inline, so
+  // the UI never depends on this file surviving across instances.
+  const outDir =
+    opts?.outDir ?? (process.env.VERCEL ? "/tmp/reports" : path.join(process.cwd(), "reports"));
   const stamp = opts?.stamp ?? new Date().toISOString().replace(/[:.]/g, "").slice(0, 15);
   const slug = slugify(opts?.slug ?? "report");
   await fs.mkdir(outDir, { recursive: true });

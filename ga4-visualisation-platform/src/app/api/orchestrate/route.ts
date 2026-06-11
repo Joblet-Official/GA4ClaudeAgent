@@ -43,10 +43,29 @@ export async function POST(req: Request) {
 
     const reportPath = await writeReport(result.brain6!.html, { slug: question });
 
+    // Structured one-line run summary → Vercel runtime logs (server-side
+    // observability: question, outcome, provider + timing per stage).
+    console.log(
+      "[orchestrate]",
+      JSON.stringify({
+        question,
+        status: "complete",
+        stages: result.orchestrator.stages.map((s) => ({
+          brain: s.brain,
+          status: s.status,
+          provider: s.provider,
+          ms: s.ms,
+        })),
+      }),
+    );
+
     return NextResponse.json({
       ok: true,
       status: "complete",
       report_path: reportPath,
+      // Inline HTML — the UI opens this as a Blob, so reports work on Vercel's
+      // read-only filesystem (the /tmp file is per-instance best-effort only).
+      report_html: result.brain6!.html,
       brain4: { source: result.brain4!.source, reconciled: result.brain4!.reconciliation.reconciled },
       brain5: { source: result.brain5!.source, blocks: result.brain5!.output.blocks.length },
       brain6: { source: result.brain6!.source, sections: result.brain6!.spec.sections.length },
@@ -54,6 +73,15 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     if (err instanceof PipelineError) {
+      console.log(
+        "[orchestrate]",
+        JSON.stringify({
+          question,
+          status: "failed",
+          error: err.message,
+          failed_stage: err.state.stages.find((s) => s.status === "failed")?.brain ?? null,
+        }),
+      );
       const status = err.causeName === "Brain4BaselineError" ? 502 : 500;
       return NextResponse.json(
         { ok: false, error: err.message, name: err.causeName, orchestrator: err.state },
