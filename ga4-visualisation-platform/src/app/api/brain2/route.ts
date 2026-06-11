@@ -21,7 +21,7 @@ import { IntentOutput, type IntentOutput as IntentOutputT } from "@/schemas/inte
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 // Vercel Pro tier max. Brain 2 p95 ~3.5s; combined B1+B2 p95 ~4.5s. Plenty of headroom.
-export const maxDuration = 60;
+export const maxDuration = 300; // Vercel Pro ceiling — L3/L4 pipelines run 2-3+ min
 
 interface PipelineBody {
   question: string;

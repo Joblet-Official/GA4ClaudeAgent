@@ -18,7 +18,7 @@ import { loadCatalog } from "@/support/catalog/loadCatalog";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 300; // Vercel Pro ceiling — L3/L4 pipelines run 2-3+ min
 
 export async function POST(req: Request) {
   let body: unknown;

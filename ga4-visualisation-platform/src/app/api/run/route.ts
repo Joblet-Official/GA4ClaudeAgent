@@ -24,7 +24,7 @@ import type { Query } from "@/schemas/metrics";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 300; // Vercel Pro ceiling — L3/L4 pipelines run 2-3+ min
 
 interface BrainPanel {
   output: unknown;
