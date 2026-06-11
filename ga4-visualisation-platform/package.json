@@ -16,9 +16,11 @@
     "test:orchestrator": "tsx --env-file=.env.local scripts/test_orchestrator.ts",
     "test:tool": "tsx --env-file=.env.local scripts/test_tool_layer.ts",
     "refresh:catalog": "python scripts/refresh_catalog.py",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:fable": "tsx --env-file=.env.local scripts/test_fable_adapter.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
     "@google-analytics/data": "^6.0.0",
     "next": "^15.1.3",
     "openai": "^4.77.0",

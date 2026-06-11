@@ -27,3 +27,6 @@ next-env.d.ts
 # editor
 .vscode/
 .idea/
+
+# env backups (secrets) — never commit
+.env.local.bak*

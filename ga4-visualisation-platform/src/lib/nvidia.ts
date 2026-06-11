@@ -24,6 +24,7 @@
  * Hardened defaults on every client: maxRetries: 0, timeout: 25_000ms.
  */
 import OpenAI from "openai";
+import { AnthropicChatClient } from "@/lib/anthropicChat";
 
 export type Provider =
   | "nvidia"
@@ -32,7 +33,8 @@ export type Provider =
   | "together"
   | "gemini"
   | "deepseek_pro"
-  | "deepseek_flash";
+  | "deepseek_flash"
+  | "fable";
 
 interface ProviderConfig {
   baseURL: string;
@@ -81,6 +83,16 @@ const PROVIDERS: Record<Provider, ProviderConfig> = {
     defaultModel: process.env.DEEPSEEK_FLASH_MODEL || "deepseek-ai/deepseek-v4-flash",
     apiKeyEnv: "DEEPSEEK_FLASH_API_KEY",
   },
+  // Claude Fable via the OFFICIAL Anthropic API (@anthropic-ai/sdk), not an
+  // OpenAI-compatible shim — there is none for Anthropic. getClient() returns
+  // an AnthropicChatClient (lib/anthropicChat.ts) exposing the exact
+  // chat.completions.create subset the brains use, so brain code is unchanged.
+  // Model id + base URL are env-overridable like every other provider.
+  fable: {
+    baseURL: process.env.ANTHROPIC_BASE_URL || "https://api.anthropic.com",
+    defaultModel: process.env.FABLE_MODEL || "claude-fable-5",
+    apiKeyEnv: "ANTHROPIC_API_KEY",
+  },
 };
 
 function pickProvider(brain?: string): Provider {
@@ -128,9 +140,11 @@ export function getClient(brain?: string, override?: GetClientOverride): BrainCl
   // DeepSeek v4 (reasoning) on NVIDIA is slow + highly variable (Pro 47s–120s+).
   // The 25s default — fine for Groq/Cerebras/NVIDIA-llama — would abort every
   // DeepSeek call mid-flight, so DeepSeek providers get a much larger default.
-  // An explicit override (e.g. the escalation/orchestrator layers) still wins.
-  const isDeepSeek = provider === "deepseek_pro" || provider === "deepseek_flash";
-  const timeoutMs = override?.timeoutMs ?? (isDeepSeek ? 150_000 : 25_000);
+  // Fable gets the same headroom: B2/B6 prompts are large and L4 spec calls run
+  // long. An explicit override (e.g. the escalation/orchestrator layers) still wins.
+  const isLongHaul =
+    provider === "deepseek_pro" || provider === "deepseek_flash" || provider === "fable";
+  const timeoutMs = override?.timeoutMs ?? (isLongHaul ? 150_000 : 25_000);
 
   // Cache key includes provider/model/timeout so an escalated Pro client never
   // collides with the Flash client for the same brain.
@@ -145,12 +159,24 @@ export function getClient(brain?: string, override?: GetClientOverride): BrainCl
     );
   }
 
-  const client = new OpenAI({
-    apiKey,
-    baseURL: cfg.baseURL,
-    maxRetries: 0,
-    timeout: timeoutMs,
-  });
+  // Anthropic is not OpenAI-compatible; the fable provider constructs the
+  // official-SDK adapter instead. It implements the exact call subset the
+  // brains use (catalogued in lib/anthropicChat.ts), so the BrainClient shape
+  // — and therefore every brain — stays unchanged. The cast is confined to
+  // this single construction point.
+  const client =
+    provider === "fable"
+      ? (new AnthropicChatClient({
+          apiKey,
+          baseURL: cfg.baseURL,
+          timeoutMs,
+        }) as unknown as OpenAI)
+      : new OpenAI({
+          apiKey,
+          baseURL: cfg.baseURL,
+          maxRetries: 0,
+          timeout: timeoutMs,
+        });
 
   const out: BrainClient = { client, model, provider };
   clientCache.set(cacheKey, out);
